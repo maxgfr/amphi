@@ -4,7 +4,7 @@ import { useLive } from "../data/hooks.ts";
 import { count, dateOnly, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { Icon } from "../ui/icons.tsx";
-import { Empty, Tabs } from "../ui/kit.tsx";
+import { Empty, Notice, saveFile, Tabs } from "../ui/kit.tsx";
 import { CourseForm } from "./course-form.tsx";
 import { SourceList } from "./sources.tsx";
 
@@ -18,6 +18,8 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
   const { t } = useLang();
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const data = useLive(
     async () => {
       const course = await get("courses", id);
@@ -63,6 +65,26 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
           <span aria-hidden="true">{course.emoji || (course.kind === "topic" ? "🧭" : "📘")}</span> {course.title}
         </h1>
         <div className="row">
+          <button
+            type="button"
+            className="secondary"
+            disabled={sending}
+            title={t("A .cursus-course file with the sources, reports and flashcards, to import in Cursus", "Un fichier .cursus-course avec les sources, rapports et cartes, à importer dans Cursus", "Eine .cursus-course-Datei mit den Quellen, Berichten und Karten, zum Import in Cursus")}
+            onClick={async () => {
+              setSending(true);
+              setSendError("");
+              try {
+                const file = await (await import("../export/cursus.ts")).courseToCursus(id);
+                saveFile(file.blob, file.filename);
+              } catch (e) {
+                setSendError(e instanceof Error ? e.message : String(e));
+              } finally {
+                setSending(false);
+              }
+            }}
+          >
+            <Icon name="send" size={18} /> {t("Send to Cursus", "Envoyer vers Cursus", "An Cursus senden")}
+          </button>
           <button type="button" className="secondary" onClick={() => setEditing(true)}>
             <Icon name="edit" size={18} /> {t("Edit", "Modifier", "Bearbeiten")}
           </button>
@@ -84,6 +106,7 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
           )}
         </div>
       </div>
+      {sendError ? <Notice kind="error">{sendError}</Notice> : null}
       {course.examDate ? <p className="meta">{t("Exam", "Examen", "Prüfung")}: {dateOnly(new Date(course.examDate).getTime())}</p> : null}
       <Tabs tabs={tabs} value={current} onChange={(k) => go(href.course(id, k))} label={t("Course sections", "Sections du cours", "Kursbereiche")} />
       <div className="tab-panel" role="tabpanel">

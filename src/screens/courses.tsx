@@ -4,6 +4,7 @@ import { useLive } from "../data/hooks.ts";
 import type { Course } from "../data/schema.ts";
 import { count, dateOnly, type T, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
+import { daysUntil } from "../learn/next.ts";
 import { courseHue } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty } from "../ui/kit.tsx";
@@ -22,12 +23,6 @@ export async function courseSummaries(): Promise<CourseSummary[]> {
   return courses
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .map((course) => ({ course, lessons: count(lessons, course.id), sources: count(sources, course.id), artifacts: count(artifacts, course.id) }));
-}
-
-/** Days from today to a YYYY-MM-DD date (negative once past). */
-export function daysUntil(date: string, now = new Date()): number {
-  const [y, m, d] = date.split("-").map(Number);
-  return Math.round((new Date(y!, m! - 1, d!).getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86_400_000);
 }
 
 export function examLabel(date: string, t: T): string {
@@ -56,10 +51,10 @@ export function Binder({ rows }: { rows: CourseSummary[] }) {
   return (
     <ol className="binder">
       {rows.map(({ course, lessons, sources, artifacts }) => (
-        <li key={course.id} data-hue={courseHue(course.id)}>
+        <li key={course.id} data-hue={courseHue(course)}>
           <a className="binder-link" href={href.course(course.id)}>
             <span className="binder-tab">
-              <span aria-hidden="true">{course.emoji || (course.kind === "topic" ? "🧭" : "📘")}</span>
+              {course.emoji ? <span aria-hidden="true">{course.emoji}</span> : null}
               <span>{course.title}</span>
             </span>
             <span className="binder-body">

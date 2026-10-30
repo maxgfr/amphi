@@ -80,7 +80,7 @@ export function RecordScreen({ courseId, lessonId }: { courseId: string; lessonI
             : t("Ready to record", "Prêt à enregistrer", "Bereit zur Aufnahme");
 
   return (
-    <div className="page narrow" data-hue={courseHue(course.id)}>
+    <div className="page narrow" data-hue={courseHue(course)}>
       <header className="divider soft">
         <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
           <a className="crumb-course" href={href.course(course.id)}>

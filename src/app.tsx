@@ -148,7 +148,7 @@ function RailCourses() {
   return (
     <ul className="rail-courses">
       {courses.map((c) => (
-        <li key={c.id} data-hue={courseHue(c.id)}>
+        <li key={c.id} data-hue={courseHue(c)}>
           <a href={href.course(c.id)} className={c.id === open ? "open" : undefined} aria-current={c.id === open ? "true" : undefined}>
             <span className="rail-tab" aria-hidden="true" />
             <span>{c.title}</span>

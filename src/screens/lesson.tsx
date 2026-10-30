@@ -40,7 +40,7 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
   const { lesson, course, sources } = data;
   const current: Tab = (["sources", "studio", "chat"] as const).includes(tab as Tab) ? (tab as Tab) : "sources";
   return (
-    <div className="page" data-hue={courseHue(course.id)}>
+    <div className="page" data-hue={courseHue(course)}>
       <header className="divider soft">
         <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
           <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>

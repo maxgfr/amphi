@@ -46,7 +46,7 @@ export function ArtifactScreen({ id }: { id: string }) {
   const View = k?.View;
   return (
     // An export error ("render the video first") goes away with the next click, before that click's own handler runs.
-    <div className="page" data-hue={courseHue(course.id)} onClickCapture={() => setError("")}>
+    <div className="page" data-hue={courseHue(course)} onClickCapture={() => setError("")}>
       <header className="divider soft">
         <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
           <a className="crumb-course" href={href.course(course.id, "studio")}>

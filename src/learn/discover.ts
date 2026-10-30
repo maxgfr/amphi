@@ -11,11 +11,12 @@ import { webSearchTools } from "llm-connect";
 import { z } from "zod";
 import { ask, type AskResult, capabilities, writeIn } from "../ai/llm.ts";
 import { askJson } from "../ai/structured.ts";
-import { fresh, put } from "../data/db.ts";
+import { fresh, list, put } from "../data/db.ts";
 import { addNote } from "../data/importers.ts";
 import type { Artifact, Course } from "../data/schema.ts";
 import { colon, trIn } from "../i18n.ts";
 import type { MindmapData } from "../studio/render/mindmap-tree.ts";
+import { freeHue } from "../ui/hue.ts";
 import { conceptRecords, conceptTree, RawConcept } from "./concepts.ts";
 
 export type Level = "beginner" | "intermediate" | "advanced";
@@ -189,7 +190,7 @@ export function proposalNote(p: Proposal, language: string): string {
 
 /** The topic, its chosen sources as notes, its concepts and their mind map. */
 export async function createTopic(input: DiscoverInput, map: TopicMap, chosen: readonly Proposal[]): Promise<Course> {
-  const course = await put("courses", { ...fresh(), kind: "topic", title: map.title, language: input.language, goal: input.goal, level: input.level });
+  const course = await put("courses", { ...fresh(), kind: "topic", title: map.title, hue: freeHue(await list("courses")), language: input.language, goal: input.goal, level: input.level });
   const where = { courseId: course.id };
   for (const p of chosen) await addNote(where, p.title, proposalNote(p, input.language), p.url && p.status !== "unsourced" ? { kind: "web", url: p.url } : {});
   const concepts = conceptRecords(map.concepts, course.id);

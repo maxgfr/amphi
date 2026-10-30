@@ -63,7 +63,7 @@ export function Today() {
           const d = describe(first, t);
           const course = courseOf(first);
           return (
-            <section className="next" data-hue={course ? courseHue(course.id) : undefined} aria-label={t("Next step", "Prochaine étape", "Nächster Schritt")}>
+            <section className="next" data-hue={course ? courseHue(course) : undefined} aria-label={t("Next step", "Prochaine étape", "Nächster Schritt")}>
               <Icon name={d.icon} size={24} />
               <p className="next-text">
                 {course ? <span className="next-course">{course.title}</span> : null}
@@ -87,7 +87,7 @@ export function Today() {
             const d = describe(s, t);
             const course = courseOf(s);
             return (
-              <li key={`${s.kind}-${s.sourceId ?? s.lessonId ?? s.courseId ?? s.conceptId}`} className="list-item" data-hue={course ? courseHue(course.id) : undefined}>
+              <li key={`${s.kind}-${s.sourceId ?? s.lessonId ?? s.courseId ?? s.conceptId}`} className="list-item" data-hue={course ? courseHue(course) : undefined}>
                 <a className="list-link" href={d.to}>
                   {course ? <span className="step-tab" aria-hidden="true" /> : <Icon name={d.icon} />}
                   <span className="list-main">{d.text}</span>

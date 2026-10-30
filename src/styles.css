@@ -663,6 +663,9 @@ main:focus-visible {
   gap: var(--space-2);
   flex-wrap: wrap;
 }
+.row.top {
+  align-items: flex-start;
+}
 .row.end {
   justify-content: flex-end;
 }
@@ -1124,6 +1127,60 @@ textarea {
   text-align: center;
   font-size: var(--fs-title);
 }
+/* The seven divider colours as swatches; the chosen one is ringed in ink. */
+.hues {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.hues legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+.hue-swatch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: var(--radius);
+  background: var(--course);
+  cursor: pointer;
+}
+.hue-swatch input {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: inherit;
+  cursor: pointer;
+}
+.hue-swatch input:checked {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink);
+}
+.hue-swatch input:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--on-course);
+}
+.hue-swatch input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
 .choices {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1456,7 +1513,7 @@ textarea {
   gap: var(--space-2);
   padding: 2px var(--space-3);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--surface) 55%, transparent);
+  background: color-mix(in oklab, white 55%, transparent);
   font-weight: 650;
 }
 .binder-link:hover .binder-tab {

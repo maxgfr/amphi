@@ -59,14 +59,14 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
   };
 
   return (
-    <div className="page" data-hue={courseHue(id)}>
+    <div className="page" data-hue={courseHue(course)}>
       <header className="divider">
         <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
           <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>
         </nav>
         <div className="page-head">
           <h1>
-            <span aria-hidden="true">{course.emoji || (course.kind === "topic" ? "🧭" : "📘")}</span> {course.title}
+            {course.emoji ? <span aria-hidden="true">{course.emoji}</span> : null} {course.title}
           </h1>
           <div className="row">
             <button

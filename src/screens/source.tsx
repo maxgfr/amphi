@@ -38,7 +38,7 @@ export function SourceScreen({ id, at }: { id: string; at?: { page?: number; t?:
     );
   const { source, course, lesson } = data;
   return (
-    <div className="page" data-hue={course ? courseHue(course.id) : undefined}>
+    <div className="page" data-hue={course ? courseHue(course) : undefined}>
       <header className="divider soft">
         <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
           {course ? (

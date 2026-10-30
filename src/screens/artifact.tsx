@@ -43,7 +43,8 @@ export function ArtifactScreen({ id }: { id: string }) {
   const scope = all.filter((s) => (!artifact.lessonId || s.lessonId === artifact.lessonId) && hasText(s));
   const View = k?.View;
   return (
-    <div className="page">
+    // An export error ("render the video first") goes away with the next click, before that click's own handler runs.
+    <div className="page" onClickCapture={() => setError("")}>
       <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
         <a href={href.course(course.id, "studio")}>{course.title}</a>
         {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}

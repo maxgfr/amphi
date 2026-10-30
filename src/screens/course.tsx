@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { fresh, get, list, put, removeCourse } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
-import { count, dateOnly, useLang } from "../i18n.ts";
+import { colon, count, dateOnly, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice, saveFile, Tabs } from "../ui/kit.tsx";
@@ -107,7 +107,7 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
         </div>
       </div>
       {sendError ? <Notice kind="error">{sendError}</Notice> : null}
-      {course.examDate ? <p className="meta">{t("Exam", "Examen", "Prüfung")}: {dateOnly(new Date(course.examDate).getTime())}</p> : null}
+      {course.examDate ? <p className="meta">{colon(t("Exam", "Examen", "Prüfung"))} {dateOnly(new Date(course.examDate).getTime())}</p> : null}
       <Tabs tabs={tabs} value={current} onChange={(k) => go(href.course(id, k))} label={t("Course sections", "Sections du cours", "Kursbereiche")} />
       <div className="tab-panel" role="tabpanel">
         {current === "lessons" ? (

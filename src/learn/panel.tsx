@@ -9,7 +9,7 @@ import { ChatPanel } from "../chat/panel.tsx";
 import { fresh, get, list, put, remove, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Artifact, Concept, Course, Id, Source } from "../data/schema.ts";
-import { count, currentLang, dateOnly, relative, useLang } from "../i18n.ts";
+import { colon, count, currentLang, dateOnly, relative, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
 import { hasText } from "../studio/panel.tsx";
 import type { QuizData } from "../studio/quiz-core.ts";
@@ -105,7 +105,7 @@ export function ProgressPanel({ courseId }: { courseId: Id }) {
                     <span className="list-title">{q.title}</span>
                     <span className="meta">
                       {last
-                        ? `${t("Last score", "Dernier score", "Letztes Ergebnis")}: ${last.score} / ${last.total} · ${t("best", "meilleur", "bestes")} ${Math.round(best * 100)} % · ${count(results.length, ["attempt", "attempts"], ["essai", "essais"], ["Versuch", "Versuche"])} · ${relative(last.at)}`
+                        ? `${colon(t("Last score", "Dernier score", "Letztes Ergebnis"))} ${last.score} / ${last.total} · ${t("best", "meilleur", "bestes")} ${Math.round(best * 100)} % · ${count(results.length, ["attempt", "attempts"], ["essai", "essais"], ["Versuch", "Versuche"])} · ${relative(last.at)}`
                         : t("Not taken yet", "Pas encore passé", "Noch nicht gemacht")}
                     </span>
                   </span>
@@ -264,7 +264,7 @@ function ConceptItem({ concept: c, index, concepts, mastery, sources, configured
       {c.summary ? <Markdown className="concept-summary" text={c.summary} onCite={(l) => openCitation(l, sourceIds)} /> : null}
       {after.length || c.refs.length ? (
         <p className="meta">
-          {after.length ? `${t("Builds on", "S'appuie sur", "Baut auf")}: ${after.join(", ")}` : ""}
+          {after.length ? `${colon(t("Builds on", "S'appuie sur", "Baut auf"))} ${after.join(", ")}` : ""}
           {c.refs.map((r) => (
             <span key={r}>
               {" "}
@@ -363,7 +363,7 @@ function TutorSession({ concept, chatId, sources, language, onClose }: { concept
         ) : null}
       </div>
       <h2 id="tutor-title">
-        {t("Tutor", "Tuteur", "Tutor")}: {concept.title}
+        {colon(t("Tutor", "Tuteur", "Tutor"))} {concept.title}
       </h2>
       {ended ? (
         <Notice kind="ok">

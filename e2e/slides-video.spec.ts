@@ -157,7 +157,11 @@ test("a video summary: the storyboard is reviewed and edited, then narrated, dra
   await page.getByLabel("Narration of scene 2").fill("Entropy measures how disordered a system is.");
   await page.getByLabel("Narration of scene 2").blur();
 
+  // Exporting before rendering says why; the message goes with the next click.
+  await page.getByRole("group", { name: "Export" }).getByRole("button", { name: "Video file" }).click();
+  await expect(page.getByText("Render the video first.")).toBeVisible();
   await page.getByRole("button", { name: "Render the video" }).click();
+  await expect(page.getByText("Render the video first.")).toBeHidden();
   const player = page.getByLabel("Video", { exact: true });
   await expect(player).toBeVisible({ timeout: 90_000 });
   expect(read.map((r) => r.input)).toEqual(["Today, entropy in one minute.", "Entropy measures how disordered a system is.", "It never decreases in an isolated system."]);

@@ -19,6 +19,7 @@ bun run dev        # http://localhost:4173/amphi/
 bun run typecheck && bun run lint && bun test src scripts
 bun run build && bun run check:network
 bun run e2e
+AMPHI_LIVE_KEY=… bun run e2e:live   # the whole path against a real provider, never in CI
 ```
 
 ## License

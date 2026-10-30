@@ -7,11 +7,12 @@ export const MOCK_AI = "http://127.0.0.1:9/v1";
 
 export const fixture = (name: string) => new URL(`./fixtures/${name}`, import.meta.url).pathname;
 
-/** Records every request leaving the page's origin (but the mocked AI and the origins in `allow`, intercepted by the test), every CSP violation and every page error. */
-export async function watch(page: Page, o: { allow?: string[] } = {}) {
+/** Records every request leaving the page's origin (but the mocked AI, the origins in `allow` and the hosts matching `allowHosts`), every CSP violation and every page error. */
+export async function watch(page: Page, o: { allow?: string[]; allowHosts?: RegExp } = {}) {
   const external: string[] = [];
   page.on("request", (r) => {
     const u = new URL(r.url());
+    if (o.allowHosts?.test(u.hostname)) return;
     if (![siteOrigin, "null", new URL(MOCK_AI).origin, ...(o.allow ?? [])].includes(u.origin) && !["blob:", "data:"].includes(u.protocol)) external.push(r.url());
   });
   await page.addInitScript(() => {
@@ -78,6 +79,7 @@ export async function courseWithNote(page: Page, note = "Entropy measures disord
   await page.goto(`${siteURL}#/courses`);
   await page.getByRole("button", { name: "New course" }).click();
   const course = page.getByRole("dialog");
+  await expect(course.getByLabel("Title")).toBeFocused();
   await course.getByLabel("Title").fill("Thermodynamics");
   await course.getByRole("button", { name: "Create" }).click();
   await page.getByRole("button", { name: "New lesson" }).click();

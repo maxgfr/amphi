@@ -13,6 +13,7 @@
     "lint": "oxlint --deny-warnings src scripts e2e",
     "test": "bun test src scripts",
     "e2e": "playwright test",
+    "e2e:live": "playwright test e2e/live.spec.ts --workers 1",
     "catalog": "bun scripts/catalog.ts"
   },
   "dependencies": {

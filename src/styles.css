@@ -1115,6 +1115,42 @@ textarea {
   color: var(--accent);
 }
 
+/* Flashcards */
+.flashcard-row {
+  align-items: flex-start;
+  padding: var(--space-3);
+}
+.flashcards-filter {
+  width: auto;
+}
+.flashcard-front {
+  font-weight: 500;
+}
+.flashcard-back {
+  color: var(--muted);
+}
+.card-editor {
+  flex: 1;
+  padding: var(--space-3);
+}
+.flashcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 12rem;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  font-size: 1.125rem;
+}
+.flashcard .cite {
+  align-self: flex-start;
+}
+.flashcard hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

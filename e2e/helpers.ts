@@ -7,12 +7,12 @@ export const MOCK_AI = "http://127.0.0.1:9/v1";
 
 export const fixture = (name: string) => new URL(`./fixtures/${name}`, import.meta.url).pathname;
 
-/** Records every request leaving the page's origin (but the mocked AI), every CSP violation and every page error. */
-export async function watch(page: Page) {
+/** Records every request leaving the page's origin (but the mocked AI and the origins in `allow`, intercepted by the test), every CSP violation and every page error. */
+export async function watch(page: Page, o: { allow?: string[] } = {}) {
   const external: string[] = [];
   page.on("request", (r) => {
     const u = new URL(r.url());
-    if (![siteOrigin, "null", new URL(MOCK_AI).origin].includes(u.origin) && !["blob:", "data:"].includes(u.protocol)) external.push(r.url());
+    if (![siteOrigin, "null", new URL(MOCK_AI).origin, ...(o.allow ?? [])].includes(u.origin) && !["blob:", "data:"].includes(u.protocol)) external.push(r.url());
   });
   await page.addInitScript(() => {
     (window as unknown as { __csp: string[] }).__csp = [];

@@ -9,6 +9,7 @@ import { SourceScreen } from "./screens/source.tsx";
 import { Today } from "./screens/today.tsx";
 import { Unlock } from "./screens/unlock.tsx";
 import { loadVault, vault } from "./secrets.ts";
+import { SyncBadge } from "./sync/badge.tsx";
 import { Icon, type IconName } from "./ui/icons.tsx";
 
 // Screens that pull in the AI SDK, recorders or exporters load when opened.
@@ -112,6 +113,7 @@ export function App() {
               </button>
             ))}
           </div>
+          <SyncBadge />
           <button type="button" className="icon-button" onClick={toggleTheme} aria-label={dark ? t("Light theme", "Thème clair", "Helles Design") : t("Dark theme", "Thème sombre", "Dunkles Design")}>
             <Icon name={dark ? "sun" : "moon"} />
           </button>

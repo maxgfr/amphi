@@ -1604,6 +1604,260 @@ fieldset:disabled .quiz-choice {
 }
 /* ── end Studio: mind maps, quizzes, infographics ─────────────────────── */
 
+/* ── Studio: slides and video summaries ───────────────────────────────── */
+
+/* A slide is always drawn light, as it is presented, printed and exported. */
+.slide-frame {
+  --bg: #f9f8f5;
+  --surface: #ffffff;
+  --surface-2: #f1f0ec;
+  --line: #dcdad4;
+  --text: #23262d;
+  --muted: #5f636c;
+  --accent: #2f63b8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e4ecfa;
+  --viz-b0: #2a78d6;
+  --viz-b1: #eb6834;
+  --viz-b2: #1baf7a;
+  --viz-b3: #eda100;
+  --viz-b4: #e87ba4;
+  --viz-b5: #008300;
+  --viz-b0-soft: #e3eefb;
+  --viz-b1-soft: #fde9e0;
+  --viz-b2-soft: #dff5ec;
+  --viz-b3-soft: #fdf1d6;
+  --viz-b4-soft: #fbe9f0;
+  --viz-b5-soft: #dcf0dc;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #dcdad4;
+  background: #ffffff;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.slide-frame .scene {
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.deck {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.deck-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--space-1) 0 0;
+  display: grid;
+  gap: var(--space-2);
+  max-block-size: calc(100dvh - 160px);
+  overflow-y: auto;
+  position: sticky;
+  inset-block-start: var(--space-4);
+}
+.deck-thumb {
+  display: grid;
+  grid-template-columns: 1.75em minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-1);
+  inline-size: 100%;
+  min-height: 0;
+  padding: var(--space-1);
+  border: 2px solid transparent;
+  background: none;
+  text-align: start;
+}
+.deck-thumb[aria-current="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.deck-num {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  padding-block-start: 2px;
+}
+.slide-big {
+  box-shadow: 0 1px 3px color-mix(in oklch, var(--text) 10%, transparent);
+}
+.slide-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.diagram-items {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin: 0;
+}
+.diagram-items legend {
+  padding-inline: var(--space-1);
+  font-weight: 500;
+}
+.diagram-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: var(--space-2);
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .deck {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .deck-strip {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: 150px;
+    overflow-x: auto;
+    max-block-size: none;
+  }
+  .slide-columns,
+  .diagram-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Presentation mode: the slide as large as the screen allows, the notes under it. */
+.presenter {
+  --text: #f2f2f0;
+  --muted: #b9bcc3;
+  --surface: #26282d;
+  --surface-2: #30333a;
+  --line: #474a52;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  background: #121316;
+  color: var(--text);
+  outline: none;
+}
+.presenter-stage {
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  min-block-size: 0;
+}
+.presenter .slide-frame {
+  inline-size: min(100%, calc((100dvh - 96px) * 16 / 9));
+  border: 0;
+  border-radius: 0;
+}
+.presenter.with-notes .slide-frame {
+  inline-size: min(100%, calc((70dvh - 96px) * 16 / 9));
+}
+.presenter-notes {
+  max-block-size: 30dvh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-6);
+  background: #1b1c20;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+.presenter-notes p {
+  margin: 0;
+  max-inline-size: 80ch;
+  margin-inline: auto;
+}
+.presenter-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-3);
+}
+.presenter-bar .icon-button {
+  font-size: 1.25rem;
+}
+.presenter-count {
+  min-inline-size: 9em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* Video storyboard and the live slideshow. */
+.storyboard-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.storyboard-head {
+  margin: 0;
+  font-size: 1rem;
+}
+@media (max-width: 760px) {
+  .storyboard-scene {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.live-show {
+  position: relative;
+  max-inline-size: 880px;
+}
+.live-caption {
+  position: absolute;
+  inset-inline: 10%;
+  inset-block-end: 4%;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(0.85rem, 2.2vw, 1.2rem);
+  line-height: 1.35;
+}
+.live-caption:not(:empty) {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.75);
+  color: #ffffff;
+}
+
+/* Printing a deck: one slide a landscape page, nothing else. */
+.slides-print {
+  display: none;
+}
+@page slides {
+  size: 13.333in 7.5in;
+  margin: 0;
+}
+@media print {
+  .slides-print {
+    display: block;
+  }
+  .page:has(.slides-print) {
+    max-width: none;
+    padding: 0;
+    gap: 0;
+  }
+  .page:has(.slides-print) > :not(.stack),
+  .page:has(.slides-print) .page-head {
+    display: none !important;
+  }
+  .slide-page {
+    page: slides;
+    break-after: page;
+    inline-size: 13.333in;
+    block-size: 7.49in;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+  }
+  .slide-page .scene {
+    block-size: 100%;
+  }
+}
+/* ── end Studio: slides and video summaries ───────────────────────────── */
+
 
 /* Sync. */
 .steps {

@@ -14,6 +14,9 @@ const TRANSFORMERS = /^assets\/w-[\w-]*transformers[\w.-]*\.js$/;
 // pdf.js, loaded only to read an imported PDF's text.
 const PDFJS = /^assets\/pdf-[\w.-]*\.js$/;
 
+// pptxgenjs (with JSZip), loaded only to export a slide deck.
+const PPTX = /^assets\/pptxgen[\w.-]*\.js$/;
+
 // Hosts that may appear as inert strings, each with the reason it is safe,
 // and the files they may appear in when that is narrower than every file.
 const ALLOWED_HOSTS: [string, string, RegExp?][] = [
@@ -53,6 +56,13 @@ const ALLOWED_HOSTS: [string, string, RegExp?][] = [
   ["example.com", "a dummy base pdf.js uses to parse relative links inside a PDF, never requested", PDFJS],
   ["foo.bar", "a dummy base pdf.js uses to parse relative links inside a PDF, never requested", PDFJS],
   ["gist.github.com", "a link inside a Transformers.js error message, never requested", TRANSFORMERS],
+  ["schemas.openxmlformats.org", "Office Open XML namespace URIs written into an exported .pptx, never dereferenced", PPTX],
+  ["schemas.microsoft.com", "Office XML namespace URIs written into an exported .pptx, never dereferenced", PPTX],
+  ["purl.org", "Dublin Core namespace URIs in an exported .pptx's properties, never dereferenced", PPTX],
+  ["gitbrent.github.io", "documentation links in pptxgenjs's comments and error messages, never requested", PPTX],
+  ["stuk.github.io", "JSZip's documentation link in its license header and error messages, never requested", PPTX],
+  ["raw.github.com", "JSZip's license link in its header comment, never requested", PPTX],
+  ["stuartk.com", "JSZip's author link in its license header, never requested", PPTX],
 ];
 
 const URL_RE = /\bhttps?:\/\/([a-z0-9.-]+\.[a-z]{2,})/gi;

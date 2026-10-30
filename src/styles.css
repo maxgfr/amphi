@@ -1631,3 +1631,175 @@ fieldset:disabled .quiz-choice {
     animation: none;
   }
 }
+
+/* ── Progress and Discover ────────────────────────────────────────────── */
+.exam-countdown {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+.concepts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.concept {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.concept-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.concept-n {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 1.5em;
+}
+.concept-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  min-width: 12ch;
+}
+.concept-rename {
+  flex: 1;
+}
+.concept-rename input {
+  flex: 1;
+  min-width: 12ch;
+}
+.concept-summary {
+  max-width: var(--measure);
+}
+.concept-summary p {
+  margin: 0;
+}
+.concept-actions {
+  justify-content: space-between;
+}
+.concept-actions .segmented button:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.concept-edit {
+  display: inline-flex;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+.move-up svg {
+  transform: rotate(90deg);
+}
+.move-down svg {
+  transform: rotate(90deg);
+}
+.mastery {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+}
+.mastery-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+.mastery-dots span {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+}
+.mastery-dots span.on {
+  background: var(--accent);
+}
+.mastery.level-0 .mastery-dots span,
+.mastery.level-1 .mastery-dots span {
+  border-color: var(--danger);
+}
+.mastery.level-1 .mastery-dots span.on {
+  background: var(--danger);
+}
+.mastery.unseen .mastery-dots span {
+  border-color: var(--line);
+}
+.mastery-text {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.add-concept input {
+  flex: 1;
+  min-width: 16ch;
+}
+.discover-options {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.discover-result h2 {
+  margin-block-end: 0;
+}
+.discover-concepts {
+  margin: 0;
+  padding-inline-start: 1.5em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: var(--measure);
+}
+.discover-concepts p {
+  margin: var(--space-1) 0 0;
+}
+.proposals {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.proposals legend {
+  font-weight: 600;
+}
+.proposal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.proposal + .proposal {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-3);
+}
+.proposal-body {
+  padding-inline-start: calc(1.25em + var(--space-2));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: var(--measure);
+}
+.proposal-body p {
+  margin: 0;
+}
+.proposal-url {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.proposal-excerpt {
+  border-inline-start: 3px solid var(--line);
+  padding-inline-start: var(--space-3);
+  font-size: 0.925rem;
+}
+/* ── end Progress and Discover ────────────────────────────────────────── */

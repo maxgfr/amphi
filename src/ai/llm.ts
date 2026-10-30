@@ -98,6 +98,14 @@ function prepare(o: AskOptions) {
 
 function wrap(e: unknown, s: LlmSettings): never {
   if (e instanceof AiError || (e as Error)?.name === "AbortError") throw e;
+  // A model on this machine answers without a network, so being offline is only blamed once a call failed.
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    throw new AiError(
+      tr("You are offline, so your AI provider cannot be reached. Your courses and what was already made still work; try again once connected.", "Vous êtes hors ligne : votre fournisseur d'IA est injoignable. Vos cours et ce qui a déjà été fait restent disponibles ; réessayez une fois connecté.", "Sie sind offline, Ihr KI-Anbieter ist daher nicht erreichbar. Ihre Kurse und alles bereits Erstellte funktionieren weiter; versuchen Sie es mit Verbindung erneut."),
+      "offline",
+      true,
+    );
+  }
   const d = describeError(e, s.apiKey);
   throw new AiError(d.message, d.code, d.retryable);
 }

@@ -1,15 +1,20 @@
 {
+  "id": "./",
   "name": "amphi",
   "short_name": "amphi",
   "description": "Follow your courses with AI: record and import lectures, then summaries, mind maps, quizzes, flashcards, slides, podcasts and video summaries.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7f6f3",
-  "theme_color": "#2f5fb3",
+  "background_color": "#faf9f6",
+  "theme_color": "#faf9f6",
+  "categories": ["education", "productivity"],
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

@@ -1,7 +1,9 @@
+// Before anything that may load Zod (sync reads its files with it too).
+import "./ai/zod-jitless.ts";
 import { createRoot } from "react-dom/client";
 import { App } from "./app.tsx";
 import { persist } from "./data/db.ts";
-import { scriptURL } from "./trusted.ts";
+import { registerServiceWorker } from "./pwa.ts";
 
 // GitHub Pages cannot send frame-ancestors; refuse to run inside a frame.
 if (window.top !== window.self) {
@@ -17,5 +19,5 @@ void persist();
 
 const secure = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
 if ("serviceWorker" in navigator && secure) {
-  void navigator.serviceWorker.register(scriptURL("./sw.js"), { scope: "./" }).catch(() => {});
+  void registerServiceWorker().catch(() => {});
 }

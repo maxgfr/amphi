@@ -1,13 +1,14 @@
 /// <reference lib="webworker" />
 // Offline support. The build replaces __MANIFEST__ with the hashed list of
-// files: the app shell is cached at install; ONNX Runtime, the workers and the big
-// optional chunks the first time they are used. Speech and voice models are not handled
-// here: llm-connect and transformers.js keep them in their own caches.
+// files: the app shell is cached at install; the rest of the app's own code
+// (`warm`) right after, once the page asks; ONNX Runtime and the workers the
+// first time they are used. Speech and voice models are not handled here:
+// llm-connect and transformers.js keep them in their own caches.
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
-declare const __MANIFEST__: { version: string; precache: string[]; lazy: string[] };
+declare const __MANIFEST__: { version: string; precache: string[]; lazy: string[]; warm: string[] };
 
-const { version, precache, lazy } = __MANIFEST__;
+const { version, precache, lazy, warm } = __MANIFEST__;
 const CACHE = `amphi-${version}`;
 const scope = new URL(sw.registration.scope);
 const abs = (p: string) => new URL(p, scope).href;
@@ -18,8 +19,33 @@ sw.addEventListener("install", (event: ExtendableEvent) => {
     caches
       .open(CACHE)
       .then((c) => c.addAll(precache.map(abs)))
-      .then(() => sw.skipWaiting()),
+      // The first install takes over at once; an update waits until the
+      // student chooses to reload (the page offers it), so a screen never
+      // changes under them mid-task.
+      .then(() => (sw.registration.active ? undefined : sw.skipWaiting())),
   );
+});
+
+/** Fetches what the app may load later, so it opens offline; what is cached already is skipped. */
+async function warmUp(): Promise<boolean> {
+  const cache = await caches.open(CACHE);
+  for (const url of warm.map(abs)) {
+    if (await cache.match(url)) continue;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return false;
+      await cache.put(url, res);
+    } catch {
+      return false; // offline again: the next visit finishes it
+    }
+  }
+  return true;
+}
+
+sw.addEventListener("message", (event: ExtendableMessageEvent) => {
+  if (event.data === "skip-waiting") void sw.skipWaiting();
+  // The page learns when everything it may need is on the device.
+  else if (event.data === "warm") event.waitUntil(warmUp().then((done) => (done ? event.source?.postMessage("warmed") : undefined)));
 });
 
 // The previous version's files stay cached: a tab still open on it keeps

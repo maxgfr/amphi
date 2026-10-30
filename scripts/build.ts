@@ -95,7 +95,7 @@ await cp(`${root}public`, dist, { recursive: true });
 const html = await Bun.file(`${dist}/index.html`).text();
 await Bun.write(
   `${dist}/index.html`,
-  html.replace("</head>", '<link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon-192.png"><link rel="manifest" href="./manifest.webmanifest"></head>'),
+  html.replace("</head>", '<link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./apple-touch-icon.png"><link rel="manifest" href="./manifest.webmanifest"></head>'),
 );
 await Bun.write(`${dist}/.nojekyll`, "");
 
@@ -141,7 +141,13 @@ const eagerCode = await staticGraph(pageEntries);
 const lazy = files.filter((f) => f.startsWith("ort/") || f.startsWith("vendor/") || f.startsWith("assets/w-") || WORKERS.some((w) => f === `${w}.js`) || (f.startsWith("assets/") && f.endsWith(".js") && !eagerCode.has(f)));
 // Speech and voice models are not the site's: llm-connect and transformers.js keep them in their own caches.
 const precache = ["./", ...files.filter((f) => f !== "index.html" && !lazy.includes(f))];
-const manifest = { version: hash.digest("hex").slice(0, 16), precache, lazy };
+// The app's own code loaded on demand (Studio views, exports, AI SDK, PDF
+// reader, Anki writer: a few MiB) is fetched once the app is open, so every
+// screen works offline after a first visit. ONNX Runtime, the speech and voice
+// workers and eSpeak (tens of MiB, useless without their models) stay lazy.
+const HEAVY = (f: string) => f.startsWith("ort/") || f.startsWith("assets/w-") || WORKERS.some((w) => f === `${w}.js`) || f === "vendor/piper_phonemize.wasm" || f === "vendor/espeak-ng.data";
+const warm = lazy.filter((f) => !HEAVY(f));
+const manifest = { version: hash.digest("hex").slice(0, 16), precache, lazy, warm };
 
 check(
   await Bun.build({

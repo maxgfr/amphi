@@ -1,6 +1,7 @@
 import { useKeyVault } from "llm-connect/react";
 import { lazy, type ReactNode, Suspense, useEffect, useState } from "react";
 import { LANGS, setLang, useLang } from "./i18n.ts";
+import { applyUpdate, dismissUpdate, useWaitingUpdate } from "./pwa.ts";
 import { type Route, href, useRoute } from "./router.ts";
 import { Courses } from "./screens/courses.tsx";
 import { CourseScreen } from "./screens/course.tsx";
@@ -128,6 +129,30 @@ export function App() {
           </Suspense>
         )}
       </main>
+      <UpdateToast />
+    </div>
+  );
+}
+
+/** A new version is installed and waiting: it takes over when the student reloads, never under them. */
+function UpdateToast() {
+  const { t } = useLang();
+  const waiting = useWaitingUpdate();
+  return (
+    <div className="toast-region" aria-live="polite">
+      {waiting ? (
+        <div className="toast">
+          <span>{t("A new version of amphi is ready.", "Une nouvelle version d'amphi est prête.", "Eine neue Version von amphi ist bereit.")}</span>
+          <span className="toast-actions">
+            <button type="button" className="link" onClick={dismissUpdate}>
+              {t("Later", "Plus tard", "Später")}
+            </button>
+            <button type="button" className="primary small" onClick={applyUpdate}>
+              {t("Reload", "Recharger", "Neu laden")}
+            </button>
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1146,3 +1146,402 @@ textarea {
     border: 0;
   }
 }
+
+/* ── Studio: mind maps, quizzes, infographics ─────────────────────────── */
+
+/* Branch colours (one per first-level branch, fixed order), with soft fills. */
+:root {
+  --viz-b0: #2a78d6;
+  --viz-b1: #eb6834;
+  --viz-b2: #1baf7a;
+  --viz-b3: #eda100;
+  --viz-b4: #e87ba4;
+  --viz-b5: #008300;
+  --viz-b0-soft: #e3eefb;
+  --viz-b1-soft: #fde9e0;
+  --viz-b2-soft: #dff5ec;
+  --viz-b3-soft: #fdf1d6;
+  --viz-b4-soft: #fbe9f0;
+  --viz-b5-soft: #dcf0dc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --viz-b0: #3987e5;
+    --viz-b1: #d95926;
+    --viz-b2: #199e70;
+    --viz-b3: #c98500;
+    --viz-b4: #d55181;
+    --viz-b5: #2f9a2f;
+    --viz-b0-soft: #1d2d44;
+    --viz-b1-soft: #3d261c;
+    --viz-b2-soft: #17342a;
+    --viz-b3-soft: #3a2f15;
+    --viz-b4-soft: #3b2230;
+    --viz-b5-soft: #1c331c;
+  }
+}
+:root[data-theme="dark"] {
+  --viz-b0: #3987e5;
+  --viz-b1: #d95926;
+  --viz-b2: #199e70;
+  --viz-b3: #c98500;
+  --viz-b4: #d55181;
+  --viz-b5: #2f9a2f;
+  --viz-b0-soft: #1d2d44;
+  --viz-b1-soft: #3d261c;
+  --viz-b2-soft: #17342a;
+  --viz-b3-soft: #3a2f15;
+  --viz-b4-soft: #3b2230;
+  --viz-b5-soft: #1c331c;
+}
+
+/* Scene colour roles (src/studio/render/svg.ts). */
+.sc-f-none {
+  fill: none;
+}
+.sc-f-bg {
+  fill: var(--bg);
+}
+.sc-f-surface {
+  fill: var(--surface);
+}
+.sc-f-surface2 {
+  fill: var(--surface-2);
+}
+.sc-f-line {
+  fill: var(--line);
+}
+.sc-f-text {
+  fill: var(--text);
+}
+.sc-f-muted {
+  fill: var(--muted);
+}
+.sc-f-accent {
+  fill: var(--accent);
+}
+.sc-f-accentInk {
+  fill: var(--accent-ink);
+}
+.sc-f-accentSoft {
+  fill: var(--accent-soft);
+}
+.sc-f-b0 {
+  fill: var(--viz-b0);
+}
+.sc-f-b1 {
+  fill: var(--viz-b1);
+}
+.sc-f-b2 {
+  fill: var(--viz-b2);
+}
+.sc-f-b3 {
+  fill: var(--viz-b3);
+}
+.sc-f-b4 {
+  fill: var(--viz-b4);
+}
+.sc-f-b5 {
+  fill: var(--viz-b5);
+}
+.sc-f-b0soft {
+  fill: var(--viz-b0-soft);
+}
+.sc-f-b1soft {
+  fill: var(--viz-b1-soft);
+}
+.sc-f-b2soft {
+  fill: var(--viz-b2-soft);
+}
+.sc-f-b3soft {
+  fill: var(--viz-b3-soft);
+}
+.sc-f-b4soft {
+  fill: var(--viz-b4-soft);
+}
+.sc-f-b5soft {
+  fill: var(--viz-b5-soft);
+}
+.sc-s-none {
+  stroke: none;
+}
+.sc-s-surface {
+  stroke: var(--surface);
+}
+.sc-s-line {
+  stroke: var(--line);
+}
+.sc-s-text {
+  stroke: var(--text);
+}
+.sc-s-muted {
+  stroke: var(--muted);
+}
+.sc-s-accent {
+  stroke: var(--accent);
+}
+.sc-s-b0 {
+  stroke: var(--viz-b0);
+}
+.sc-s-b1 {
+  stroke: var(--viz-b1);
+}
+.sc-s-b2 {
+  stroke: var(--viz-b2);
+}
+.sc-s-b3 {
+  stroke: var(--viz-b3);
+}
+.sc-s-b4 {
+  stroke: var(--viz-b4);
+}
+.sc-s-b5 {
+  stroke: var(--viz-b5);
+}
+
+.scene {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  font-family: var(--font);
+}
+.sc-cite {
+  cursor: pointer;
+}
+.sc-cite:hover text,
+.sc-cite:focus-visible text {
+  text-decoration: underline;
+}
+.sc-cite:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.infographic {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  max-width: 880px;
+}
+
+/* Mind map editor. */
+.mm-toolbar {
+  gap: var(--space-1);
+}
+.mm-sep {
+  inline-size: 1px;
+  block-size: 24px;
+  background: var(--line);
+  margin-inline: var(--space-1);
+}
+.mm-zoom {
+  min-inline-size: 4.5ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.mm-wrap {
+  position: relative;
+  block-size: min(70vh, 640px);
+  min-block-size: 360px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  overflow: hidden;
+}
+.mm-canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  font-family: var(--font);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.mm-canvas:active {
+  cursor: grabbing;
+}
+.mm-edge {
+  fill: none;
+  stroke-width: 2;
+}
+.mm-node {
+  cursor: pointer;
+}
+.mm-node:focus {
+  outline: none;
+}
+.mm-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.mm-node:not(:focus-visible) .mm-ring {
+  stroke-dasharray: 5 4;
+}
+.mm-toggle {
+  cursor: pointer;
+}
+.mm-rename {
+  position: absolute;
+  min-height: 0;
+  padding: 0 var(--space-2);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 16px color-mix(in oklch, var(--text) 18%, transparent);
+}
+.mm-details {
+  min-block-size: 1.5em;
+  color: var(--muted);
+}
+.mm-details strong {
+  color: var(--text);
+}
+.mm-keys {
+  margin: var(--space-2) 0 0;
+  padding-inline-start: var(--space-5);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.mm-outline ul {
+  padding-inline-start: var(--space-5);
+}
+.mm-outline-title {
+  font-weight: 600;
+}
+
+/* Quiz. */
+.quiz {
+  max-inline-size: var(--measure);
+}
+.quiz-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-inline-start-width: 4px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.quiz-card.correct {
+  border-inline-start-color: var(--ok);
+}
+.quiz-card.partial {
+  border-inline-start-color: var(--viz-b3);
+}
+.quiz-card.incorrect {
+  border-inline-start-color: var(--danger);
+}
+.quiz-card fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.quiz-question {
+  padding: 0;
+  margin-block-end: var(--space-1);
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.quiz-choices {
+  display: grid;
+  gap: var(--space-2);
+}
+.quiz-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  min-block-size: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.quiz-choice:hover {
+  border-color: color-mix(in oklch, var(--text) 25%, var(--line));
+}
+.quiz-choice:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.quiz-choice.right,
+.quiz-choice.right:has(input:checked) {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+.quiz-choice.wrong,
+.quiz-choice.wrong:has(input:checked) {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+fieldset:disabled .quiz-choice {
+  cursor: default;
+}
+.quiz-letter {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.6em;
+  block-size: 1.6em;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  flex: none;
+}
+.quiz-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--line);
+}
+.quiz-feedback p {
+  margin: 0;
+}
+.quiz-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+}
+.quiz-card.correct .quiz-verdict {
+  color: var(--ok);
+}
+.quiz-card.incorrect .quiz-verdict {
+  color: var(--danger);
+}
+.quiz-score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.quiz-score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.quiz-timer {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.quiz-timer.low {
+  color: var(--danger);
+}
+.quiz-review,
+.quiz-all {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+/* ── end Studio: mind maps, quizzes, infographics ─────────────────────── */

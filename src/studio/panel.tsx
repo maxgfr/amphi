@@ -10,8 +10,8 @@ import type { Artifact, Id, Source } from "../data/schema.ts";
 import { currentLang, relative, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
 import { Icon } from "../ui/icons.tsx";
-import { Empty, Notice, ProgressBar, Sheet } from "../ui/kit.tsx";
-import { STUDIO, studioKind } from "./registry.ts";
+import { Notice, ProgressBar, Sheet } from "../ui/kit.tsx";
+import { STUDIO_GROUPS, studioKind } from "./registry.ts";
 import { cancelJob, runStudio, useJobs } from "./run.ts";
 import type { StudioKind } from "./types.ts";
 
@@ -43,25 +43,39 @@ export function StudioPanel({ courseId, lessonId }: { courseId: Id; lessonId?: I
       {!data.sources.length ? (
         <Notice>{t("Add sources first (PDF, notes, a transcribed recording): everything here is made from them.", "Ajoutez d'abord des sources (PDF, notes, un enregistrement transcrit) : tout ici est fait à partir d'elles.", "Fügen Sie zuerst Quellen hinzu (PDF, Notizen, eine transkribierte Aufnahme): Alles hier entsteht aus ihnen.")}</Notice>
       ) : null}
-      <div className="studio-grid">
-        {STUDIO.map((k) => (
-          <button key={k.type} type="button" className="studio-tile" disabled={!data.configured || !data.sources.length} onClick={() => setMaking(k)}>
-            <Icon name={k.icon} size={22} />
-            <span className="tile-title">{k.label(t)}</span>
-            <span className="meta">{k.blurb(t)}</span>
-          </button>
+      {data.artifacts.length ? (
+        <>
+          <h2 className="section-title">{t("Made in this Studio", "Réalisé dans ce Studio", "In diesem Studio erstellt")}</h2>
+          <ul className="list">
+            {data.artifacts.map((a) => (
+              <ArtifactRow key={a.id} artifact={a} job={jobs.find((j) => j.artifactId === a.id)} />
+            ))}
+          </ul>
+          <h2 className="section-title">{t("Make something new", "Créer autre chose", "Etwas Neues erstellen")}</h2>
+        </>
+      ) : null}
+      <div className="studio-groups">
+        {STUDIO_GROUPS.map((g) => (
+          <section key={g.id} className="studio-group" aria-labelledby={`studio-${g.id}`}>
+            <h3 id={`studio-${g.id}`} className="group-title">
+              {g.label(t)}
+            </h3>
+            <div className="group-list">
+              {g.kinds.map((k) => (
+                <button key={k.type} type="button" className="studio-tile" disabled={!data.configured || !data.sources.length} onClick={() => setMaking(k)}>
+                  <span className="tile-icon" aria-hidden="true">
+                    <Icon name={k.icon} size={20} />
+                  </span>
+                  <span className="tile-text">
+                    <span className="tile-title">{k.label(t)}</span>
+                    <span className="meta">{k.blurb(t)}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
-      <h2 className="section-title">{t("Made in this Studio", "Réalisé dans ce Studio", "In diesem Studio erstellt")}</h2>
-      {data.artifacts.length ? (
-        <ul className="list">
-          {data.artifacts.map((a) => (
-            <ArtifactRow key={a.id} artifact={a} job={jobs.find((j) => j.artifactId === a.id)} />
-          ))}
-        </ul>
-      ) : (
-        <Empty icon="sparkle" title={t("Nothing yet", "Rien pour l'instant", "Noch nichts")} />
-      )}
       {making ? <MakeSheet k={making} sources={data.sources} courseId={courseId} lessonId={lessonId} onClose={() => setMaking(null)} /> : null}
     </section>
   );

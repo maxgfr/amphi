@@ -412,7 +412,7 @@ a {
 .rail-tools .segmented button {
   color: var(--rail-muted);
 }
-.rail-tools .segmented button:hover:not(:disabled) {
+.rail-tools .segmented button:hover:not(:disabled, [aria-pressed="true"]) {
   color: var(--rail-text);
 }
 .rail-tools .segmented button[aria-pressed="true"] {
@@ -712,13 +712,13 @@ main:focus-visible {
 }
 .divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]),
 .divider:not(.soft) .button:not(.primary) {
-  background: color-mix(in oklab, var(--surface) 72%, var(--course));
+  background: color-mix(in oklab, white 62%, var(--course));
   border-color: color-mix(in oklab, var(--on-course) 22%, transparent);
   color: var(--on-course);
   box-shadow: none;
 }
 .divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]):hover:not(:disabled) {
-  background: var(--surface);
+  background: color-mix(in oklab, white 85%, var(--course));
   border-color: color-mix(in oklab, var(--on-course) 40%, transparent);
 }
 .divider:not(.soft) h1 .icon {
@@ -767,13 +767,20 @@ main:focus-visible {
   border: 0;
   margin: 0;
   min-height: 42px;
-  background: color-mix(in oklab, var(--surface) 34%, transparent);
+  background: color-mix(in oklab, var(--surface) 45%, transparent);
   color: inherit;
   font-weight: 600;
 }
 .divider .tabs button:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--surface) 62%, transparent);
+  background: color-mix(in oklab, var(--surface) 75%, transparent);
   color: inherit;
+}
+/* On a full-colour divider the tabs are cut from lighter card, whatever the theme. */
+.divider:not(.soft) .tabs button:not([aria-selected="true"]) {
+  background: color-mix(in oklab, white 36%, transparent);
+}
+.divider:not(.soft) .tabs button:not([aria-selected="true"]):hover:not(:disabled) {
+  background: color-mix(in oklab, white 62%, transparent);
 }
 .divider .tabs button[aria-selected="true"] {
   box-shadow: none;
@@ -860,6 +867,34 @@ main:focus-visible {
     padding: var(--space-4) max(var(--space-4), env(safe-area-inset-right)) var(--space-5) max(var(--space-4), env(safe-area-inset-left));
     box-shadow: none;
   }
+}
+
+/* Motion: tabs rise from behind their divider as a screen opens, one after the other. */
+@keyframes tab-rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+.divider .tabs button,
+.binder-tab {
+  animation: tab-rise 0.36s var(--ease) backwards;
+}
+.divider .tabs button:nth-child(2),
+.binder li:nth-child(2) .binder-tab {
+  animation-delay: 40ms;
+}
+.divider .tabs button:nth-child(3),
+.binder li:nth-child(3) .binder-tab {
+  animation-delay: 80ms;
+}
+.divider .tabs button:nth-child(4),
+.binder li:nth-child(4) .binder-tab {
+  animation-delay: 120ms;
+}
+.divider .tabs button:nth-child(n + 5),
+.binder li:nth-child(n + 5) .binder-tab {
+  animation-delay: 160ms;
 }
 
 /* ── Controls. A button is quiet (secondary) unless it is the one primary action, in ink. ── */

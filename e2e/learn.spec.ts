@@ -147,7 +147,7 @@ test("progress: concepts from the sources, mastery from a quiz, self-assessment,
   await expect(page.getByRole("heading", { name: "Tutor: The second law of thermodynamics" })).toBeVisible();
   await expect(page.getByText("Let's work on “The second law of thermodynamics”.", { exact: false })).toBeVisible();
   await page.getByLabel("Your question").fill("It says entropy grows, I think.");
-  await page.getByRole("button", { name: "Send" }).click();
+  await page.getByRole("button", { name: "Send", exact: true }).click();
   await expect(page.getByText("Good start. What happens to the entropy")).toBeVisible();
   const tutorCall = calls.find((c) => c.system.includes("Socratic tutor"))!;
   expect(tutorCall.system).toContain('The concept of this session: "The second law of thermodynamics"');

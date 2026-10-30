@@ -44,15 +44,17 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
         <a href={href.course(course.id)}>{course.title}</a>
       </nav>
       <div className="page-head">
-        <input
-          className="title-input"
-          aria-label={t("Lesson title", "Titre de la séance", "Titel der Sitzung")}
-          defaultValue={lesson.title}
-          onBlur={(e) => {
-            const v = e.currentTarget.value.trim();
-            if (v && v !== lesson.title) void update("lessons", id, { title: v });
-          }}
-        />
+        <h1 className="title-heading">
+          <input
+            className="title-input"
+            aria-label={t("Lesson title", "Titre de la séance", "Titel der Sitzung")}
+            defaultValue={lesson.title}
+            onBlur={(e) => {
+              const v = e.currentTarget.value.trim();
+              if (v && v !== lesson.title) void update("lessons", id, { title: v });
+            }}
+          />
+        </h1>
         <div className="row">
           <input
             type="date"

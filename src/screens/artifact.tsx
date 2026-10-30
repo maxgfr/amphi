@@ -49,16 +49,18 @@ export function ArtifactScreen({ id }: { id: string }) {
         {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}
       </nav>
       <div className="page-head">
-        <input
-          className="title-input"
-          aria-label={t("Title", "Titre", "Titel")}
-          defaultValue={artifact.title}
-          key={artifact.title}
-          onBlur={(e) => {
-            const v = e.currentTarget.value.trim();
-            if (v && v !== artifact.title) void update("artifacts", id, { title: v });
-          }}
-        />
+        <h1 className="title-heading">
+          <input
+            className="title-input"
+            aria-label={t("Title", "Titre", "Titel")}
+            defaultValue={artifact.title}
+            key={artifact.title}
+            onBlur={(e) => {
+              const v = e.currentTarget.value.trim();
+              if (v && v !== artifact.title) void update("artifacts", id, { title: v });
+            }}
+          />
+        </h1>
         <div className="row no-print">
           {k && artifact.status !== "working" ? (
             <button type="button" className="secondary" onClick={() => setRegenerating(true)}>
@@ -102,12 +104,15 @@ export function ArtifactScreen({ id }: { id: string }) {
       {artifact.status === "ready" && View ? (
         <>
           {k.exports?.length ? (
-            <div className="row wrap no-print" aria-label={t("Export", "Exporter", "Exportieren")}>
+            <div className="toolbar no-print" role="group" aria-labelledby="artifact-export">
+              <span id="artifact-export" className="toolbar-label">
+                {t("Export", "Exporter", "Exportieren")}
+              </span>
               {k.exports.map((x) => (
                 <button
                   key={x.id}
                   type="button"
-                  className="secondary"
+                  className="secondary small"
                   disabled={exporting === x.id}
                   onClick={async () => {
                     setExporting(x.id);
@@ -122,7 +127,7 @@ export function ArtifactScreen({ id }: { id: string }) {
                     }
                   }}
                 >
-                  <Icon name="download" size={18} /> {x.label(t)}
+                  <Icon name="download" size={16} /> {x.label(t)}
                 </button>
               ))}
             </div>

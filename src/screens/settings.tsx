@@ -7,6 +7,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { llm, loadLlm, reloadLlm } from "../ai/llm.ts";
 import { persist } from "../data/db.ts";
 import { bytes, useLang } from "../i18n.ts";
+import { useOfflineReady } from "../pwa.ts";
 import { go, href } from "../router.ts";
 import { protectWithPassphrase, removePassphrase, vaultMode } from "../secrets.ts";
 import { Field, Notice, Tabs } from "../ui/kit.tsx";
@@ -247,6 +248,7 @@ function KeySettings() {
 
 function DeviceSettings() {
   const { t } = useLang();
+  const offline = useOfflineReady();
   const [info, setInfo] = useState<{ persisted: boolean; usage?: number; quota?: number } | null>(null);
   useEffect(() => {
     void (async () => {
@@ -266,6 +268,14 @@ function DeviceSettings() {
         <dd>{info.quota !== undefined ? bytes(info.quota) : "—"}</dd>
         <dt>{t("Protected from eviction", "Protégé de l'effacement", "Vor Löschung geschützt")}</dt>
         <dd>{info.persisted ? t("Yes", "Oui", "Ja") : t("No: the browser may clear it when space runs out. Sync keeps a copy.", "Non : le navigateur peut l'effacer s'il manque de place. La synchro garde une copie.", "Nein: Der Browser kann ihn bei Platzmangel löschen. Die Synchronisierung behält eine Kopie.")}</dd>
+        <dt>{t("Works offline", "Fonctionne hors ligne", "Funktioniert offline")}</dt>
+        <dd>
+          {offline === "ready"
+            ? t("Yes: the app is on this device. AI, Discover and sync wait for a connection.", "Oui : l'application est sur cet appareil. L'IA, Découvrir et la synchro attendent une connexion.", "Ja: Die App liegt auf diesem Gerät. KI, Entdecken und Synchronisierung warten auf eine Verbindung.")
+            : offline === "preparing"
+              ? t("Getting ready…", "En préparation…", "Wird vorbereitet…")
+              : t("No: this browser cannot keep the app.", "Non : ce navigateur ne peut pas garder l'application.", "Nein: Dieser Browser kann die App nicht speichern.")}
+        </dd>
       </dl>
     </div>
   );

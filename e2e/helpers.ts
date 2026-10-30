@@ -66,13 +66,10 @@ export async function mockAi(page: Page, reply: (call: AiCall) => string) {
 /** Point the AI settings at the mocked server. */
 export async function setUpAi(page: Page) {
   await page.goto(`${siteURL}#/settings/ai`);
-  // The form loads the saved settings after it shows, which can undo an early choice on a busy machine: retry until it sticks.
-  await expect(async () => {
-    await page.getByRole("button", { name: "On my machine" }).click();
-    await page.getByLabel("Server address").fill(MOCK_AI, { timeout: 2000 });
-    await page.getByLabel("Model", { exact: true }).fill("mock", { timeout: 2000 });
-    await page.getByRole("button", { name: "Save" }).click({ timeout: 2000 });
-  }).toPass({ timeout: 60_000 });
+  await page.getByRole("button", { name: "On my machine" }).click();
+  await page.getByLabel("Server address").fill(MOCK_AI);
+  await page.getByLabel("Model", { exact: true }).fill("mock");
+  await page.getByRole("button", { name: "Save" }).click();
   await expect(page.getByRole("status")).toHaveText("Saved.");
 }
 

@@ -53,9 +53,15 @@ function AiSettings() {
   const { t } = useLang();
   const s = useLlmSettings(llm);
   const [status, setStatus] = useState("");
+  // open() replaces the draft with the saved settings: the form shows only after it, so no early edit is lost.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    void loadLlm().then(() => llm.open());
+    void loadLlm().then(() => {
+      llm.open();
+      setReady(true);
+    });
   }, []);
+  if (!ready) return <div aria-busy="true" />;
   const providers = [...s.providers.recommended, ...s.providers.others];
   const custom = s.draft.custom;
   return (

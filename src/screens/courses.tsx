@@ -35,11 +35,11 @@ export function examLabel(date: string, t: T): string {
   return `${t("Exam", "Examen", "Prüfung")} ${dateOnly(new Date(date).getTime())}`;
 }
 
-/** "3 lessons" with the number set apart. */
-function Counted({ text }: { text: string }) {
+/** "3 lessons" with the number set apart; a zero stays quiet. */
+function Counted({ n, text }: { n: number; text: string }) {
   const i = text.indexOf(" ");
   return (
-    <span>
+    <span className={n ? "binder-count" : "binder-count zero"}>
       <strong>{text.slice(0, i)}</strong> {text.slice(i + 1)}
     </span>
   );
@@ -58,10 +58,13 @@ export function Binder({ rows }: { rows: CourseSummary[] }) {
               <span>{course.title}</span>
             </span>
             <span className="binder-body">
-              {course.kind === "topic" ? <span>{t("Topic", "Sujet", "Thema")}</span> : <Counted text={count(lessons, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])} />}
-              <Counted text={count(sources, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} />
-              <Counted text={count(artifacts, ["study aid", "study aids"], ["création", "créations"], ["Lernhilfe", "Lernhilfen"])} />
               {course.examDate ? <span className="binder-exam">{examLabel(course.examDate, t)}</span> : null}
+              {course.kind === "topic" ? <span className="binder-kind">{t("Topic", "Sujet", "Thema")}</span> : null}
+              <span className="binder-counts">
+                {course.kind === "course" ? <Counted n={lessons} text={count(lessons, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])} /> : null}
+                <Counted n={sources} text={count(sources, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} />
+                <Counted n={artifacts} text={count(artifacts, ["study aid", "study aids"], ["création", "créations"], ["Lernhilfe", "Lernhilfen"])} />
+              </span>
             </span>
           </a>
         </li>

@@ -27,12 +27,12 @@
   --line-strong: oklch(62% 0.01 250);
   --text: oklch(21% 0.014 260);
   --muted: oklch(44% 0.014 255);
-  /* Ballpoint blue: links, citations, focus, progress. Never a filled button. */
-  --accent: oklch(47% 0.19 265);
-  --accent-hover: oklch(41% 0.19 265);
+  /* Ink does everything that acts: links, citations, focus, progress. The only hues are the dividers'. */
+  --accent: oklch(21% 0.014 260);
+  --accent-hover: oklch(32% 0.016 260);
   --accent-ink: oklch(99% 0 0);
-  --accent-soft: oklch(93.6% 0.034 265);
-  --accent-text: oklch(44% 0.19 265);
+  --accent-soft: oklch(91% 0.006 245);
+  --accent-text: oklch(21% 0.014 260);
   /* Ink: the one primary action on a screen. */
   --ink: oklch(21% 0.014 260);
   --ink-hover: oklch(32% 0.016 260);
@@ -47,14 +47,14 @@
   --scrim: oklch(20% 0.012 260 / 0.42);
   --shadow-1: 0 1px 2px oklch(20% 0.012 260 / 0.08);
   --shadow-2: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07);
-  --focus-ring: 0 0 0 3px oklch(47% 0.19 265 / 0.3);
+  --focus-ring: 0 0 0 3px oklch(21% 0.014 260 / 0.22);
 
   /* The course's divider colour. Outside a course: a plain grey divider. */
   --l: 0.8;
   --c: 0.012;
   --h: 250;
   --course: oklch(var(--l) var(--c) var(--h));
-  --course-soft: color-mix(in oklab, var(--course) 30%, var(--surface));
+  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
   --course-deep: oklch(0.42 var(--c) var(--h));
   --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
 
@@ -126,7 +126,7 @@
 }
 [data-hue] {
   --course: oklch(var(--l) var(--c) var(--h));
-  --course-soft: color-mix(in oklab, var(--course) 30%, var(--surface));
+  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
   --course-deep: oklch(0.42 var(--c) var(--h));
   --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
 }
@@ -146,11 +146,11 @@
     --line-strong: oklch(54% 0.012 258);
     --text: oklch(93% 0.005 245);
     --muted: oklch(73% 0.01 255);
-    --accent: oklch(74% 0.13 265);
-    --accent-hover: oklch(80% 0.11 265);
-    --accent-ink: oklch(18% 0.02 260);
-    --accent-soft: oklch(32% 0.07 265);
-    --accent-text: oklch(81% 0.1 265);
+    --accent: oklch(94% 0.005 245);
+    --accent-hover: oklch(86% 0.006 245);
+    --accent-ink: oklch(19% 0.012 260);
+    --accent-soft: oklch(31% 0.01 258);
+    --accent-text: oklch(94% 0.005 245);
     --ink: oklch(94% 0.005 245);
     --ink-hover: oklch(86% 0.006 245);
     --on-ink: oklch(19% 0.012 260);
@@ -164,14 +164,14 @@
     --scrim: oklch(5% 0 0 / 0.58);
     --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
     --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
-    --focus-ring: 0 0 0 3px oklch(74% 0.13 265 / 0.38);
+    --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
     --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-    --course-soft: color-mix(in oklab, var(--course) 24%, var(--surface));
+    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
     --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   }
   :root:not([data-theme="light"]) [data-hue] {
     --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-    --course-soft: color-mix(in oklab, var(--course) 24%, var(--surface));
+    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
     --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   }
 }
@@ -188,11 +188,11 @@
   --line-strong: oklch(54% 0.012 258);
   --text: oklch(93% 0.005 245);
   --muted: oklch(73% 0.01 255);
-  --accent: oklch(74% 0.13 265);
-  --accent-hover: oklch(80% 0.11 265);
-  --accent-ink: oklch(18% 0.02 260);
-  --accent-soft: oklch(32% 0.07 265);
-  --accent-text: oklch(81% 0.1 265);
+  --accent: oklch(94% 0.005 245);
+  --accent-hover: oklch(86% 0.006 245);
+  --accent-ink: oklch(19% 0.012 260);
+  --accent-soft: oklch(31% 0.01 258);
+  --accent-text: oklch(94% 0.005 245);
   --ink: oklch(94% 0.005 245);
   --ink-hover: oklch(86% 0.006 245);
   --on-ink: oklch(19% 0.012 260);
@@ -206,15 +206,15 @@
   --scrim: oklch(5% 0 0 / 0.58);
   --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
   --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
-  --focus-ring: 0 0 0 3px oklch(74% 0.13 265 / 0.38);
+  --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
   --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-  --course-soft: color-mix(in oklab, var(--course) 24%, var(--surface));
+  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
   --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   color-scheme: dark;
 }
 :root[data-theme="dark"] [data-hue] {
   --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-  --course-soft: color-mix(in oklab, var(--course) 24%, var(--surface));
+  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
   --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
 }
 :root[data-theme="light"] {
@@ -240,8 +240,10 @@ body {
   -webkit-font-smoothing: antialiased;
   caret-color: var(--accent);
 }
+/* Selected text is highlighted, as with a marker. */
 ::selection {
-  background: color-mix(in oklab, var(--accent) 26%, transparent);
+  background: var(--mark);
+  color: var(--text);
 }
 h1,
 h2,
@@ -692,6 +694,15 @@ main:focus-visible {
   background: var(--course-soft);
   color: var(--text);
 }
+/* In the evening a lesson's divider is a charcoal sheet; its course tab keeps the full colour. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .divider.soft {
+    background: var(--surface-2);
+  }
+}
+:root[data-theme="dark"] .divider.soft {
+  background: var(--surface-2);
+}
 .divider .crumbs a:not(.crumb-course) {
   color: inherit;
   opacity: 0.78;
@@ -830,6 +841,10 @@ main:focus-visible {
 .divider.soft h1:not(.title-heading) {
   font-size: var(--fs-headline);
 }
+.paper .recorder {
+  border: 0;
+  padding-inline: 0;
+}
 .paper .page-text {
   border-width: 1px 0 0;
   border-radius: 0;
@@ -898,6 +913,22 @@ main:focus-visible {
 .divider .tabs button:nth-child(n + 5),
 .binder li:nth-child(n + 5) .binder-tab {
   animation-delay: 160ms;
+}
+
+/* On a phone a divider's actions keep one row: their labels are read, not shown. */
+@media (max-width: 560px) {
+  .divider .page-head .btn-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .divider .page-head .row > :is(button, .button) {
+    min-inline-size: 44px;
+    padding-inline: var(--space-3);
+  }
 }
 
 /* ── Controls. A button is quiet (secondary) unless it is the one primary action, in ink. ── */
@@ -1501,13 +1532,34 @@ textarea {
 .binder li:not(:nth-child(4n + 1)) .binder-body {
   border-radius: var(--radius-lg);
 }
-.binder-body strong {
+/* Counts sit right, in columns, as on a contents page. */
+.binder-counts {
+  margin-inline-start: auto;
+  display: flex;
+  gap: var(--space-5);
+}
+.binder-count {
+  min-inline-size: 7.5em;
+  text-align: end;
+  white-space: nowrap;
+}
+.binder-count strong {
   font-family: var(--display);
   font-size: var(--fs-title);
   font-weight: 760;
 }
+.binder-count.zero {
+  opacity: 0.62;
+}
+.binder-count.zero strong {
+  font-family: var(--font);
+  font-size: inherit;
+  font-weight: 500;
+}
+.binder-kind {
+  font-weight: 650;
+}
 .binder-exam {
-  margin-inline-start: auto;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -1535,8 +1587,13 @@ textarea {
     gap: var(--space-1) var(--space-4);
     padding: var(--space-3) var(--space-4);
   }
-  .binder-exam {
+  .binder-counts {
     margin-inline-start: 0;
+    gap: var(--space-4);
+  }
+  .binder-count {
+    min-inline-size: 0;
+    text-align: start;
   }
 }
 
@@ -1567,6 +1624,23 @@ textarea {
   color: var(--text);
   box-shadow: var(--shadow-1);
 }
+/* Filed under its course: the course's divider tab rises from the sheet's top edge. */
+.next[data-hue] {
+  position: relative;
+  margin-top: var(--space-3);
+  border-start-start-radius: 0;
+}
+.next[data-hue]::before {
+  content: "";
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline-start: 0;
+  inline-size: 112px;
+  block-size: 14px;
+  background: var(--course);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+  border-start-start-radius: var(--radius-sm);
+}
 .next > .icon {
   box-sizing: content-box;
   padding: 10px;
@@ -1581,19 +1655,6 @@ textarea {
   font-stretch: 100%;
   letter-spacing: -0.012em;
   line-height: 1.3;
-}
-/* The course the step belongs to, as its divider tab. */
-.next-course {
-  display: table;
-  font-family: var(--font);
-  font-size: var(--fs-small);
-  font-weight: 650;
-  letter-spacing: 0;
-  padding: 1px var(--space-3) 1px var(--space-2);
-  margin-bottom: var(--space-2);
-  border-radius: var(--radius-sm);
-  background: var(--course);
-  color: var(--on-course);
 }
 .next.calm > .icon {
   background: var(--ok-soft);
@@ -1768,7 +1829,6 @@ textarea {
   background: var(--danger);
   border-color: var(--danger);
   color: var(--accent-ink);
-  box-shadow: 0 0 0 6px var(--danger-soft);
 }
 .rec-button:hover:not(:disabled) {
   border-color: var(--danger);
@@ -1778,7 +1838,6 @@ textarea {
   background: var(--text);
   border-color: var(--text);
   color: var(--bg);
-  box-shadow: 0 0 0 6px var(--surface-2);
 }
 .rec-side {
   min-inline-size: 9rem;
@@ -2284,9 +2343,10 @@ textarea {
   box-shadow: none;
   background: var(--accent-soft);
   color: var(--accent-text);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 .cite:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--accent) 22%, var(--accent-soft));
+  background: var(--mark);
 }
 .cite:active:not(:disabled) {
   transform: none;

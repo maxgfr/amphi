@@ -70,7 +70,7 @@ export function ArtifactScreen({ id }: { id: string }) {
           <div className="row no-print">
             {k && artifact.status !== "working" ? (
               <button type="button" className="secondary" onClick={() => setRegenerating(true)}>
-                <Icon name="refresh" size={18} /> {t("Regenerate", "Régénérer", "Neu erstellen")}
+                <Icon name="refresh" size={18} /> <span className="btn-label">{t("Regenerate", "Régénérer", "Neu erstellen")}</span>
               </button>
             ) : null}
             <button

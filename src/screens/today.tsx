@@ -65,10 +65,7 @@ export function Today() {
           return (
             <section className="next" data-hue={course ? courseHue(course) : undefined} aria-label={t("Next step", "Prochaine étape", "Nächster Schritt")}>
               <Icon name={d.icon} size={24} />
-              <p className="next-text">
-                {course ? <span className="next-course">{course.title}</span> : null}
-                {d.text}
-              </p>
+              <p className="next-text">{d.text}</p>
               <a className="button primary" href={d.to}>
                 {d.action}
               </a>

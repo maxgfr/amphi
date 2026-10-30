@@ -87,10 +87,10 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
                 }
               }}
             >
-              <Icon name="send" size={18} /> {t("Send to Cursus", "Envoyer vers Cursus", "An Cursus senden")}
+              <Icon name="send" size={18} /> <span className="btn-label">{t("Send to Cursus", "Envoyer vers Cursus", "An Cursus senden")}</span>
             </button>
             <button type="button" className="secondary" onClick={() => setEditing(true)}>
-              <Icon name="edit" size={18} /> {t("Edit", "Modifier", "Bearbeiten")}
+              <Icon name="edit" size={18} /> <span className="btn-label">{t("Edit", "Modifier", "Bearbeiten")}</span>
             </button>
             {confirmDelete ? (
               <button

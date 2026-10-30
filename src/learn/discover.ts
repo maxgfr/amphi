@@ -14,7 +14,7 @@ import { askJson } from "../ai/structured.ts";
 import { fresh, put } from "../data/db.ts";
 import { addNote } from "../data/importers.ts";
 import type { Artifact, Course } from "../data/schema.ts";
-import { trIn } from "../i18n.ts";
+import { colon, trIn } from "../i18n.ts";
 import type { MindmapData } from "../studio/render/mindmap-tree.ts";
 import { conceptRecords, conceptTree, RawConcept } from "./concepts.ts";
 
@@ -182,7 +182,7 @@ export function proposalNote(p: Proposal, language: string): string {
   const tt = trIn(language);
   const why = p.why ? `_${p.why}_` : "";
   if (p.status === "unsourced") {
-    return [`> ${tt("Suggested without a web search: unsourced, to verify.", "Suggéré sans recherche web : non sourcé, à vérifier.", "Ohne Websuche vorgeschlagen: ohne Quelle, zu prüfen.")}`, why, p.level ? `${tt("Level", "Niveau", "Niveau")}: ${p.level}` : ""].filter(Boolean).join("\n\n");
+    return [`> ${tt("Suggested without a web search: unsourced, to verify.", "Suggéré sans recherche web : non sourcé, à vérifier.", "Ohne Websuche vorgeschlagen: ohne Quelle, zu prüfen.")}`, why, p.level ? `${colon(tt("Level", "Niveau", "Niveau"), language)} ${p.level}` : ""].filter(Boolean).join("\n\n");
   }
   return [p.excerpt, why].filter(Boolean).join("\n\n");
 }

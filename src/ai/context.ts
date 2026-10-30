@@ -7,6 +7,7 @@
 import MiniSearch from "minisearch";
 import type { Source } from "../data/schema.ts";
 import { clock } from "../i18n.ts";
+import { expandCitations } from "./labels.ts";
 
 export interface Passage {
   id: string;
@@ -138,7 +139,7 @@ const LABEL = /\[(S\d+(?: (?:p\.\d+|§\d+|\d+:\d{2}(?::\d{2})?))?)\]/g;
 
 /** The citation labels a text uses, in order of first appearance. */
 export function citationsIn(text: string): string[] {
-  return [...new Set([...text.matchAll(LABEL)].map((m) => m[1]!))];
+  return [...new Set([...expandCitations(text).matchAll(LABEL)].map((m) => m[1]!))];
 }
 
 /** Where a label points: the source and the page or moment. */

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Source } from "../data/schema.ts";
 import { budgetFor, buildContext, chunk, citationsIn, passagesOf, resolveLabel } from "./context.ts";
+import { expandCitations } from "./labels.ts";
 
 const base = { createdAt: 0, updatedAt: 0, courseId: "c", status: "ready" as const };
 const pdf: Source = { ...base, id: "a", kind: "pdf", title: "Slides", pages: [{ n: 1, text: "Entropy measures disorder." }, { n: 2, text: "The second law: entropy never decreases." }] };
@@ -65,6 +66,12 @@ describe("citations", () => {
     expect(resolveLabel("S2 1:05", keys)).toEqual({ sourceId: "b", page: undefined, t: 65 });
     expect(resolveLabel("S2 1:05:10", keys)).toEqual({ sourceId: "b", page: undefined, t: 3910 });
     expect(resolveLabel("S9", keys)).toBeNull();
+  });
+
+  test("grouped in one bracket are split, other brackets are left alone", () => {
+    expect(citationsIn("Joule [S1 §1, S2 §1] and Mayer [S2 p.3; S3 1:05]")).toEqual(["S1 §1", "S2 §1", "S2 p.3", "S3 1:05"]);
+    expect(expandCitations("[S1 §1, S2 §1]")).toBe("[S1 §1] [S2 §1]");
+    expect(expandCitations("[S1 p.2, see the slides]")).toBe("[S1 p.2, see the slides]");
   });
 });
 

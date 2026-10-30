@@ -5,6 +5,7 @@
 // cards. Cursus mints fresh ids on import, so the package uses local refs.
 
 import { citationsIn, passagesOf, resolveLabel } from "../ai/context.ts";
+import { expandCitations } from "../ai/labels.ts";
 import { get, getBlob, list } from "../data/db.ts";
 import type { Artifact, Course, Id, Lesson, Source } from "../data/schema.ts";
 import type { FlashcardsData } from "../studio/cards.ts";
@@ -64,7 +65,7 @@ const exportable = (s: Source) => Boolean(sourceBody(s).trim()) || (s.kind === "
 /** Citation labels ("[S1 p.3]") read as the source's title, since the labels mean nothing outside amphi. */
 function readableCitations(md: string, sourceIds: Id[], sources: Map<Id, Source>): string {
   const keys = keysOf(sourceIds);
-  return md.replace(/\[(S\d+(?: (?:p\.\d+|§\d+|\d+:\d{2}(?::\d{2})?))?)\]/g, (all, label: string) => {
+  return expandCitations(md).replace(/\[(S\d+(?: (?:p\.\d+|§\d+|\d+:\d{2}(?::\d{2})?))?)\]/g, (all, label: string) => {
     const r = resolveLabel(label, keys);
     const title = r && sources.get(r.sourceId)?.title;
     if (!title) return all;

@@ -216,7 +216,7 @@ function Conversation({ id, sources, language, extraSystem, onBack }: { id: Id; 
           </button>
         )}
       </form>
-      <p className="meta">{t(`Passages of ${sources.length} sources go to ${recipient()} with each question.`, `Des passages de ${sources.length} sources partent chez ${recipient()} avec chaque question.`, `Mit jeder Frage gehen Passagen aus ${sources.length} Quellen an ${recipient()}.`)}</p>
+      <p className="meta">{t(`Passages of ${count(sources.length, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} go to ${recipient()} with each question.`, `Des passages de ${count(sources.length, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} partent chez ${recipient()} avec chaque question.`, `Mit jeder Frage gehen Passagen aus ${count(sources.length, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} an ${recipient()}.`)}</p>
     </section>
   );
 }

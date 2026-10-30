@@ -37,7 +37,7 @@ export function CourseForm({ open, onClose, course, kind = "course", onSaved }: 
             <input className="emoji-input" value={emoji} maxLength={4} onChange={(e) => setEmoji(e.currentTarget.value)} placeholder="📘" />
           </Field>
           <Field label={t("Title", "Titre", "Titel")}>
-            <input value={title} onChange={(e) => setTitle(e.currentTarget.value)} required autoFocus placeholder={isTopic ? t("Thermodynamics", "Thermodynamique", "Thermodynamik") : t("Organic chemistry", "Chimie organique", "Organische Chemie")} />
+            <input value={title} onChange={(e) => setTitle(e.currentTarget.value)} required data-autofocus placeholder={isTopic ? t("Thermodynamics", "Thermodynamique", "Thermodynamik") : t("Organic chemistry", "Chimie organique", "Organische Chemie")} />
           </Field>
         </div>
         <Field label={t("Language of the material", "Langue des supports", "Sprache der Unterlagen")} hint={t("Summaries, quizzes and podcasts are written in it.", "Les résumés, quiz et podcasts sont écrits dans cette langue.", "Zusammenfassungen, Quizze und Podcasts werden in dieser Sprache geschrieben.")}>

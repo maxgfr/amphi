@@ -4,6 +4,7 @@
 
 import type { ModelMessage } from "ai";
 import { budgetFor, buildContext, CITE_RULE } from "../ai/context.ts";
+import { expandCitations } from "../ai/labels.ts";
 import { ask, askStream, capabilities, writeIn } from "../ai/llm.ts";
 import { addNote } from "../data/importers.ts";
 import { update } from "../data/db.ts";
@@ -42,7 +43,7 @@ export async function* answer(chat: Chat, sources: Source[], question: string, l
 /** "[S1 p.3]" → "(Title, p.3)": labels only mean something next to the passages they were given with. */
 export function spellCitations(text: string, sourceIds: readonly string[] | undefined, sources: Source[]): string {
   if (!sourceIds) return text;
-  return text.replace(/\[S(\d+)((?: (?:p\.\d+|§\d+|\d+:\d{2}(?::\d{2})?))?)\]/g, (m, n: string, rest: string) => {
+  return expandCitations(text).replace(/\[S(\d+)((?: (?:p\.\d+|§\d+|\d+:\d{2}(?::\d{2})?))?)\]/g, (m, n: string, rest: string) => {
     const s = sources.find((x) => x.id === sourceIds[Number(n) - 1]);
     return s ? `(${s.title}${rest ? `,${rest}` : ""})` : m;
   });

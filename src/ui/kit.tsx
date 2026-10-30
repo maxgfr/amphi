@@ -12,7 +12,11 @@ export function Sheet({ open, onClose, title, children, wide }: { open: boolean;
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // showModal focuses the close button; start in the field marked data-autofocus, else the first one.
+      (d.querySelector<HTMLElement>(".sheet-body [data-autofocus]") ?? d.querySelector<HTMLElement>(".sheet-body :is(input, textarea, select):not(:disabled, [type=hidden], [type=checkbox], [type=radio])"))?.focus();
+    }
     if (!open && d.open) d.close();
   }, [open]);
   return (

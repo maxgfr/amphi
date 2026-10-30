@@ -59,6 +59,9 @@ export const trIn =
   (en, fr, de) =>
     pick(code?.startsWith("fr") ? "fr" : code?.startsWith("de") ? "de" : "en", en, fr, de);
 
+/** "Score:" in English and German, "Score :" in French. */
+export const colon = (label: string, l: string = lang) => (l.startsWith("fr") ? `${label} :` : `${label}:`);
+
 /** "1 lesson", "3 lessons", in the interface's language: each pair is [one, other]. */
 export function count(n: number, en: [string, string], fr: [string, string], de: [string, string], l: Lang = lang): string {
   const forms = l === "fr" ? fr : l === "de" ? de : en;

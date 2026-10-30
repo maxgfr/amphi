@@ -5,7 +5,7 @@ A local-first study app on GitHub Pages (`maxgfr.github.io/amphi/`): no server, 
 ## Commands
 
 - `bun run dev`: build and serve under `/amphi/` on port 4173.
-- `bun run typecheck`, `bun run lint`, `bun test src scripts`, `bun run build`, `bun run check:network`, `bun run e2e`: the CI gates, all must pass.
+- `bun run typecheck`, `bun run lint`, `bun test src scripts`, `bun run build`, `bun run check:network`, `bun run e2e`: the CI gates, all must pass. `bun run e2e:live` (`e2e/live.spec.ts`) replays the whole path against a real provider with `AMPHI_LIVE_KEY`; it is skipped without it, and never runs in CI.
 - `bun run catalog`: refresh `public/models.json`.
 
 ## Conventions

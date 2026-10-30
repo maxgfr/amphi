@@ -11,7 +11,7 @@ import { askJson } from "../ai/structured.ts";
 import { fresh, list, put } from "../data/db.ts";
 import { conceptRule } from "../learn/concepts.ts";
 import type { Artifact } from "../data/schema.ts";
-import { clock, trIn, useLang } from "../i18n.ts";
+import { clock, colon, trIn, useLang } from "../i18n.ts";
 import { openCitation } from "../ui/cite.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Field, Notice, Segmented, slug } from "../ui/kit.tsx";
@@ -224,7 +224,7 @@ function View({ artifact, onChange }: ViewProps<QuizData>) {
       <div className="stack quiz">
         <div className="quiz-score" role="status">
           <span className="quiz-score-value">
-            {t("Score", "Score", "Ergebnis")}: {fmt(points)} / {total}
+            {colon(t("Score", "Score", "Ergebnis"))} {fmt(points)} / {total}
           </span>
           <span className="meta">{Math.round(ratio * 100)} %</span>
         </div>
@@ -420,12 +420,12 @@ function QuestionCard({
           </p>
           {readOnly && q.kind === "short" && typeof response === "string" && response ? (
             <p className="meta">
-              {t("Your answer", "Votre réponse", "Ihre Antwort")}: {response}
+              {colon(t("Your answer", "Votre réponse", "Ihre Antwort"))} {response}
             </p>
           ) : null}
           {verdict !== "correct" || q.kind === "short" ? (
             <p>
-              {t("Answer", "Réponse", "Antwort")}: <strong>{answerText(q, t)}</strong>
+              {colon(t("Answer", "Réponse", "Antwort"))} <strong>{answerText(q, t)}</strong>
             </p>
           ) : null}
           {checked?.feedback ? <p>{checked.feedback}</p> : null}

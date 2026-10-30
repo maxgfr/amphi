@@ -122,7 +122,7 @@ function NoteSheet({ onClose, onSave }: { onClose: () => void; onSave: (title: s
         }}
       >
         <Field label={t("Title", "Titre", "Titel")}>
-          <input value={title} onChange={(e) => setTitle(e.currentTarget.value)} autoFocus />
+          <input value={title} onChange={(e) => setTitle(e.currentTarget.value)} data-autofocus />
         </Field>
         <Field label={t("Text (Markdown)", "Texte (Markdown)", "Text (Markdown)")}>
           <textarea rows={14} value={text} onChange={(e) => setText(e.currentTarget.value)} required />

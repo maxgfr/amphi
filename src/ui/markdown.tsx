@@ -6,6 +6,7 @@
 import DOMPurify from "dompurify";
 import { Marked } from "marked";
 import { useEffect, useMemo, useRef } from "react";
+import { expandCitations } from "../ai/labels.ts";
 
 const marked = new Marked({ gfm: true, breaks: false, async: false });
 
@@ -20,7 +21,7 @@ const CONFIG = {
 };
 
 function rawHtml(md: string, cite: boolean): string {
-  const html = marked.parse(md) as string;
+  const html = marked.parse(cite ? expandCitations(md) : md) as string;
   return cite ? html.replace(LABEL, (_, label: string) => `<button type="button" class="cite" data-cite="${escapeAttr(label)}">${label}</button>`) : html;
 }
 

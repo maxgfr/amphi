@@ -1,6 +1,6 @@
 import { expect, type Page, type Route } from "@playwright/test";
 
-export const siteURL = process.env.AMPHI_URL ?? "http://localhost:4173/amphi/";
+export const siteURL = process.env.AMPHI_URL ?? `http://localhost:${process.env.PORT ?? 4173}/amphi/`;
 const siteOrigin = new URL(siteURL).origin;
 /** The fake OpenAI-compatible server the tests point the AI settings at; requests to it are answered by `mockAi`. */
 export const MOCK_AI = "http://127.0.0.1:9/v1";

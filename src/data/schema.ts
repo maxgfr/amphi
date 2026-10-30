@@ -150,6 +150,8 @@ export interface StudyEvent extends Base {
   conceptId?: Id;
   artifactId?: Id;
   kind: "quiz" | "card" | "self" | "tutor";
+  /** The concept's name as the quiz or card states it, when no concept record is linked yet. */
+  concept?: string;
   /** 0 (not known) to 1 (known). */
   score: number;
   at: number;

@@ -2,7 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 
 // AMPHI_URL runs the suite against a deployed site instead of a local build.
 const remote = process.env.AMPHI_URL;
-export const baseURL = remote ?? "http://localhost:4173/amphi/";
+// PORT lets several checkouts run their suites side by side.
+const port = Number(process.env.PORT ?? 4173);
+export const baseURL = remote ?? `http://localhost:${port}/amphi/`;
 
 export default defineConfig({
   testDir: "e2e",
@@ -18,7 +20,7 @@ export default defineConfig({
     ? undefined
     : {
         command: "bun scripts/build.ts --serve",
-        url: "http://localhost:4173/amphi/",
+        url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
       },

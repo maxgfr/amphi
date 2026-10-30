@@ -116,7 +116,7 @@ test("flashcards are generated, edited, reviewed into study events, and exported
   await expect(page.getByRole("heading", { name: "Entropy" })).toBeVisible();
 
   // The whole course, from its page.
-  await page.getByRole("link", { name: "Thermodynamics" }).click();
+  await page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Thermodynamics" }).click();
   const course = await download(page, "Send to Cursus");
   expect(course.name).toBe("thermodynamics.cursus-course");
   const all = JSON.parse(new TextDecoder().decode(unzipSync(course.bytes)["course.json"])) as { sections: { name: string }[]; cards: unknown[] };

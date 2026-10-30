@@ -7,7 +7,8 @@ import { nextSteps, type Step } from "../learn/next.ts";
 import "../learn/rules.ts";
 import { href } from "../router.ts";
 import { Icon, type IconName } from "../ui/icons.tsx";
-import { CourseCard, courseSummaries } from "./courses.tsx";
+import { courseHue } from "../ui/hue.ts";
+import { Binder, courseSummaries } from "./courses.tsx";
 
 async function configured(): Promise<boolean> {
   const { loadLlm, savedSettings } = await import("../ai/llm.ts");
@@ -38,7 +39,7 @@ function describe(s: Step, t: T): { icon: IconName; text: string; action: string
 }
 
 export function Today() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const data = useLive(
     async () => {
       const [steps, courses] = await Promise.all([configured().then((c) => nextSteps(c)), courseSummaries()]);
@@ -49,16 +50,25 @@ export function Today() {
   );
   if (!data) return <div className="page" aria-busy="true" />;
   const [first, ...rest] = data.steps;
+  const courseOf = (s: Step) => data.courses.find((c) => c.course.id === s.courseId)?.course;
+  const today = new Intl.DateTimeFormat(lang, { weekday: "long", day: "numeric", month: "long" }).format(new Date());
   return (
     <div className="page">
-      <h1>{t("Today", "Aujourd'hui", "Heute")}</h1>
+      <div className="today-head">
+        <h1>{t("Today", "Aujourd'hui", "Heute")}</h1>
+        <p className="today-date">{today}</p>
+      </div>
       {first ? (
         (() => {
           const d = describe(first, t);
+          const course = courseOf(first);
           return (
-            <section className="next" aria-label={t("Next step", "Prochaine étape", "Nächster Schritt")}>
-              <Icon name={d.icon} size={28} />
-              <p className="next-text">{d.text}</p>
+            <section className="next" data-hue={course ? courseHue(course.id) : undefined} aria-label={t("Next step", "Prochaine étape", "Nächster Schritt")}>
+              <Icon name={d.icon} size={24} />
+              <p className="next-text">
+                {course ? <span className="next-course">{course.title}</span> : null}
+                {d.text}
+              </p>
               <a className="button primary" href={d.to}>
                 {d.action}
               </a>
@@ -67,7 +77,7 @@ export function Today() {
         })()
       ) : (
         <section className="next calm">
-          <Icon name="check" size={28} />
+          <Icon name="check" size={24} />
           <p className="next-text">{t("Nothing urgent. Record or import today's lecture when it is done.", "Rien d'urgent. Enregistrez ou importez le cours du jour quand il est terminé.", "Nichts Dringendes. Nehmen Sie die heutige Vorlesung auf oder importieren Sie sie, wenn sie vorbei ist.")}</p>
         </section>
       )}
@@ -75,11 +85,13 @@ export function Today() {
         <ul className="list compact">
           {rest.slice(0, 4).map((s) => {
             const d = describe(s, t);
+            const course = courseOf(s);
             return (
-              <li key={`${s.kind}-${s.sourceId ?? s.lessonId ?? s.courseId ?? s.conceptId}`} className="list-item">
+              <li key={`${s.kind}-${s.sourceId ?? s.lessonId ?? s.courseId ?? s.conceptId}`} className="list-item" data-hue={course ? courseHue(course.id) : undefined}>
                 <a className="list-link" href={d.to}>
-                  <Icon name={d.icon} />
+                  {course ? <span className="step-tab" aria-hidden="true" /> : <Icon name={d.icon} />}
                   <span className="list-main">{d.text}</span>
+                  <span className="list-end">{d.action}</span>
                   <Icon name="chevron-right" />
                 </a>
               </li>
@@ -90,11 +102,7 @@ export function Today() {
       {data.courses.length ? (
         <>
           <h2 className="section-title">{t("Your courses", "Vos cours", "Ihre Kurse")}</h2>
-          <div className="grid">
-            {data.courses.slice(0, 6).map((s) => (
-              <CourseCard key={s.course.id} s={s} />
-            ))}
-          </div>
+          <Binder rows={data.courses.slice(0, 8)} />
         </>
       ) : null}
     </div>

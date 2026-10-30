@@ -12,6 +12,7 @@ import { go, href } from "../router.ts";
 import { isoDay } from "../speech/draft.ts";
 import { elapsed, level, markMoment, pauseRecording, resumeRecording, startRecording, stopRecording, useRecorder } from "../speech/recorder.ts";
 import { RecoveryNotice, useRecovery } from "../speech/recovery.tsx";
+import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Field, Notice } from "../ui/kit.tsx";
 
@@ -35,6 +36,7 @@ export function RecordScreen({ courseId, lessonId }: { courseId: string; lessonI
   );
   const [picked, setPicked] = useState<Id | null>(null);
   useClock(rec.state === "recording");
+  useOpenCourse(data?.course?.id);
   const stopping = useRef(false);
 
   if (data === undefined) return <div className="page" aria-busy="true" />;
@@ -78,12 +80,16 @@ export function RecordScreen({ courseId, lessonId }: { courseId: string; lessonI
             : t("Ready to record", "Prêt à enregistrer", "Bereit zur Aufnahme");
 
   return (
-    <div className="page narrow">
-      <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-        <a href={href.course(course.id)}>{course.title}</a>
-        {recordingLesson && (rec.state !== "idle" || lessonId) ? <a href={href.lesson(recordingLesson.id)}>{recordingLesson.title}</a> : null}
-      </nav>
-      <h1>{t("Record a lecture", "Enregistrer un cours", "Vorlesung aufnehmen")}</h1>
+    <div className="page narrow" data-hue={courseHue(course.id)}>
+      <header className="divider soft">
+        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+          <a className="crumb-course" href={href.course(course.id)}>
+            {course.title}
+          </a>
+          {recordingLesson && (rec.state !== "idle" || lessonId) ? <a href={href.lesson(recordingLesson.id)}>{recordingLesson.title}</a> : null}
+        </nav>
+        <h1>{t("Record a lecture", "Enregistrer un cours", "Vorlesung aufnehmen")}</h1>
+      </header>
       {rec.state === "idle" ? <RecoveryNotice /> : null}
       {rec.error ? <Notice kind="error">{rec.error}</Notice> : null}
       {rec.state === "idle" && rec.saved ? (

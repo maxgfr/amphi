@@ -62,7 +62,7 @@ test("after a first visit, every screen, the Studio's views and its exports work
   const mindmap = await make(page, /^Mind map/, /Mind map ·/);
   const cards = await make(page, /^Flashcards/, /Flashcards · Lesson 1/);
   const slides = await make(page, /^Slides/, /Entropy in slides/);
-  await page.getByRole("link", { name: "Thermodynamics" }).click();
+  await page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Thermodynamics" }).click();
   const course = page.url();
 
   // Sync to a repository while online.

@@ -1,11 +1,13 @@
 import { lazy, Suspense, useState } from "react";
 import { fresh, get, list, put, removeCourse } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
-import { colon, count, dateOnly, useLang } from "../i18n.ts";
+import { count, dateOnly, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
+import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice, saveFile, Tabs } from "../ui/kit.tsx";
 import { CourseForm } from "./course-form.tsx";
+import { examLabel } from "./courses.tsx";
 import { SourceList } from "./sources.tsx";
 
 const StudioPanel = lazy(() => import("../studio/panel.tsx").then((m) => ({ default: m.StudioPanel })));
@@ -20,6 +22,7 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
+  useOpenCourse(id);
   const data = useLive(
     async () => {
       const course = await get("courses", id);
@@ -56,62 +59,64 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
   };
 
   return (
-    <div className="page">
-      <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-        <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>
-      </nav>
-      <div className="page-head">
-        <h1>
-          <span aria-hidden="true">{course.emoji || (course.kind === "topic" ? "🧭" : "📘")}</span> {course.title}
-        </h1>
-        <div className="row">
-          <button
-            type="button"
-            className="secondary"
-            disabled={sending}
-            title={t("A .cursus-course file with the sources, reports and flashcards, to import in Cursus", "Un fichier .cursus-course avec les sources, rapports et cartes, à importer dans Cursus", "Eine .cursus-course-Datei mit den Quellen, Berichten und Karten, zum Import in Cursus")}
-            onClick={async () => {
-              setSending(true);
-              setSendError("");
-              try {
-                const file = await (await import("../export/cursus.ts")).courseToCursus(id);
-                saveFile(file.blob, file.filename);
-              } catch (e) {
-                setSendError(e instanceof Error ? e.message : String(e));
-              } finally {
-                setSending(false);
-              }
-            }}
-          >
-            <Icon name="send" size={18} /> {t("Send to Cursus", "Envoyer vers Cursus", "An Cursus senden")}
-          </button>
-          <button type="button" className="secondary" onClick={() => setEditing(true)}>
-            <Icon name="edit" size={18} /> {t("Edit", "Modifier", "Bearbeiten")}
-          </button>
-          {confirmDelete ? (
+    <div className="page" data-hue={courseHue(id)}>
+      <header className="divider">
+        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+          <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>
+        </nav>
+        <div className="page-head">
+          <h1>
+            <span aria-hidden="true">{course.emoji || (course.kind === "topic" ? "🧭" : "📘")}</span> {course.title}
+          </h1>
+          <div className="row">
             <button
               type="button"
-              className="danger"
+              className="secondary"
+              disabled={sending}
+              title={t("A .cursus-course file with the sources, reports and flashcards, to import in Cursus", "Un fichier .cursus-course avec les sources, rapports et cartes, à importer dans Cursus", "Eine .cursus-course-Datei mit den Quellen, Berichten und Karten, zum Import in Cursus")}
               onClick={async () => {
-                await removeCourse(id);
-                go(href.courses());
+                setSending(true);
+                setSendError("");
+                try {
+                  const file = await (await import("../export/cursus.ts")).courseToCursus(id);
+                  saveFile(file.blob, file.filename);
+                } catch (e) {
+                  setSendError(e instanceof Error ? e.message : String(e));
+                } finally {
+                  setSending(false);
+                }
               }}
             >
-              {t("Delete for good", "Supprimer définitivement", "Endgültig löschen")}
+              <Icon name="send" size={18} /> {t("Send to Cursus", "Envoyer vers Cursus", "An Cursus senden")}
             </button>
-          ) : (
-            <button type="button" className="icon-button" aria-label={t("Delete the course", "Supprimer le cours", "Kurs löschen")} onClick={() => setConfirmDelete(true)}>
-              <Icon name="trash" size={18} />
+            <button type="button" className="secondary" onClick={() => setEditing(true)}>
+              <Icon name="edit" size={18} /> {t("Edit", "Modifier", "Bearbeiten")}
             </button>
-          )}
+            {confirmDelete ? (
+              <button
+                type="button"
+                className="danger"
+                onClick={async () => {
+                  await removeCourse(id);
+                  go(href.courses());
+                }}
+              >
+                {t("Delete for good", "Supprimer définitivement", "Endgültig löschen")}
+              </button>
+            ) : (
+              <button type="button" className="icon-button" aria-label={t("Delete the course", "Supprimer le cours", "Kurs löschen")} onClick={() => setConfirmDelete(true)}>
+                <Icon name="trash" size={18} />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-      {sendError ? <Notice kind="error">{sendError}</Notice> : null}
-      {course.examDate ? <p className="meta">{colon(t("Exam", "Examen", "Prüfung"))} {dateOnly(new Date(course.examDate).getTime())}</p> : null}
-      <Tabs tabs={tabs} value={current} onChange={(k) => go(href.course(id, k))} label={t("Course sections", "Sections du cours", "Kursbereiche")} />
+        {sendError ? <Notice kind="error">{sendError}</Notice> : null}
+        {course.examDate ? <p className="divider-facts">{examLabel(course.examDate, t)} · {dateOnly(new Date(course.examDate).getTime())}</p> : null}
+        <Tabs tabs={tabs} value={current} onChange={(k) => go(href.course(id, k))} label={t("Course sections", "Sections du cours", "Kursbereiche")} />
+      </header>
       <div className="tab-panel" role="tabpanel">
         {current === "lessons" ? (
-          <section>
+          <section className="stack">
             <div className="row">
               <button type="button" className="primary" onClick={() => void addLesson()}>
                 <Icon name="plus" /> {t("New lesson", "Nouvelle séance", "Neue Sitzung")}
@@ -129,10 +134,9 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
                       <a className="list-link" href={href.lesson(l.id)}>
                         <span className="list-main">
                           <span className="list-title">{l.title}</span>
-                          <span className="meta">
-                            {l.date ? dateOnly(new Date(l.date).getTime()) : ""} · {count(n, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])}
-                          </span>
+                          <span className="meta">{count(n, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])}</span>
                         </span>
+                        {l.date ? <span className="list-end">{dateOnly(new Date(l.date).getTime())}</span> : null}
                         <Icon name="chevron-right" />
                       </a>
                     </li>

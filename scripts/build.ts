@@ -95,7 +95,10 @@ await cp(`${root}public`, dist, { recursive: true });
 const html = await Bun.file(`${dist}/index.html`).text();
 await Bun.write(
   `${dist}/index.html`,
-  html.replace("</head>", '<link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./apple-touch-icon.png"><link rel="manifest" href="./manifest.webmanifest"></head>'),
+  html.replace(
+    "</head>",
+    '<link rel="preload" href="./fonts/archivo.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="./fonts/archivo.css"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./apple-touch-icon.png"><link rel="manifest" href="./manifest.webmanifest"></head>',
+  ),
 );
 await Bun.write(`${dist}/.nojekyll`, "");
 

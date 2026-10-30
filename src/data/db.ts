@@ -174,6 +174,10 @@ export async function setMeta(key: string, value: unknown): Promise<void> {
   await (await db()).put("meta", value, key);
 }
 
+export async function deleteMeta(key: string): Promise<void> {
+  await (await db()).delete("meta", key);
+}
+
 /** Ask the browser not to evict our data under storage pressure. */
 export async function persist(): Promise<boolean> {
   try {

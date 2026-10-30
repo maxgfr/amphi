@@ -7,6 +7,7 @@ import { ACCEPT, addNote, importFile } from "../data/importers.ts";
 import type { Id, Source } from "../data/schema.ts";
 import { bytes, clock, count, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
+import { RecoveryNotice } from "../speech/recovery.tsx";
 import { Icon, type IconName } from "../ui/icons.tsx";
 import { Empty, Field, Notice, Sheet } from "../ui/kit.tsx";
 
@@ -71,6 +72,7 @@ export function SourceList({ sources, courseId, lessonId }: { sources: Source[];
         </button>
         <input ref={input} type="file" multiple accept={ACCEPT} hidden onChange={(e) => e.currentTarget.files && void add(e.currentTarget.files)} />
       </div>
+      <RecoveryNotice courseId={courseId} />
       {busy > 0 ? <p className="meta" role="status">{t("Importing…", "Import…", "Import…")}</p> : null}
       {errors.map((e) => (
         <Notice key={e} kind="error">

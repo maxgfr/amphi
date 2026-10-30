@@ -3,6 +3,8 @@
 import { useLive } from "../data/hooks.ts";
 import { type T, useLang } from "../i18n.ts";
 import { nextSteps, type Step } from "../learn/next.ts";
+// Registers the concepts to review among the next steps.
+import "../learn/rules.ts";
 import { href } from "../router.ts";
 import { Icon, type IconName } from "../ui/icons.tsx";
 import { CourseCard, courseSummaries } from "./courses.tsx";

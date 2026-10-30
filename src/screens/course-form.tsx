@@ -7,7 +7,7 @@ import type { Course } from "../data/schema.ts";
 import { LANGS, languageLabel, useLang } from "../i18n.ts";
 import { Field, Sheet } from "../ui/kit.tsx";
 
-const MATERIAL_LANGS = [...LANGS, "es", "it", "pt", "nl"];
+export const MATERIAL_LANGS = [...LANGS, "es", "it", "pt", "nl"];
 
 export function CourseForm({ open, onClose, course, kind = "course", onSaved }: { open: boolean; onClose: () => void; course?: Course; kind?: Course["kind"]; onSaved?: (c: Course) => void }) {
   const { t, lang } = useLang();

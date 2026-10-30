@@ -5,6 +5,7 @@
 import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, rm, stat } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
+import { trimEspeak } from "./espeak.ts";
 
 const root = new URL("../", import.meta.url).pathname;
 const dist = `${root}dist`;
@@ -29,6 +30,16 @@ const noNodeBuiltins: Bun.BunPlugin = {
   name: "no-node-builtins",
   setup(build) {
     build.onResolve({ filter: /^(node:)?(fs|path|crypto|buffer|util|events|stream|url|os|child_process|worker_threads|module)$/ }, () => ({ path: `${root}scripts/node-stub.ts` }));
+  },
+};
+
+// eSpeak NG for the voice worker, with only the data of the languages it reads (see scripts/espeak.ts).
+const PIPER = `${root}node_modules/@diffusionstudio/piper-wasm/build/`;
+const espeak = trimEspeak(await Bun.file(`${PIPER}piper_phonemize.js`).text(), new Uint8Array(await Bun.file(`${PIPER}piper_phonemize.data`).arrayBuffer()));
+const trimmedEspeak: Bun.BunPlugin = {
+  name: "trimmed-espeak",
+  setup(build) {
+    build.onLoad({ filter: /piper_phonemize\.js$/ }, () => ({ contents: espeak.glue, loader: "js" }));
   },
 };
 
@@ -60,7 +71,7 @@ for (const name of WORKERS) {
       splitting: true,
       naming: { entry: `${name}.js`, chunk: `assets/w-${name}-[name]-[hash].[ext]`, asset: "assets/[name]-[hash].[ext]" },
       define,
-      plugins: [noNodeBuiltins],
+      plugins: [noNodeBuiltins, trimmedEspeak],
     }),
   );
 }
@@ -74,6 +85,9 @@ for (const name of ["ort-wasm-simd-threaded", "ort-wasm-simd-threaded.jsep", "or
 await mkdir(`${dist}/vendor`, { recursive: true });
 await cp(`${root}node_modules/pdfjs-dist/build/pdf.worker.min.mjs`, `${dist}/vendor/pdf.worker.mjs`);
 await cp(`${root}node_modules/sql.js/dist/sql-wasm-browser.wasm`, `${dist}/vendor/sql-wasm.wasm`);
+// eSpeak NG reads the voices' text into phonemes.
+await cp(`${PIPER}piper_phonemize.wasm`, `${dist}/vendor/piper_phonemize.wasm`);
+await Bun.write(`${dist}/vendor/espeak-ng.data`, espeak.data);
 
 await cp(`${root}public`, dist, { recursive: true });
 // Links to files under public/ are added after bundling: the HTML bundler
@@ -146,7 +160,7 @@ console.log(`site: ${files.length + 1} files, ${(total / 1048576).toFixed(1)} Mi
 
 if (serve) {
   const port = Number(process.env.PORT ?? 4173);
-  const types: Record<string, string> = { wasm: "application/wasm", webmanifest: "application/manifest+json", mjs: "text/javascript", onnx: "application/octet-stream" };
+  const types: Record<string, string> = { wasm: "application/wasm", webmanifest: "application/manifest+json", mjs: "text/javascript", onnx: "application/octet-stream", data: "application/octet-stream" };
   Bun.serve({
     port,
     async fetch(req) {

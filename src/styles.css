@@ -1581,3 +1581,31 @@ fieldset:disabled .quiz-choice {
   gap: var(--space-3);
 }
 /* ── end Studio: mind maps, quizzes, infographics ─────────────────────── */
+
+
+/* Sync. */
+.steps {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  display: grid;
+  gap: var(--space-2);
+}
+.sync-badge[data-state="waiting"] {
+  color: var(--accent);
+}
+.sync-badge[data-state="error"] {
+  color: var(--danger);
+}
+.sync-badge[data-state="busy"] svg {
+  animation: sync-pulse 1.2s var(--ease) infinite alternate;
+}
+@keyframes sync-pulse {
+  to {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sync-badge[data-state="busy"] svg {
+    animation: none;
+  }
+}

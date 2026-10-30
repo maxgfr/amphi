@@ -55,7 +55,6 @@
   --h: 250;
   --course: oklch(var(--l) var(--c) var(--h));
   --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
-  --course-deep: oklch(0.42 var(--c) var(--h));
   --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
 
   /* Type: a fixed scale, no fluid sizes in the app. */
@@ -127,7 +126,6 @@
 [data-hue] {
   --course: oklch(var(--l) var(--c) var(--h));
   --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
-  --course-deep: oklch(0.42 var(--c) var(--h));
   --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
 }
 
@@ -167,12 +165,10 @@
     --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
     --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
     --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
-    --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   }
   :root:not([data-theme="light"]) [data-hue] {
     --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
     --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
-    --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   }
 }
 :root[data-theme="dark"] {
@@ -209,13 +205,11 @@
   --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
   --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
   --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
-  --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
   color-scheme: dark;
 }
 :root[data-theme="dark"] [data-hue] {
   --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
   --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
-  --course-deep: oklch(0.8 calc(var(--c) * 0.8) var(--h));
 }
 :root[data-theme="light"] {
   color-scheme: light;
@@ -1000,9 +994,13 @@ button:disabled {
   color: var(--accent-text);
   padding: 0 var(--space-1);
   min-height: 32px;
+  /* Ink like the text around it: the underline says it acts. */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 .link:hover:not(:disabled) {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 .small {
   min-height: 32px;
@@ -1548,9 +1546,6 @@ textarea {
   font-size: var(--fs-title);
   font-weight: 760;
 }
-.binder-count.zero {
-  opacity: 0.62;
-}
 .binder-count.zero strong {
   font-family: var(--font);
   font-size: inherit;
@@ -1739,11 +1734,11 @@ textarea {
   border-radius: var(--radius-sm);
   scroll-margin-top: var(--space-6);
 }
+.transcript li.marked {
+  background: color-mix(in oklab, var(--mark) 60%, transparent);
+}
 .transcript li.active {
   background: var(--course-soft);
-}
-.transcript li.marked {
-  box-shadow: inset 3px 0 0 var(--mark);
 }
 .transcript .time {
   min-height: 0;

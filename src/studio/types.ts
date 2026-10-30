@@ -65,10 +65,10 @@ export interface StudioKind<D = unknown, O extends Record<string, unknown> = Rec
   blurb: (t: T) => string;
   defaults: O;
   Options?: FC<OptionsProps<O>>;
-  /** Why it cannot run now (missing capability, no browser support), or null. */
-  problem?: (t: T) => string | null;
-  /** What leaves the device besides the sources' text, shown before generating ("the script goes to OpenAI for the voices"). */
-  sends?: (t: T, options: O) => string | null;
+  /** Why it cannot run now (missing capability, no browser support), or null. `language` is the course's. */
+  problem?: (t: T, language: string) => string | null;
+  /** What leaves the device besides the sources' text, or downloads, shown before generating ("the script goes to OpenAI for the voices"). */
+  sends?: (t: T, options: O, language: string) => string | null;
   generate: (ctx: StudioContext, options: O) => Promise<Generated<D>>;
   View: FC<ViewProps<D>>;
   exports?: StudioExport<D>[];

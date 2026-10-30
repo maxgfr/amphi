@@ -21,6 +21,7 @@
     "@ai-sdk/mistral": "4.0.75",
     "@ai-sdk/openai": "4.0.105",
     "@ai-sdk/openai-compatible": "3.0.81",
+    "@diffusionstudio/piper-wasm": "1.0.0",
     "@huggingface/transformers": "4.3.2",
     "@noble/hashes": "2.4.0",
     "ai": "7.0.157",

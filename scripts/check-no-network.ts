@@ -41,7 +41,7 @@ const ALLOWED_HOSTS: [string, string, RegExp?][] = [
   // On-device AI.
   [
     "huggingface.co",
-    "where the speech models (Parakeet, Canary, Whisper) are downloaded from, once, when the user starts a transcription after seeing their size; the CSP's connect-src allows huggingface.co and its download servers for that",
+    "where the speech models (Parakeet, Canary, Whisper) and the voices (Kokoro, Piper, pinned revisions checked by SHA-256) are downloaded from, once, after the user sees their size; the CSP's connect-src allows huggingface.co and its download servers for that",
   ],
   ["llm-connect.invalid", "a placeholder base URL llm-connect builds transcription requests against before swapping in the provider's; .invalid never resolves"],
   ["mozilla.org", "documentation links inside error messages, never requested"],

@@ -4,10 +4,10 @@
 
 import { useState } from "react";
 import { loadLlm, recipient, savedSettings } from "../ai/llm.ts";
-import { list } from "../data/db.ts";
+import { get, list } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Artifact, Id, Source } from "../data/schema.ts";
-import { relative, useLang } from "../i18n.ts";
+import { currentLang, relative, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice, ProgressBar, Sheet } from "../ui/kit.tsx";
@@ -108,8 +108,10 @@ export function MakeSheet({ k, sources, courseId, lessonId, onClose, replace }: 
   const [options, setOptions] = useState<Record<string, unknown>>({ ...k.defaults, ...replace?.options });
   const [chosen, setChosen] = useState<Set<Id>>(() => new Set(replace?.sourceIds.filter((id) => sources.some((s) => s.id === id)) ?? sources.map((s) => s.id)));
   const [error, setError] = useState("");
-  const problem = k.problem?.(t) ?? null;
-  const extra = k.sends?.(t, options as never) ?? null;
+  // The course's language decides some types' voices, and what they download or send.
+  const language = useLive(async () => (await get("courses", courseId))?.language || currentLang(), ["courses"], [courseId]) ?? currentLang();
+  const problem = k.problem?.(t, language) ?? null;
+  const extra = k.sends?.(t, options as never, language) ?? null;
   const to = recipient();
   const Options = k.Options;
   return (

@@ -1,0 +1,53 @@
+{
+  "name": "amphi",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Follow your courses with AI, in your browser: record and import lectures, then get summaries, mind maps, quizzes, flashcards, slides, podcasts and video summaries. Your data stays yours.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "bun scripts/build.ts --serve",
+    "build": "bun scripts/build.ts",
+    "check:network": "bun scripts/check-no-network.ts dist",
+    "typecheck": "tsc --noEmit -p .",
+    "lint": "oxlint --deny-warnings src scripts e2e",
+    "test": "bun test src scripts",
+    "e2e": "playwright test",
+    "catalog": "bun scripts/catalog.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.92",
+    "@ai-sdk/google": "4.0.108",
+    "@ai-sdk/mistral": "4.0.75",
+    "@ai-sdk/openai": "4.0.105",
+    "@ai-sdk/openai-compatible": "3.0.81",
+    "@huggingface/transformers": "4.3.2",
+    "@noble/hashes": "2.4.0",
+    "ai": "7.0.157",
+    "dompurify": "3.4.17",
+    "fflate": "0.8.3",
+    "idb": "8.0.4",
+    "llm-connect": "2.5.0",
+    "llm-models": "1.14.0",
+    "marked": "18.1.2",
+    "mediabunny": "1.64.0",
+    "minisearch": "7.2.0",
+    "onnxruntime-web": "1.31.1",
+    "pdfjs-dist": "6.4.299",
+    "pptxgenjs": "4.0.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sql.js": "1.15.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/bun": "1.4.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/sql.js": "1.4.11",
+    "fake-indexeddb": "6.2.7",
+    "oxlint": "1.90.0",
+    "typescript": "7.0.2"
+  }
+}

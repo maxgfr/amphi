@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self' https://api.github.com https://huggingface.co https://*.huggingface.co https://*.hf.co https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.mistral.ai https://openrouter.ai https://api.groq.com https://api.x.ai http://localhost:* http://127.0.0.1:*; img-src 'self' blob: data:; media-src 'self' blob:; font-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types amphi dompurify"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>amphi: follow your courses with AI</title>
+    <meta name="description" content="Record and import your lectures, then get summaries, mind maps, quizzes, flashcards, slides, podcasts and video summaries, grounded in your own sources. No account, no server: your data stays in your browser and your own GitHub repository." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href="https://maxgfr.github.io/amphi/" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>amphi runs entirely in your browser and needs JavaScript.</noscript>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

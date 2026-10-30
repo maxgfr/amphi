@@ -73,90 +73,94 @@ export function Discover() {
 
   return (
     <div className="page discover">
-      <h1>{t("Discover a topic", "Découvrir un sujet", "Ein Thema entdecken")}</h1>
-      <p className="lead">
-        {t(
-          "Something to learn outside your courses: get a map of its concepts in the order to learn them, and sources to start with.",
-          "Quelque chose à apprendre en dehors de vos cours : obtenez la carte de ses notions dans l'ordre où les apprendre, et des sources pour commencer.",
-          "Etwas außerhalb Ihrer Kurse lernen: Erhalten Sie eine Karte seiner Begriffe in der Lernreihenfolge und Quellen für den Einstieg.",
-        )}
-      </p>
-      {!ai.configured ? (
-        <Notice>
-          {t("Discover uses your own AI provider.", "Découvrir utilise votre propre fournisseur d'IA.", "Entdecken nutzt Ihren eigenen KI-Anbieter.")} <a href={href.settings("ai")}>{t("Set one up", "En configurer un", "Einen einrichten")}</a>
-        </Notice>
-      ) : null}
-      <form
-        className="stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void run();
-        }}
-      >
-        <Field label={t("Topic", "Sujet", "Thema")}>
-          <input value={input.topic} required onChange={(e) => set("topic", e.currentTarget.value)} placeholder={t("e.g. Thermodynamics, Roman history, linear algebra", "ex. thermodynamique, histoire romaine, algèbre linéaire", "z. B. Thermodynamik, römische Geschichte, lineare Algebra")} />
-        </Field>
-        <div className="grid discover-options">
-          <Field label={t("Your level", "Votre niveau", "Ihr Niveau")}>
-            <select value={input.level} onChange={(e) => set("level", e.currentTarget.value as Level)}>
-              <option value="beginner">{t("Beginner", "Débutant", "Anfänger")}</option>
-              <option value="intermediate">{t("Intermediate", "Intermédiaire", "Fortgeschritten")}</option>
-              <option value="advanced">{t("Advanced", "Avancé", "Experte")}</option>
-            </select>
-          </Field>
-          <Field label={t("Your goal", "Votre objectif", "Ihr Ziel")}>
-            <select value={input.goal} onChange={(e) => set("goal", e.currentTarget.value as Goal)}>
-              <option value="exam">{t("Pass an exam", "Réussir un examen", "Eine Prüfung bestehen")}</option>
-              <option value="general">{t("General knowledge", "Culture générale", "Allgemeinwissen")}</option>
-              <option value="project">{t("A project", "Un projet", "Ein Projekt")}</option>
-            </select>
-          </Field>
-          <Field label={t("Language", "Langue", "Sprache")}>
-            <select value={input.language} onChange={(e) => set("language", e.currentTarget.value)}>
-              {MATERIAL_LANGS.map((l) => (
-                <option key={l} value={l}>
-                  {languageLabel(l)}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        {ai.configured ? (
-          ai.web ? (
-            <Notice>
-              {t(
-                `Your topic, level and goal are sent to ${ai.to}, which searches the web with its own search tool.`,
-                `Votre sujet, niveau et objectif sont envoyés à ${ai.to}, qui cherche sur le web avec son propre outil de recherche.`,
-                `Ihr Thema, Niveau und Ziel werden an ${ai.to} gesendet, das mit seinem eigenen Suchwerkzeug im Web sucht.`,
-              )}
-            </Notice>
-          ) : (
-            <Notice>
-              {t(
-                `Your topic, level and goal are sent to ${ai.to}. This model cannot search the web: the plan comes from its own knowledge, and its reading suggestions are unsourced, to verify. A model with web search (Claude, GPT, Gemini) finds real sources.`,
-                `Votre sujet, niveau et objectif sont envoyés à ${ai.to}. Ce modèle ne peut pas chercher sur le web : le plan vient de ses propres connaissances, et ses suggestions de lecture sont non sourcées, à vérifier. Un modèle avec recherche web (Claude, GPT, Gemini) trouve de vraies sources.`,
-                `Ihr Thema, Niveau und Ziel werden an ${ai.to} gesendet. Dieses Modell kann nicht im Web suchen: Der Plan stammt aus seinem eigenen Wissen, seine Lesevorschläge sind ohne Quelle und zu prüfen. Ein Modell mit Websuche (Claude, GPT, Gemini) findet echte Quellen.`,
-              )}
-            </Notice>
-          )
-        ) : null}
-        <div className="row">
-          {busy === "mapping" ? (
-            <button type="button" className="secondary" onClick={() => abort.current?.abort()}>
-              <Icon name="stop" size={18} /> {t("Stop", "Arrêter", "Stopp")}
-            </button>
-          ) : (
-            <button type="submit" className="primary" disabled={!ai.configured || !input.topic.trim() || busy !== ""}>
-              <Icon name="compass" size={18} /> {map ? t("Map it again", "Refaire la carte", "Neu kartieren") : t("Map the topic", "Cartographier le sujet", "Thema kartieren")}
-            </button>
+      <header className="divider">
+        <h1>{t("Discover a topic", "Découvrir un sujet", "Ein Thema entdecken")}</h1>
+        <p className="divider-lead">
+          {t(
+            "Something to learn outside your courses: get a map of its concepts in the order to learn them, and sources to start with.",
+            "Quelque chose à apprendre en dehors de vos cours : obtenez la carte de ses notions dans l'ordre où les apprendre, et des sources pour commencer.",
+            "Etwas außerhalb Ihrer Kurse lernen: Erhalten Sie eine Karte seiner Begriffe in der Lernreihenfolge und Quellen für den Einstieg.",
           )}
-          {busy === "mapping" ? (
-            <span className="meta" role="status">
-              {ai.web ? t("Searching the web and mapping the topic…", "Recherche sur le web et carte du sujet…", "Websuche und Kartierung des Themas…") : t("Mapping the topic…", "Carte du sujet en cours…", "Thema wird kartiert…")}
-            </span>
+        </p>
+      </header>
+      <div className="paper">
+        {!ai.configured ? (
+          <Notice>
+            {t("Discover uses your own AI provider.", "Découvrir utilise votre propre fournisseur d'IA.", "Entdecken nutzt Ihren eigenen KI-Anbieter.")} <a href={href.settings("ai")}>{t("Set one up", "En configurer un", "Einen einrichten")}</a>
+          </Notice>
+        ) : null}
+        <form
+          className="stack"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run();
+          }}
+        >
+          <Field label={t("Topic", "Sujet", "Thema")}>
+            <input value={input.topic} required onChange={(e) => set("topic", e.currentTarget.value)} placeholder={t("e.g. Thermodynamics, Roman history, linear algebra", "ex. thermodynamique, histoire romaine, algèbre linéaire", "z. B. Thermodynamik, römische Geschichte, lineare Algebra")} />
+          </Field>
+          <div className="grid discover-options">
+            <Field label={t("Your level", "Votre niveau", "Ihr Niveau")}>
+              <select value={input.level} onChange={(e) => set("level", e.currentTarget.value as Level)}>
+                <option value="beginner">{t("Beginner", "Débutant", "Anfänger")}</option>
+                <option value="intermediate">{t("Intermediate", "Intermédiaire", "Fortgeschritten")}</option>
+                <option value="advanced">{t("Advanced", "Avancé", "Experte")}</option>
+              </select>
+            </Field>
+            <Field label={t("Your goal", "Votre objectif", "Ihr Ziel")}>
+              <select value={input.goal} onChange={(e) => set("goal", e.currentTarget.value as Goal)}>
+                <option value="exam">{t("Pass an exam", "Réussir un examen", "Eine Prüfung bestehen")}</option>
+                <option value="general">{t("General knowledge", "Culture générale", "Allgemeinwissen")}</option>
+                <option value="project">{t("A project", "Un projet", "Ein Projekt")}</option>
+              </select>
+            </Field>
+            <Field label={t("Language", "Langue", "Sprache")}>
+              <select value={input.language} onChange={(e) => set("language", e.currentTarget.value)}>
+                {MATERIAL_LANGS.map((l) => (
+                  <option key={l} value={l}>
+                    {languageLabel(l)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          {ai.configured ? (
+            ai.web ? (
+              <Notice>
+                {t(
+                  `Your topic, level and goal are sent to ${ai.to}, which searches the web with its own search tool.`,
+                  `Votre sujet, niveau et objectif sont envoyés à ${ai.to}, qui cherche sur le web avec son propre outil de recherche.`,
+                  `Ihr Thema, Niveau und Ziel werden an ${ai.to} gesendet, das mit seinem eigenen Suchwerkzeug im Web sucht.`,
+                )}
+              </Notice>
+            ) : (
+              <Notice>
+                {t(
+                  `Your topic, level and goal are sent to ${ai.to}. This model cannot search the web: the plan comes from its own knowledge, and its reading suggestions are unsourced, to verify. A model with web search (Claude, GPT, Gemini) finds real sources.`,
+                  `Votre sujet, niveau et objectif sont envoyés à ${ai.to}. Ce modèle ne peut pas chercher sur le web : le plan vient de ses propres connaissances, et ses suggestions de lecture sont non sourcées, à vérifier. Un modèle avec recherche web (Claude, GPT, Gemini) trouve de vraies sources.`,
+                  `Ihr Thema, Niveau und Ziel werden an ${ai.to} gesendet. Dieses Modell kann nicht im Web suchen: Der Plan stammt aus seinem eigenen Wissen, seine Lesevorschläge sind ohne Quelle und zu prüfen. Ein Modell mit Websuche (Claude, GPT, Gemini) findet echte Quellen.`,
+                )}
+              </Notice>
+            )
           ) : null}
-        </div>
-      </form>
+          <div className="row">
+            {busy === "mapping" ? (
+              <button type="button" className="secondary" onClick={() => abort.current?.abort()}>
+                <Icon name="stop" size={18} /> {t("Stop", "Arrêter", "Stopp")}
+              </button>
+            ) : (
+              <button type="submit" className="primary" disabled={!ai.configured || !input.topic.trim() || busy !== ""}>
+                <Icon name="compass" size={18} /> {map ? t("Map it again", "Refaire la carte", "Neu kartieren") : t("Map the topic", "Cartographier le sujet", "Thema kartieren")}
+              </button>
+            )}
+            {busy === "mapping" ? (
+              <span className="meta" role="status">
+                {ai.web ? t("Searching the web and mapping the topic…", "Recherche sur le web et carte du sujet…", "Websuche und Kartierung des Themas…") : t("Mapping the topic…", "Carte du sujet en cours…", "Thema wird kartiert…")}
+              </span>
+            ) : null}
+          </div>
+        </form>
+      </div>
       {error ? <Notice kind="error">{error}</Notice> : null}
       {map ? <Result map={map} chosen={chosen} setChosen={setChosen} creating={busy === "creating"} onCreate={() => void create()} /> : null}
     </div>
@@ -167,7 +171,7 @@ function Result({ map, chosen, setChosen, creating, onCreate }: { map: TopicMap;
   const { t } = useLang();
   const titleOf = new Map(map.concepts.map((c) => [c.title.toLowerCase(), c.title]));
   return (
-    <section className="stack discover-result" aria-labelledby="discover-map">
+    <section className="paper discover-result" aria-labelledby="discover-map">
       <h2 id="discover-map">{map.title}</h2>
       {map.overview ? <p className="lead">{map.overview}</p> : null}
       <h3 className="section-title">{t("Concepts, in the order to learn them", "Notions, dans l'ordre où les apprendre", "Begriffe in der Lernreihenfolge")}</h3>

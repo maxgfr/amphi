@@ -8,6 +8,7 @@ import { useBlobUrl, useLive } from "../data/hooks.ts";
 import type { Source } from "../data/schema.ts";
 import { clock, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
+import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice } from "../ui/kit.tsx";
 import { Markdown } from "../ui/markdown.tsx";
@@ -27,6 +28,7 @@ export function SourceScreen({ id, at }: { id: string; at?: { page?: number; t?:
     ["sources"],
     [id],
   );
+  useOpenCourse(data?.course?.id);
   if (data === undefined) return <div className="page" aria-busy="true" />;
   if (data === null)
     return (
@@ -36,34 +38,42 @@ export function SourceScreen({ id, at }: { id: string; at?: { page?: number; t?:
     );
   const { source, course, lesson } = data;
   return (
-    <div className="page">
-      <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-        {course ? <a href={href.course(course.id, "sources")}>{course.title}</a> : null}
-        {lesson ? <a href={href.lesson(lesson.id)}>{lesson.title}</a> : null}
-      </nav>
-      <div className="page-head">
-        <h1>
-          <Icon name={SOURCE_ICON[source.kind]} size={24} /> {source.title}
-        </h1>
-        {source.url ? (
-          <a className="button secondary" href={source.url} target="_blank" rel="noopener noreferrer">
-            <Icon name="external" size={18} /> {t("Open the page", "Ouvrir la page", "Seite öffnen")}
-          </a>
+    <div className="page" data-hue={course ? courseHue(course) : undefined}>
+      <header className="divider soft">
+        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+          {course ? (
+            <a className="crumb-course" href={href.course(course.id, "sources")}>
+              {course.title}
+            </a>
+          ) : null}
+          {lesson ? <a href={href.lesson(lesson.id)}>{lesson.title}</a> : null}
+        </nav>
+        <div className="page-head">
+          <h1>
+            <Icon name={SOURCE_ICON[source.kind]} size={24} /> {source.title}
+          </h1>
+          {source.url ? (
+            <a className="button secondary" href={source.url} target="_blank" rel="noopener noreferrer">
+              <Icon name="external" size={18} /> {t("Open the page", "Ouvrir la page", "Seite öffnen")}
+            </a>
+          ) : null}
+        </div>
+        <p className="meta">{sourceMeta(source, t)}</p>
+      </header>
+      <div className="paper">
+        {source.status === "error" ? <Notice kind="error">{source.error}</Notice> : null}
+        {source.kind === "pdf" ? <PdfText source={source} page={at?.page} /> : null}
+        {source.kind === "text" || source.kind === "web" ? <NoteView source={source} /> : null}
+        {source.kind === "audio" || source.kind === "video" || source.kind === "recording" ? (
+          <MediaView source={source} t0={at?.t}>
+            {source.status === "pending" || source.status === "transcribing" || (source.status === "error" && !source.transcript) ? (
+              <Suspense fallback={null}>
+                <Transcribe source={source} />
+              </Suspense>
+            ) : null}
+          </MediaView>
         ) : null}
       </div>
-      <p className="meta">{sourceMeta(source, t)}</p>
-      {source.status === "error" ? <Notice kind="error">{source.error}</Notice> : null}
-      {source.kind === "pdf" ? <PdfText source={source} page={at?.page} /> : null}
-      {source.kind === "text" || source.kind === "web" ? <NoteView source={source} /> : null}
-      {source.kind === "audio" || source.kind === "video" || source.kind === "recording" ? (
-        <MediaView source={source} t0={at?.t}>
-          {source.status === "pending" || source.status === "transcribing" || (source.status === "error" && !source.transcript) ? (
-            <Suspense fallback={null}>
-              <Transcribe source={source} />
-            </Suspense>
-          ) : null}
-        </MediaView>
-      ) : null}
     </div>
   );
 }

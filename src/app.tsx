@@ -1,5 +1,5 @@
 import { useKeyVault } from "llm-connect/react";
-import { lazy, type ReactNode, Suspense, useEffect, useState } from "react";
+import { Fragment, lazy, type ReactNode, Suspense, useEffect, useState } from "react";
 import { LANGS, setLang, useLang } from "./i18n.ts";
 import { applyUpdate, dismissUpdate, useWaitingUpdate } from "./pwa.ts";
 import { type Route, href, useRoute } from "./router.ts";
@@ -10,7 +10,10 @@ import { SourceScreen } from "./screens/source.tsx";
 import { Today } from "./screens/today.tsx";
 import { Unlock } from "./screens/unlock.tsx";
 import { loadVault, vault } from "./secrets.ts";
+import { list } from "./data/db.ts";
+import { useLive } from "./data/hooks.ts";
 import { SyncBadge } from "./sync/badge.tsx";
+import { courseHue, useOpenCourseId } from "./ui/hue.ts";
 import { Icon, type IconName } from "./ui/icons.tsx";
 
 // Screens that pull in the AI SDK, recorders or exporters load when opened.
@@ -100,10 +103,13 @@ export function App() {
         </a>
         <nav aria-label={t("Main", "Principale", "Hauptnavigation")}>
           {nav.map((n) => (
-            <a key={n.id} href={n.href} aria-current={current === n.id ? "page" : undefined}>
-              <Icon name={n.icon} />
-              <span>{n.label}</span>
-            </a>
+            <Fragment key={n.id}>
+              <a href={n.href} aria-current={current === n.id ? "page" : undefined}>
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+              </a>
+              {n.id === "courses" ? <RailCourses /> : null}
+            </Fragment>
           ))}
         </nav>
         <div className="rail-tools">
@@ -131,6 +137,25 @@ export function App() {
       </main>
       <UpdateToast />
     </div>
+  );
+}
+
+/** The courses filed under Courses, each behind its divider tab; the open one stands out. */
+function RailCourses() {
+  const open = useOpenCourseId();
+  const courses = useLive(async () => (await list("courses")).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 8), ["courses"], []);
+  if (!courses?.length) return null;
+  return (
+    <ul className="rail-courses">
+      {courses.map((c) => (
+        <li key={c.id} data-hue={courseHue(c)}>
+          <a href={href.course(c.id)} className={c.id === open ? "open" : undefined} aria-current={c.id === open ? "true" : undefined}>
+            <span className="rail-tab" aria-hidden="true" />
+            <span>{c.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }
 

@@ -1,54 +1,77 @@
-/* amphi: calm, focused, legible for long study sessions. The system is
-   described in DESIGN.md; tokens first, then the shell, shared parts, and one
-   section per feature. Feature sections use these tokens only. */
+/* amphi: the student's ring binder. Grey pressboard for the ground, white
+   paper for what one works in, a charcoal spine for the sidebar, and one
+   coloured divider per course. The system is described in DESIGN.md; tokens
+   first, then the shell, shared parts, and one section per feature. Feature
+   sections use these tokens only. */
+
+/* Archivo (SIL OFL, public/fonts/OFL.txt) is declared in public/fonts/archivo.css,
+   served from the site itself: the printed voice of the dividers, titles and
+   tabs. Body text stays in the platform's own sans. */
 
 :root {
   color-scheme: light dark;
-  /* The platform's own sans (San Francisco on the iPad, iPhone and Mac students use): no web font to download or allowlist. */
   --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --display: "Archivo", var(--font);
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* Paper: a warm off-white ground, white surfaces, ink with a cool cast. */
-  --bg: oklch(98.2% 0.004 85);
-  --rail-bg: oklch(96.4% 0.006 85);
-  --surface: oklch(100% 0 0);
-  --surface-2: oklch(96% 0.006 85);
-  --hover: oklch(23% 0.012 260 / 0.05);
-  --line: oklch(90.5% 0.008 85);
-  --line-strong: oklch(66% 0.01 85);
-  --text: oklch(23% 0.012 260);
-  --muted: oklch(47% 0.012 260);
-  --accent: oklch(50% 0.13 255);
-  --accent-hover: oklch(45% 0.13 255);
+  /* Pressboard ground, white paper, a charcoal spine. */
+  --bg: oklch(92.2% 0.005 245);
+  --board-2: oklch(88.6% 0.007 245);
+  --surface: oklch(99.6% 0.0015 245);
+  --surface-2: oklch(96.4% 0.004 245);
+  --rail-bg: oklch(23.5% 0.012 258);
+  --rail-text: oklch(94% 0.005 245);
+  --rail-muted: oklch(74% 0.012 250);
+  --hover: oklch(21% 0.014 260 / 0.055);
+  --line: oklch(88.5% 0.006 245);
+  --line-strong: oklch(62% 0.01 250);
+  --text: oklch(21% 0.014 260);
+  --muted: oklch(44% 0.014 255);
+  /* Ink does everything that acts: links, citations, focus, progress. The only hues are the dividers'. */
+  --accent: oklch(21% 0.014 260);
+  --accent-hover: oklch(32% 0.016 260);
   --accent-ink: oklch(99% 0 0);
-  --accent-soft: oklch(94.5% 0.028 255);
-  --accent-text: oklch(45% 0.13 255);
-  --danger: oklch(52% 0.17 25);
-  --danger-soft: oklch(95.5% 0.025 25);
-  --ok: oklch(50% 0.12 150);
-  --ok-soft: oklch(95.5% 0.03 150);
-  --warn: oklch(55% 0.12 70);
-  --warn-soft: oklch(95.5% 0.04 85);
-  --mark: oklch(93% 0.08 95);
-  --scrim: oklch(20% 0.01 260 / 0.38);
-  --shadow-1: 0 1px 2px oklch(20% 0.01 260 / 0.07);
-  --shadow-2: 0 12px 32px -8px oklch(20% 0.01 260 / 0.22), 0 2px 6px oklch(20% 0.01 260 / 0.06);
-  --focus-ring: 0 0 0 3px oklch(50% 0.13 255 / 0.28);
+  --accent-soft: oklch(91% 0.006 245);
+  --accent-text: oklch(21% 0.014 260);
+  /* Ink: the one primary action on a screen. */
+  --ink: oklch(21% 0.014 260);
+  --ink-hover: oklch(32% 0.016 260);
+  --on-ink: oklch(99% 0 0);
+  --danger: oklch(52% 0.19 28);
+  --danger-soft: oklch(95.2% 0.03 28);
+  --ok: oklch(49% 0.12 152);
+  --ok-soft: oklch(95% 0.035 152);
+  --warn: oklch(55% 0.13 70);
+  --warn-soft: oklch(95.5% 0.045 85);
+  --mark: oklch(92% 0.1 98);
+  --scrim: oklch(20% 0.012 260 / 0.42);
+  --shadow-1: 0 1px 2px oklch(20% 0.012 260 / 0.08);
+  --shadow-2: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07);
+  --focus-ring: 0 0 0 3px oklch(21% 0.014 260 / 0.22);
 
-  /* Type: a fixed scale (about 1.125), no fluid sizes in the app. */
+  /* The course's divider colour. Outside a course: a plain grey divider. */
+  --l: 0.8;
+  --c: 0.012;
+  --h: 250;
+  --course: oklch(var(--l) var(--c) var(--h));
+  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
+  --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
+
+  /* Type: a fixed scale, no fluid sizes in the app. */
   --fs-caption: 0.75rem;
   --fs-footnote: 0.8125rem;
   --fs-small: 0.875rem;
   --fs-control: 0.9375rem;
   --fs-body: 1rem;
   --fs-lead: 1.125rem;
-  --fs-title: 1.25rem;
-  --fs-headline: 1.5rem;
-  --fs-display: 1.875rem;
+  --fs-title: 1.3125rem;
+  --fs-headline: 1.625rem;
+  --fs-display: 2.25rem;
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
+  /* Pressboard corners: barely rounded. */
+  --radius-sm: 4px;
+  --radius: 7px;
+  --radius-lg: 10px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -56,71 +79,137 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
-  --rail: 232px;
+  --rail: 248px;
   --measure: 70ch;
   --tabbar: 64px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --fast: 0.15s;
-  --base: 0.22s;
+  --base: 0.24s;
 }
 
-/* Evening: a deep blue-grey, never pure black, the same accent lifted. */
+/* The seven pressboard dividers. Text on a divider is always dark ink. */
+[data-hue="0"] {
+  --l: 0.71;
+  --c: 0.155;
+  --h: 36;
+}
+[data-hue="1"] {
+  --l: 0.83;
+  --c: 0.14;
+  --h: 82;
+}
+[data-hue="2"] {
+  --l: 0.81;
+  --c: 0.135;
+  --h: 120;
+}
+[data-hue="3"] {
+  --l: 0.76;
+  --c: 0.125;
+  --h: 158;
+}
+[data-hue="4"] {
+  --l: 0.77;
+  --c: 0.095;
+  --h: 204;
+}
+[data-hue="5"] {
+  --l: 0.73;
+  --c: 0.115;
+  --h: 258;
+}
+[data-hue="6"] {
+  --l: 0.74;
+  --c: 0.12;
+  --h: 312;
+}
+[data-hue] {
+  --course: oklch(var(--l) var(--c) var(--h));
+  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
+  --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
+}
+
+/* Evening: a black binder, charcoal sheets, the dividers a step deeper. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: oklch(18.5% 0.008 260);
-    --rail-bg: oklch(20.5% 0.009 260);
-    --surface: oklch(22.5% 0.009 260);
-    --surface-2: oklch(26% 0.01 260);
-    --hover: oklch(95% 0.006 85 / 0.06);
-    --line: oklch(31% 0.012 260);
-    --line-strong: oklch(52% 0.012 260);
-    --text: oklch(93% 0.006 85);
-    --muted: oklch(72% 0.01 260);
-    --accent: oklch(72% 0.12 255);
-    --accent-hover: oklch(77% 0.11 255);
-    --accent-ink: oklch(18% 0.02 260);
-    --accent-soft: oklch(31% 0.05 255);
-    --accent-text: oklch(80% 0.1 255);
-    --danger: oklch(70% 0.15 25);
-    --danger-soft: oklch(30% 0.06 25);
-    --ok: oklch(74% 0.12 150);
-    --ok-soft: oklch(30% 0.05 150);
-    --warn: oklch(80% 0.12 80);
+    --bg: oklch(17.5% 0.008 258);
+    --board-2: oklch(21% 0.009 258);
+    --surface: oklch(22.5% 0.009 258);
+    --surface-2: oklch(26.5% 0.01 258);
+    --rail-bg: oklch(13.5% 0.008 258);
+    --rail-text: oklch(92% 0.005 245);
+    --rail-muted: oklch(70% 0.01 250);
+    --hover: oklch(95% 0.005 245 / 0.065);
+    --line: oklch(31% 0.012 258);
+    --line-strong: oklch(54% 0.012 258);
+    --text: oklch(93% 0.005 245);
+    --muted: oklch(73% 0.01 255);
+    --accent: oklch(94% 0.005 245);
+    --accent-hover: oklch(86% 0.006 245);
+    --accent-ink: oklch(19% 0.012 260);
+    --accent-soft: oklch(31% 0.01 258);
+    --accent-text: oklch(94% 0.005 245);
+    --ink: oklch(94% 0.005 245);
+    --ink-hover: oklch(86% 0.006 245);
+    --on-ink: oklch(19% 0.012 260);
+    --danger: oklch(71% 0.16 28);
+    --danger-soft: oklch(30% 0.07 28);
+    --ok: oklch(75% 0.13 152);
+    --ok-soft: oklch(30% 0.05 152);
+    --warn: oklch(81% 0.12 80);
     --warn-soft: oklch(31% 0.05 80);
-    --mark: oklch(38% 0.07 95);
-    --scrim: oklch(5% 0 0 / 0.55);
-    --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.3);
-    --shadow-2: 0 16px 40px -8px oklch(0% 0 0 / 0.55);
-    --focus-ring: 0 0 0 3px oklch(72% 0.12 255 / 0.35);
+    --mark: oklch(40% 0.08 98);
+    --scrim: oklch(5% 0 0 / 0.58);
+    --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
+    --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
+    --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
+    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
+    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
+  }
+  :root:not([data-theme="light"]) [data-hue] {
+    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
+    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
   }
 }
 :root[data-theme="dark"] {
-  --bg: oklch(18.5% 0.008 260);
-  --rail-bg: oklch(20.5% 0.009 260);
-  --surface: oklch(22.5% 0.009 260);
-  --surface-2: oklch(26% 0.01 260);
-  --hover: oklch(95% 0.006 85 / 0.06);
-  --line: oklch(31% 0.012 260);
-  --line-strong: oklch(52% 0.012 260);
-  --text: oklch(93% 0.006 85);
-  --muted: oklch(72% 0.01 260);
-  --accent: oklch(72% 0.12 255);
-  --accent-hover: oklch(77% 0.11 255);
-  --accent-ink: oklch(18% 0.02 260);
-  --accent-soft: oklch(31% 0.05 255);
-  --accent-text: oklch(80% 0.1 255);
-  --danger: oklch(70% 0.15 25);
-  --danger-soft: oklch(30% 0.06 25);
-  --ok: oklch(74% 0.12 150);
-  --ok-soft: oklch(30% 0.05 150);
-  --warn: oklch(80% 0.12 80);
+  --bg: oklch(17.5% 0.008 258);
+  --board-2: oklch(21% 0.009 258);
+  --surface: oklch(22.5% 0.009 258);
+  --surface-2: oklch(26.5% 0.01 258);
+  --rail-bg: oklch(13.5% 0.008 258);
+  --rail-text: oklch(92% 0.005 245);
+  --rail-muted: oklch(70% 0.01 250);
+  --hover: oklch(95% 0.005 245 / 0.065);
+  --line: oklch(31% 0.012 258);
+  --line-strong: oklch(54% 0.012 258);
+  --text: oklch(93% 0.005 245);
+  --muted: oklch(73% 0.01 255);
+  --accent: oklch(94% 0.005 245);
+  --accent-hover: oklch(86% 0.006 245);
+  --accent-ink: oklch(19% 0.012 260);
+  --accent-soft: oklch(31% 0.01 258);
+  --accent-text: oklch(94% 0.005 245);
+  --ink: oklch(94% 0.005 245);
+  --ink-hover: oklch(86% 0.006 245);
+  --on-ink: oklch(19% 0.012 260);
+  --danger: oklch(71% 0.16 28);
+  --danger-soft: oklch(30% 0.07 28);
+  --ok: oklch(75% 0.13 152);
+  --ok-soft: oklch(30% 0.05 152);
+  --warn: oklch(81% 0.12 80);
   --warn-soft: oklch(31% 0.05 80);
-  --mark: oklch(38% 0.07 95);
-  --scrim: oklch(5% 0 0 / 0.55);
-  --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.3);
-  --shadow-2: 0 16px 40px -8px oklch(0% 0 0 / 0.55);
-  --focus-ring: 0 0 0 3px oklch(72% 0.12 255 / 0.35);
+  --mark: oklch(40% 0.08 98);
+  --scrim: oklch(5% 0 0 / 0.58);
+  --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
+  --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
+  --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
+  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
+  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
   color-scheme: dark;
+}
+:root[data-theme="dark"] [data-hue] {
+  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
+  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
 }
 :root[data-theme="light"] {
   color-scheme: light;
@@ -134,7 +223,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scrollbar-color: color-mix(in oklch, var(--text) 22%, transparent) transparent;
+  scrollbar-color: color-mix(in oklab, var(--text) 26%, transparent) transparent;
   -webkit-tap-highlight-color: transparent;
 }
 body {
@@ -145,20 +234,24 @@ body {
   -webkit-font-smoothing: antialiased;
   caret-color: var(--accent);
 }
+/* Selected text is highlighted, as with a marker. */
 ::selection {
-  background: color-mix(in oklch, var(--accent) 24%, transparent);
+  background: var(--mark);
+  color: var(--text);
 }
 h1,
 h2,
 h3 {
-  line-height: 1.2;
+  line-height: 1.15;
   text-wrap: balance;
   margin: 0;
 }
 h1 {
+  font-family: var(--display);
   font-size: var(--fs-display);
-  font-weight: 680;
-  letter-spacing: -0.022em;
+  font-weight: 760;
+  font-stretch: 106%;
+  letter-spacing: -0.024em;
 }
 p {
   margin: 0;
@@ -166,7 +259,7 @@ p {
 }
 a {
   color: var(--accent-text);
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
 }
 :focus-visible {
@@ -181,13 +274,13 @@ a {
   display: none !important;
 }
 
-/* ── Shell: a sidebar on wide screens; on phones a top bar and a tab bar. ── */
+/* ── Shell: the charcoal spine on wide screens; on phones a top bar and a tab bar. ── */
 .shell {
   min-height: 100dvh;
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr);
-  /* The sidebar's colour runs the full height even when the page is longer than the screen. */
-  background: linear-gradient(to right, var(--rail-bg) calc(var(--rail) - 1px), var(--line) calc(var(--rail) - 1px) var(--rail), var(--bg) var(--rail));
+  /* The spine runs the full height even when the page is longer than the screen. */
+  background: linear-gradient(to right, var(--rail-bg) var(--rail), var(--bg) var(--rail));
 }
 .skip {
   position: absolute;
@@ -209,13 +302,19 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  padding: var(--space-5) var(--space-3);
+  padding: var(--space-5) 0 var(--space-4) var(--space-3);
+  color: var(--rail-text);
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 .wordmark {
-  font-weight: 700;
-  font-size: var(--fs-title);
-  letter-spacing: -0.025em;
-  color: var(--text);
+  font-family: var(--display);
+  font-weight: 820;
+  font-stretch: 118%;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--rail-text);
   text-decoration: none;
   padding-inline: var(--space-3);
   align-self: flex-start;
@@ -229,39 +328,100 @@ a {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 38px;
+  min-height: 40px;
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius);
-  color: var(--text);
+  border-radius: var(--radius) 0 0 var(--radius);
+  color: var(--rail-text);
   text-decoration: none;
   font-size: var(--fs-control);
   font-weight: 500;
-  transition: background var(--fast) var(--ease);
+  transition:
+    background var(--fast) var(--ease),
+    color var(--fast) var(--ease);
 }
 .rail nav a .icon {
-  color: var(--muted);
+  color: var(--rail-muted);
 }
 .rail nav a:hover {
-  background: var(--hover);
+  background: oklch(100% 0 0 / 0.07);
 }
-/* Only the current place speaks in the accent. */
+/* The current place is a tab cut from the page: the page's own ground, joined to it. */
 .rail nav a[aria-current="page"] {
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  font-weight: 600;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 650;
 }
 .rail nav a[aria-current="page"] .icon {
-  color: var(--accent);
+  color: var(--text);
+}
+.rail nav a:focus-visible {
+  outline-offset: -2px;
+}
+/* The courses, filed under Courses as divider tabs; the open one stands out. */
+.rail-courses {
+  list-style: none;
+  margin: var(--space-1) 0 var(--space-2);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rail .rail-courses a {
+  min-height: 34px;
+  padding-inline-start: calc(var(--space-3) + 6px);
+  font-size: var(--fs-small);
+  color: var(--rail-muted);
+}
+.rail .rail-courses a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-tab {
+  flex: none;
+  inline-size: 12px;
+  block-size: 14px;
+  background: var(--course);
+  clip-path: polygon(0 0, 100% 3px, 100% calc(100% - 3px), 0 100%);
+  transition: inline-size var(--base) var(--ease);
+}
+.rail .rail-courses a.open {
+  color: var(--rail-text);
+  font-weight: 650;
+}
+.rail .rail-courses a.open .rail-tab {
+  inline-size: 22px;
 }
 .rail-tools {
   margin-top: auto;
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  padding-inline: var(--space-1);
+  padding-inline: var(--space-1) var(--space-3);
+  color: var(--rail-text);
 }
 .rail-tools .segmented {
   margin-inline-end: auto;
+  background: oklch(100% 0 0 / 0.07);
+  border-color: oklch(100% 0 0 / 0.1);
+}
+.rail-tools .segmented button {
+  color: var(--rail-muted);
+}
+.rail-tools .segmented button:hover:not(:disabled, [aria-pressed="true"]) {
+  color: var(--rail-text);
+}
+.rail-tools .segmented button[aria-pressed="true"] {
+  background: var(--rail-text);
+  color: var(--rail-bg);
+  box-shadow: none;
+}
+.rail-tools .icon-button {
+  color: var(--rail-muted);
+}
+.rail-tools .icon-button:hover:not(:disabled) {
+  color: var(--rail-text);
+  background: oklch(100% 0 0 / 0.08);
 }
 main,
 main:focus-visible {
@@ -269,15 +429,21 @@ main:focus-visible {
   outline: none;
 }
 .page {
-  max-width: 1080px;
+  max-width: 1120px;
   margin-inline: auto;
-  padding: var(--space-6) var(--space-6) var(--space-7);
+  padding: var(--space-6) var(--space-7) var(--space-7);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 .page.narrow {
-  max-width: 760px;
+  max-width: 800px;
+}
+
+@media (max-width: 1100px) {
+  .page {
+    padding-inline: var(--space-6);
+  }
 }
 
 @media (max-width: 760px) {
@@ -289,14 +455,20 @@ main:focus-visible {
   .rail {
     position: static;
     height: auto;
+    overflow: visible;
     flex-direction: row;
     align-items: center;
     gap: var(--space-2);
-    padding: max(var(--space-2), env(safe-area-inset-top)) max(var(--space-3), env(safe-area-inset-right)) 0 max(var(--space-4), env(safe-area-inset-left));
+    padding: max(var(--space-2), env(safe-area-inset-top)) max(var(--space-3), env(safe-area-inset-right)) var(--space-2) max(var(--space-4), env(safe-area-inset-left));
+    background: var(--rail-bg);
   }
   .wordmark {
     padding-inline: 0;
     align-self: center;
+    font-size: 1.375rem;
+  }
+  .rail-courses {
+    display: none;
   }
   .rail-tools {
     margin: 0 0 0 auto;
@@ -313,7 +485,7 @@ main:focus-visible {
     flex-direction: row;
     gap: 0;
     padding: var(--space-1) max(var(--space-2), env(safe-area-inset-right)) calc(var(--space-1) + env(safe-area-inset-bottom)) max(var(--space-2), env(safe-area-inset-left));
-    background: color-mix(in oklch, var(--bg) 82%, transparent);
+    background: color-mix(in oklab, var(--surface) 84%, transparent);
     backdrop-filter: blur(18px) saturate(1.6);
     -webkit-backdrop-filter: blur(18px) saturate(1.6);
     border-top: 1px solid var(--line);
@@ -326,20 +498,22 @@ main:focus-visible {
     justify-content: center;
     gap: 2px;
     padding: var(--space-1) 2px;
+    border-radius: var(--radius);
     font-size: 0.6875rem;
     font-weight: 600;
     color: var(--muted);
     text-align: center;
+  }
+  .rail nav a .icon {
+    width: 24px;
+    height: 24px;
+    color: inherit;
   }
   .rail nav a span {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  .rail nav a .icon {
-    width: 24px;
-    height: 24px;
   }
   .rail nav a:hover {
     background: none;
@@ -348,16 +522,17 @@ main:focus-visible {
   .rail nav a[aria-current="page"],
   .rail nav a[aria-current="page"]:hover {
     background: none;
-    color: var(--accent-text);
+    color: var(--text);
   }
   .rail nav a[aria-current="page"] .icon {
     stroke-width: 2.25;
+    color: var(--text);
   }
   .page {
     padding: var(--space-4) max(var(--space-4), env(safe-area-inset-right)) calc(var(--tabbar) + var(--space-6) + env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
   }
   h1 {
-    font-size: 1.625rem;
+    font-size: 1.75rem;
   }
 }
 
@@ -372,19 +547,23 @@ main:focus-visible {
 .page-head h1 {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-2) var(--space-3);
   min-width: 0;
+}
+.page-head h1 .icon {
+  color: var(--muted);
 }
 .crumbs {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-1) var(--space-2);
   font-size: var(--fs-small);
-  margin-block-end: calc(-1 * var(--space-2));
 }
 .crumbs a {
   color: var(--muted);
   text-decoration: none;
+  font-weight: 500;
 }
 .crumbs a + a::before {
   content: "/";
@@ -394,6 +573,24 @@ main:focus-visible {
 .crumbs a:hover {
   color: var(--text);
 }
+/* Inside a course the first crumb is the course's own divider tab. */
+.crumbs .crumb-course {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-3) 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--course);
+  color: var(--on-course);
+  font-weight: 650;
+}
+.crumbs a.crumb-course::before {
+  content: none;
+}
+.crumbs .crumb-course:hover {
+  color: var(--on-course);
+  background: color-mix(in oklab, var(--course) 88%, var(--on-course));
+}
 .lead {
   color: var(--muted);
   max-width: var(--measure);
@@ -401,6 +598,7 @@ main:focus-visible {
 .meta {
   color: var(--muted);
   font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
 }
 .hint {
   color: var(--accent-text);
@@ -412,9 +610,12 @@ main:focus-visible {
 }
 /* More air above a section than inside it. */
 .section-title {
-  font-size: var(--fs-body);
-  font-weight: 650;
-  margin-top: var(--space-4);
+  font-family: var(--display);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  font-stretch: 100%;
+  letter-spacing: -0.01em;
+  margin-top: var(--space-5);
 }
 /* An editable title keeps its own line once the actions beside it would crowd it. */
 .title-heading {
@@ -424,8 +625,10 @@ main:focus-visible {
 }
 .title-input {
   font: inherit;
+  font-family: var(--display);
   font-size: var(--fs-headline);
-  font-weight: 680;
+  font-weight: 740;
+  font-stretch: 104%;
   letter-spacing: -0.02em;
   border: 1px solid transparent;
   background: transparent;
@@ -438,11 +641,12 @@ main:focus-visible {
   text-overflow: ellipsis;
 }
 .title-input:hover {
-  border-color: var(--line);
+  border-color: color-mix(in oklab, currentColor 22%, transparent);
 }
 .title-input:focus {
   border-color: var(--line-strong);
   background: var(--surface);
+  color: var(--text);
 }
 .stack {
   display: flex;
@@ -454,6 +658,9 @@ main:focus-visible {
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
+}
+.row.top {
+  align-items: flex-start;
 }
 .row.end {
   justify-content: flex-end;
@@ -467,7 +674,258 @@ main:focus-visible {
   gap: var(--space-3);
 }
 
-/* ── Controls. A button is quiet (secondary) unless it is the one primary action. ── */
+/* ── The divider: the head of every screen inside a course. ── */
+.divider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--course);
+  color: var(--on-course);
+}
+.divider.soft {
+  background: var(--course-soft);
+  color: var(--text);
+}
+/* In the evening a lesson's divider is a charcoal sheet; its course tab keeps the full colour. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .divider.soft {
+    background: var(--surface-2);
+  }
+}
+:root[data-theme="dark"] .divider.soft {
+  background: var(--surface-2);
+}
+.divider .crumbs a:not(.crumb-course) {
+  color: inherit;
+  opacity: 0.78;
+}
+.divider .crumbs a:not(.crumb-course):hover {
+  opacity: 1;
+}
+.divider .crumbs a + a::before {
+  color: inherit;
+  opacity: 0.55;
+}
+.divider:not(.soft) .crumbs .crumb-course {
+  background: color-mix(in oklab, var(--on-course) 10%, transparent);
+}
+.divider .icon-button {
+  color: inherit;
+}
+.divider .icon-button:hover:not(:disabled) {
+  color: inherit;
+  background: color-mix(in oklab, var(--on-course) 10%, transparent);
+}
+.divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]),
+.divider:not(.soft) .button:not(.primary) {
+  background: color-mix(in oklab, white 62%, var(--course));
+  border-color: color-mix(in oklab, var(--on-course) 22%, transparent);
+  color: var(--on-course);
+  box-shadow: none;
+}
+.divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]):hover:not(:disabled) {
+  background: color-mix(in oklab, white 85%, var(--course));
+  border-color: color-mix(in oklab, var(--on-course) 40%, transparent);
+}
+.divider:not(.soft) h1 .icon {
+  color: inherit;
+}
+.divider-lead {
+  max-width: var(--measure);
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+}
+.divider .divider-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.divider .divider-facts strong {
+  font-family: var(--display);
+  font-weight: 750;
+  font-size: var(--fs-lead);
+  margin-inline-end: 0.3em;
+}
+.divider input[type="date"] {
+  min-height: 34px;
+  padding-block: 2px;
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  border-color: color-mix(in oklab, currentColor 30%, transparent);
+  font-size: var(--fs-small);
+}
+/* Folder tabs on the divider's lower edge; the selected one joins the sheet under it. */
+.divider:has(+ .tab-panel) {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  padding-bottom: 0;
+}
+.divider .tabs {
+  margin-top: var(--space-2);
+  border: 0;
+  gap: var(--space-1);
+}
+.divider .tabs button {
+  box-shadow: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  border: 0;
+  margin: 0;
+  min-height: 42px;
+  background: color-mix(in oklab, var(--surface) 45%, transparent);
+  color: inherit;
+  font-weight: 600;
+}
+.divider .tabs button:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--surface) 75%, transparent);
+  color: inherit;
+}
+/* On a full-colour divider the tabs are cut from lighter card, whatever the theme. */
+.divider:not(.soft) .tabs button:not([aria-selected="true"]) {
+  background: color-mix(in oklab, white 36%, transparent);
+}
+.divider:not(.soft) .tabs button:not([aria-selected="true"]):hover:not(:disabled) {
+  background: color-mix(in oklab, white 62%, transparent);
+}
+.divider .tabs button[aria-selected="true"] {
+  box-shadow: none;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+}
+.divider .tabs button[aria-selected="true"] .icon {
+  color: var(--text);
+}
+.divider .tabs .count {
+  background: color-mix(in oklab, var(--on-course) 10%, transparent);
+  color: inherit;
+}
+.divider .tabs button[aria-selected="true"] .count {
+  background: var(--course-soft);
+}
+.divider + .tab-panel {
+  margin-top: calc(-1 * var(--space-4));
+  padding: var(--space-5);
+  background: var(--surface);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+/* A screen without tabs files its content on one sheet under the divider. */
+.divider:has(+ .paper) {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+.paper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+.divider + .paper {
+  margin-top: calc(-1 * var(--space-4));
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+.divider.soft h1:not(.title-heading) {
+  font-size: var(--fs-headline);
+}
+.paper .recorder {
+  border: 0;
+  padding-inline: 0;
+}
+.paper .page-text {
+  border-width: 1px 0 0;
+  border-radius: 0;
+  padding-inline: 0;
+  background: transparent;
+}
+.paper .page-text.highlight {
+  border-radius: var(--radius);
+  padding-inline: var(--space-4);
+}
+/* On the sheet, groups are ruled, not boxed. */
+.divider + .tab-panel :is(.list, .group-list),
+.paper .list {
+  border-inline: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.divider + .tab-panel .concept {
+  border-width: 1px 0 0;
+  border-radius: 0;
+  padding-inline: 0;
+}
+@media (max-width: 760px) {
+  .divider {
+    margin-inline: calc(-1 * max(var(--space-4), env(safe-area-inset-left)));
+    margin-top: calc(-1 * var(--space-4));
+    border-radius: 0;
+    padding: var(--space-4) max(var(--space-4), env(safe-area-inset-right)) var(--space-4) max(var(--space-4), env(safe-area-inset-left));
+  }
+  .divider .tabs {
+    margin-inline: calc(-1 * max(var(--space-4), env(safe-area-inset-left)));
+    padding-inline: max(var(--space-3), env(safe-area-inset-left)) var(--space-5);
+  }
+  .divider + .tab-panel,
+  .divider + .paper {
+    margin-inline: calc(-1 * max(var(--space-4), env(safe-area-inset-left)));
+    border-radius: 0;
+    padding: var(--space-4) max(var(--space-4), env(safe-area-inset-right)) var(--space-5) max(var(--space-4), env(safe-area-inset-left));
+    box-shadow: none;
+  }
+}
+
+/* Motion: tabs rise from behind their divider as a screen opens, one after the other. */
+@keyframes tab-rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+.divider .tabs button,
+.binder-tab {
+  animation: tab-rise 0.36s var(--ease) backwards;
+}
+.divider .tabs button:nth-child(2),
+.binder li:nth-child(2) .binder-tab {
+  animation-delay: 40ms;
+}
+.divider .tabs button:nth-child(3),
+.binder li:nth-child(3) .binder-tab {
+  animation-delay: 80ms;
+}
+.divider .tabs button:nth-child(4),
+.binder li:nth-child(4) .binder-tab {
+  animation-delay: 120ms;
+}
+.divider .tabs button:nth-child(n + 5),
+.binder li:nth-child(n + 5) .binder-tab {
+  animation-delay: 160ms;
+}
+
+/* On a phone a divider's actions keep one row: their labels are read, not shown. */
+@media (max-width: 560px) {
+  .divider .page-head .btn-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .divider .page-head .row > :is(button, .button) {
+    min-inline-size: 44px;
+    padding-inline: var(--space-3);
+  }
+}
+
+/* ── Controls. A button is quiet (secondary) unless it is the one primary action, in ink. ── */
 button,
 .button {
   font: inherit;
@@ -481,7 +939,7 @@ button,
   min-height: 40px;
   padding: var(--space-1) var(--space-4);
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -499,7 +957,7 @@ button:hover:not(:disabled),
 }
 button:active:not(:disabled),
 .button:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 button:disabled {
   opacity: 0.45;
@@ -507,23 +965,27 @@ button:disabled {
   box-shadow: none;
 }
 .primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+  font-weight: 650;
 }
 .primary:hover:not(:disabled),
 .button.primary:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: var(--ink-hover);
+  border-color: var(--ink-hover);
 }
 .danger {
   background: var(--danger);
   border-color: var(--danger);
-  color: var(--accent-ink);
+  color: oklch(99% 0 0);
+}
+:root[data-theme="dark"] .danger {
+  color: oklch(18% 0.02 28);
 }
 .danger:hover:not(:disabled) {
   border-color: var(--danger);
-  background: color-mix(in oklch, var(--danger) 88%, var(--text));
+  background: color-mix(in oklab, var(--danger) 88%, var(--text));
 }
 .link {
   border: 0;
@@ -532,9 +994,13 @@ button:disabled {
   color: var(--accent-text);
   padding: 0 var(--space-1);
   min-height: 32px;
+  /* Ink like the text around it: the underline says it acts. */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 .link:hover:not(:disabled) {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 .small {
   min-height: 32px;
@@ -570,8 +1036,8 @@ button:disabled {
   padding: 3px;
   gap: 2px;
   border-radius: var(--radius);
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+  background: var(--board-2);
+  border: 1px solid transparent;
 }
 .segmented button {
   flex: none;
@@ -589,7 +1055,8 @@ button:disabled {
 .segmented button[aria-pressed="true"] {
   background: var(--surface);
   color: var(--text);
-  box-shadow: var(--shadow-1), 0 0 0 1px var(--line);
+  font-weight: 650;
+  box-shadow: var(--shadow-1), 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent);
 }
 .segmented button:active:not(:disabled) {
   transform: none;
@@ -623,7 +1090,7 @@ textarea {
 }
 input::placeholder,
 textarea::placeholder {
-  color: color-mix(in oklch, var(--muted) 85%, transparent);
+  color: color-mix(in oklab, var(--muted) 88%, transparent);
 }
 input:focus-visible,
 select:focus-visible,
@@ -639,7 +1106,7 @@ input[type="radio"] {
   min-height: 0;
   margin: 0;
   flex: none;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 input[type="checkbox"]:focus-visible,
 input[type="radio"]:focus-visible {
@@ -653,7 +1120,7 @@ input[type="date"] {
 input[type="range"] {
   padding: 0;
   border: 0;
-  accent-color: var(--accent);
+  accent-color: var(--ink);
 }
 input[type="range"]:focus-visible {
   box-shadow: none;
@@ -671,7 +1138,7 @@ textarea {
   min-width: 0;
 }
 .field-label {
-  font-weight: 600;
+  font-weight: 650;
   font-size: var(--fs-small);
 }
 .field-hint {
@@ -689,6 +1156,60 @@ textarea {
   text-align: center;
   font-size: var(--fs-title);
 }
+/* The seven divider colours as swatches; the chosen one is ringed in ink. */
+.hues {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.hues legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+.hue-swatch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: var(--radius);
+  background: var(--course);
+  cursor: pointer;
+}
+.hue-swatch input {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: inherit;
+  cursor: pointer;
+}
+.hue-swatch input:checked {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink);
+}
+.hue-swatch input:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--on-course);
+}
+.hue-swatch input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
 .choices {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -701,7 +1222,7 @@ textarea {
   overflow: auto;
 }
 .choices legend {
-  font-weight: 600;
+  font-weight: 650;
   font-size: var(--fs-small);
   padding-inline: var(--space-1);
 }
@@ -728,11 +1249,11 @@ textarea {
   }
 }
 
-/* ── Tabs. ── */
+/* ── Tabs (outside a divider: Settings, Discover). ── */
 .tabs {
   display: flex;
   gap: var(--space-1);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -743,11 +1264,13 @@ textarea {
   background: transparent;
   box-shadow: none;
   color: var(--muted);
-  border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   padding: 0 var(--space-3);
   min-height: 44px;
   white-space: nowrap;
+  font-family: var(--display);
+  font-stretch: 96%;
+  font-weight: 600;
 }
 .tabs button:hover:not(:disabled) {
   color: var(--text);
@@ -757,21 +1280,22 @@ textarea {
 }
 .tabs button[aria-selected="true"] {
   color: var(--text);
-  font-weight: 600;
-  border-bottom-color: var(--accent);
+  font-weight: 750;
+  box-shadow: inset 0 -3px 0 var(--ink);
 }
 .tabs button[aria-selected="true"] .icon {
-  color: var(--accent);
+  color: var(--text);
 }
 .tabs button:focus-visible {
-  outline-offset: -2px;
+  outline-offset: -3px;
 }
 .tabs .count {
+  font-family: var(--font);
   font-size: var(--fs-caption);
-  font-weight: 600;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
-  background: var(--surface-2);
+  background: var(--board-2);
   border-radius: 999px;
   padding: 0 6px;
   min-width: 1.5em;
@@ -785,9 +1309,9 @@ textarea {
 @media (max-width: 760px) {
   /* Five tabs do not fit a phone: text only, and the edge fades where more is hidden. */
   .tabs {
-    gap: 0;
+    gap: 2px;
     margin-inline: calc(-1 * var(--space-4));
-    padding-inline: var(--space-1) var(--space-5);
+    padding-inline: var(--space-3) var(--space-5);
     mask-image: linear-gradient(to right, black calc(100% - var(--space-5)), transparent);
   }
   .tabs button .icon {
@@ -864,9 +1388,14 @@ textarea {
 }
 .list-link > .icon:last-child:not(:first-child) {
   color: var(--line-strong);
+  transition: transform var(--fast) var(--ease);
 }
 .list-link:hover {
   background: var(--hover);
+}
+.list-link:hover > .icon:last-child:not(:first-child) {
+  transform: translateX(2px);
+  color: var(--text);
 }
 .list-link:active:not(:disabled) {
   transform: none;
@@ -882,9 +1411,16 @@ textarea {
   gap: 2px;
 }
 .list-title {
-  font-weight: 500;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.list-end {
+  flex: none;
+  color: var(--muted);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
 }
 .list.compact .list-link {
   min-height: 48px;
@@ -898,20 +1434,21 @@ textarea {
   gap: var(--space-2);
   padding: var(--space-7) var(--space-5);
   color: var(--muted);
-  background: color-mix(in oklch, var(--surface-2) 55%, transparent);
+  border: 1px dashed color-mix(in oklab, var(--text) 22%, transparent);
   border-radius: var(--radius-lg);
 }
 .empty > .icon {
   box-sizing: content-box;
   padding: 12px;
   margin-block-end: var(--space-1);
-  border-radius: var(--radius-lg);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border-radius: var(--radius);
+  background: var(--course-soft);
+  color: var(--text);
 }
 .empty-title {
   color: var(--text);
-  font-weight: 650;
+  font-family: var(--display);
+  font-weight: 700;
   font-size: var(--fs-lead);
 }
 .empty p {
@@ -921,30 +1458,214 @@ textarea {
   margin-top: var(--space-2);
 }
 
+/* ── The binder: courses as a stack of dividers whose tabs step across. ── */
+.binder {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.binder li {
+  --step: 0;
+  display: flex;
+  flex-direction: column;
+}
+.binder li:nth-child(4n + 2) {
+  --step: 1;
+}
+.binder li:nth-child(4n + 3) {
+  --step: 2;
+}
+.binder li:nth-child(4n + 4) {
+  --step: 3;
+}
+.binder-link {
+  display: flex;
+  flex-direction: column;
+  color: var(--on-course);
+  text-decoration: none;
+}
+.binder-link:focus-visible {
+  outline: none;
+}
+.binder-tab {
+  align-self: flex-start;
+  margin-inline-start: calc(var(--step) * 18%);
+  max-width: min(46%, 26rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5) var(--space-1) var(--space-4);
+  background: var(--course);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+  font-family: var(--display);
+  font-weight: 720;
+  font-stretch: 100%;
+  font-size: var(--fs-lead);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  transition: transform var(--base) var(--ease);
+}
+.binder-tab span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.binder-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  min-height: 60px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  background: var(--course);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition: box-shadow var(--base) var(--ease);
+}
+.binder li:not(:nth-child(4n + 1)) .binder-body {
+  border-radius: var(--radius-lg);
+}
+/* Counts sit right, in columns, as on a contents page. */
+.binder-counts {
+  margin-inline-start: auto;
+  display: flex;
+  gap: var(--space-5);
+}
+.binder-count {
+  min-inline-size: 7.5em;
+  text-align: end;
+  white-space: nowrap;
+}
+.binder-count strong {
+  font-family: var(--display);
+  font-size: var(--fs-title);
+  font-weight: 760;
+}
+.binder-count.zero strong {
+  font-family: var(--font);
+  font-size: inherit;
+  font-weight: 500;
+}
+.binder-kind {
+  font-weight: 650;
+}
+.binder-exam {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-3);
+  border-radius: 999px;
+  background: color-mix(in oklab, white 55%, transparent);
+  font-weight: 650;
+}
+.binder-link:hover .binder-tab {
+  transform: translateY(-3px);
+}
+.binder-link:hover .binder-body {
+  box-shadow: var(--shadow-2);
+}
+.binder-link:focus-visible .binder-body {
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent);
+}
+@media (max-width: 760px) {
+  .binder-tab {
+    margin-inline-start: calc(var(--step) * 12%);
+    max-width: 78%;
+    font-size: var(--fs-body);
+  }
+  .binder-body {
+    gap: var(--space-1) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+  }
+  .binder-counts {
+    margin-inline-start: 0;
+    gap: var(--space-4);
+  }
+  .binder-count {
+    min-inline-size: 0;
+    text-align: start;
+  }
+}
+
 /* ── Today. ── */
+.today-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+}
+.today-date {
+  font-family: var(--display);
+  font-size: var(--fs-lead);
+  font-weight: 600;
+  font-stretch: 100%;
+  color: var(--muted);
+}
+/* The next step: one sheet, filed under its course's divider tab when it has one. */
 .next {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5);
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-5) var(--space-6);
   border-radius: var(--radius-lg);
-  background: var(--accent-soft);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+}
+/* Filed under its course: the course's divider tab rises from the sheet's top edge. */
+.next[data-hue] {
+  position: relative;
+  margin-top: var(--space-3);
+  border-start-start-radius: 0;
+}
+.next[data-hue]::before {
+  content: "";
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline-start: 0;
+  inline-size: 112px;
+  block-size: 14px;
+  background: var(--course);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+  border-start-start-radius: var(--radius-sm);
+}
+.next > .icon {
+  box-sizing: content-box;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--course-soft);
   color: var(--text);
 }
-.next .icon {
-  color: var(--accent);
-}
 .next-text {
-  font-size: var(--fs-lead);
-  font-weight: 500;
-  line-height: 1.4;
+  font-family: var(--display);
+  font-size: var(--fs-title);
+  font-weight: 650;
+  font-stretch: 100%;
+  letter-spacing: -0.012em;
+  line-height: 1.3;
 }
-.next.calm {
-  background: var(--surface-2);
-}
-.next.calm .icon {
+.next.calm > .icon {
+  background: var(--ok-soft);
   color: var(--ok);
+}
+.step-tab {
+  flex: none;
+  inline-size: 18px;
+  block-size: 18px;
+  background: var(--course);
+  clip-path: polygon(0 0, 100% 4px, 100% calc(100% - 4px), 0 100%);
+}
+.today-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 @media (max-width: 560px) {
   .next {
@@ -1013,11 +1734,11 @@ textarea {
   border-radius: var(--radius-sm);
   scroll-margin-top: var(--space-6);
 }
-.transcript li.active {
-  background: var(--accent-soft);
-}
 .transcript li.marked {
-  box-shadow: inset 3px 0 0 var(--mark);
+  background: color-mix(in oklab, var(--mark) 60%, transparent);
+}
+.transcript li.active {
+  background: var(--course-soft);
 }
 .transcript .time {
   min-height: 0;
@@ -1103,17 +1824,15 @@ textarea {
   background: var(--danger);
   border-color: var(--danger);
   color: var(--accent-ink);
-  box-shadow: 0 0 0 6px var(--danger-soft);
 }
 .rec-button:hover:not(:disabled) {
   border-color: var(--danger);
-  background: color-mix(in oklch, var(--danger) 88%, var(--text));
+  background: color-mix(in oklab, var(--danger) 88%, var(--text));
 }
 .rec-button.stop {
   background: var(--text);
   border-color: var(--text);
   color: var(--bg);
-  box-shadow: 0 0 0 6px var(--surface-2);
 }
 .rec-side {
   min-inline-size: 9rem;
@@ -1156,11 +1875,11 @@ textarea {
 }
 .notice.error {
   background: var(--danger-soft);
-  border-color: color-mix(in oklch, var(--danger) 30%, transparent);
+  border-color: color-mix(in oklab, var(--danger) 30%, transparent);
 }
 .notice.ok {
   background: var(--ok-soft);
-  border-color: color-mix(in oklch, var(--ok) 30%, transparent);
+  border-color: color-mix(in oklab, var(--ok) 30%, transparent);
 }
 .progress {
   height: 6px;
@@ -1426,8 +2145,8 @@ textarea {
   inline-size: 36px;
   block-size: 36px;
   border-radius: var(--radius);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--course-soft);
+  color: var(--text);
 }
 .tile-text {
   display: flex;
@@ -1481,7 +2200,7 @@ textarea {
 }
 .message.user {
   align-self: flex-end;
-  background: var(--accent-soft);
+  background: var(--course-soft);
   white-space: pre-wrap;
 }
 .message.assistant {
@@ -1581,11 +2300,12 @@ textarea {
   border-radius: var(--radius);
   overflow: auto;
 }
+/* A quoted passage is highlighted, as a student marks a printed page. */
 .prose blockquote {
   margin-inline: 0;
-  padding-inline-start: var(--space-4);
-  border-inline-start: 3px solid var(--line);
-  color: var(--muted);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--mark) 70%, transparent);
 }
 .prose table {
   border-collapse: collapse;
@@ -1618,9 +2338,10 @@ textarea {
   box-shadow: none;
   background: var(--accent-soft);
   color: var(--accent-text);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 .cite:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--accent) 22%, var(--accent-soft));
+  background: var(--mark);
 }
 .cite:active:not(:disabled) {
   transform: none;
@@ -1698,6 +2419,15 @@ textarea {
   }
   .title-input {
     border: 0;
+  }
+  .divider,
+  .paper,
+  .divider + .tab-panel {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    color: black;
   }
 }
 
@@ -1979,13 +2709,13 @@ textarea {
 }
 /* A graded question: the whole card takes the verdict's hue, quietly. */
 .quiz-card.correct {
-  border-color: color-mix(in oklch, var(--ok) 45%, var(--line));
+  border-color: color-mix(in oklab, var(--ok) 45%, var(--line));
 }
 .quiz-card.partial {
-  border-color: color-mix(in oklch, var(--warn) 45%, var(--line));
+  border-color: color-mix(in oklab, var(--warn) 45%, var(--line));
 }
 .quiz-card.incorrect {
-  border-color: color-mix(in oklch, var(--danger) 45%, var(--line));
+  border-color: color-mix(in oklab, var(--danger) 45%, var(--line));
 }
 .quiz-card fieldset {
   border: 0;
@@ -2347,7 +3077,8 @@ fieldset:disabled .quiz-choice {
     padding: 0;
     gap: 0;
   }
-  .page:has(.slides-print) > :not(.stack),
+  .page:has(.slides-print) > :not(.stack, .paper),
+  .page:has(.slides-print) .paper > :not(.stack),
   .page:has(.slides-print) .page-head {
     display: none !important;
   }
@@ -2559,8 +3290,9 @@ fieldset:disabled .quiz-choice {
   overflow-wrap: anywhere;
 }
 .proposal-excerpt {
-  border-inline-start: 3px solid var(--line);
-  padding-inline-start: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
   font-size: var(--fs-small);
 }
 /* ── end Progress and Discover ────────────────────────────────────────── */

@@ -55,7 +55,7 @@ test("a course made on one device reaches another through a GitHub repository, a
   await b.page.getByRole("button", { name: "Connect and sync" }).click();
   await synced(b.page);
   await b.page.goto(`${siteURL}#/courses`);
-  await expect(b.page.getByText("Thermodynamics")).toBeVisible();
+  await expect(b.page.getByRole("main").getByText("Thermodynamics")).toBeVisible();
 
   // B adds a course; A gets it.
   await b.page.getByRole("button", { name: "New course" }).click();
@@ -70,7 +70,7 @@ test("a course made on one device reaches another through a GitHub repository, a
   await a.page.getByRole("button", { name: "Sync now" }).click();
   await synced(a.page);
   await a.page.goto(`${siteURL}#/courses`);
-  await expect(a.page.getByText("Optics")).toBeVisible();
+  await expect(a.page.getByRole("main").getByText("Optics")).toBeVisible();
 
   await a.watched.assertClean();
   await b.watched.assertClean();
@@ -103,7 +103,7 @@ test("end-to-end encrypted: the repository holds opaque objects; another device 
   await b.page.getByRole("button", { name: "Connect and sync" }).click();
   await synced(b.page);
   await b.page.goto(`${siteURL}#/courses`);
-  await expect(b.page.getByText("Thermodynamics")).toBeVisible();
+  await expect(b.page.getByRole("main").getByText("Thermodynamics")).toBeVisible();
 
   await a.watched.assertClean();
   await b.watched.assertClean();
@@ -127,7 +127,7 @@ test("a zip backup opens in a fresh browser", async ({ browser }) => {
   await pc.getByLabel("Zip to import").setInputFiles(zip);
   await expect(pc.getByText(/^Imported: \d+ record/)).toBeVisible();
   await pc.goto(`${siteURL}#/courses`);
-  await pc.getByText("Thermodynamics").click();
+  await pc.getByRole("main").getByText("Thermodynamics").click();
   await expect(pc.getByRole("tab", { name: "Sources 1" })).toBeVisible();
 
   await wa.assertClean();

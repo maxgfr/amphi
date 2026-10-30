@@ -1,56 +1,81 @@
 ---
 name: amphi
-description: A calm study desk for your own lectures, light by day and deep blue-grey by night.
+description: The student's binder. Grey pressboard, white paper sheets, a charcoal spine, and one coloured divider per course.
 colors:
-  ground: "oklch(98.2% 0.004 85)"
-  rail: "oklch(96.4% 0.006 85)"
-  surface: "oklch(100% 0 0)"
-  surface-2: "oklch(96% 0.006 85)"
-  line: "oklch(90.5% 0.008 85)"
-  line-strong: "oklch(66% 0.01 85)"
-  ink: "oklch(23% 0.012 260)"
-  ink-muted: "oklch(47% 0.012 260)"
-  accent: "oklch(50% 0.13 255)"
-  accent-hover: "oklch(45% 0.13 255)"
-  accent-ink: "oklch(99% 0 0)"
-  accent-soft: "oklch(94.5% 0.028 255)"
-  accent-text: "oklch(45% 0.13 255)"
-  danger: "oklch(52% 0.17 25)"
-  danger-soft: "oklch(95.5% 0.025 25)"
-  ok: "oklch(50% 0.12 150)"
-  ok-soft: "oklch(95.5% 0.03 150)"
-  warn: "oklch(55% 0.12 70)"
-  mark: "oklch(93% 0.08 95)"
-  dark-ground: "oklch(18.5% 0.008 260)"
-  dark-rail: "oklch(20.5% 0.009 260)"
-  dark-surface: "oklch(22.5% 0.009 260)"
-  dark-surface-2: "oklch(26% 0.01 260)"
-  dark-line: "oklch(31% 0.012 260)"
-  dark-line-strong: "oklch(52% 0.012 260)"
-  dark-ink: "oklch(93% 0.006 85)"
-  dark-ink-muted: "oklch(72% 0.01 260)"
-  dark-accent: "oklch(72% 0.12 255)"
-  dark-accent-ink: "oklch(18% 0.02 260)"
-  dark-accent-soft: "oklch(31% 0.05 255)"
-  dark-accent-text: "oklch(80% 0.1 255)"
+  pressboard: "oklch(92.2% 0.005 245)"
+  pressboard-deep: "oklch(88.6% 0.007 245)"
+  paper: "oklch(99.6% 0.0015 245)"
+  paper-2: "oklch(96.4% 0.004 245)"
+  spine: "oklch(23.5% 0.012 258)"
+  spine-text: "oklch(94% 0.005 245)"
+  spine-muted: "oklch(74% 0.012 250)"
+  line: "oklch(88.5% 0.006 245)"
+  line-strong: "oklch(62% 0.01 250)"
+  ink: "oklch(21% 0.014 260)"
+  ink-hover: "oklch(32% 0.016 260)"
+  on-ink: "oklch(99% 0 0)"
+  ink-soft: "oklch(91% 0.006 245)"
+  muted: "oklch(44% 0.014 255)"
+  highlighter: "oklch(92% 0.1 98)"
+  danger: "oklch(52% 0.19 28)"
+  danger-soft: "oklch(95.2% 0.03 28)"
+  ok: "oklch(49% 0.12 152)"
+  ok-soft: "oklch(95% 0.035 152)"
+  warn: "oklch(55% 0.13 70)"
+  warn-soft: "oklch(95.5% 0.045 85)"
+  divider-grey: "oklch(80% 0.012 250)"
+  divider-vermilion: "oklch(71% 0.155 36)"
+  divider-saffron: "oklch(83% 0.14 82)"
+  divider-olive: "oklch(81% 0.135 120)"
+  divider-green: "oklch(76% 0.125 158)"
+  divider-teal: "oklch(77% 0.095 204)"
+  divider-cobalt: "oklch(73% 0.115 258)"
+  divider-violet: "oklch(74% 0.12 312)"
+  dark-pressboard: "oklch(17.5% 0.008 258)"
+  dark-pressboard-deep: "oklch(21% 0.009 258)"
+  dark-paper: "oklch(22.5% 0.009 258)"
+  dark-paper-2: "oklch(26.5% 0.01 258)"
+  dark-spine: "oklch(13.5% 0.008 258)"
+  dark-line: "oklch(31% 0.012 258)"
+  dark-line-strong: "oklch(54% 0.012 258)"
+  dark-ink: "oklch(94% 0.005 245)"
+  dark-on-ink: "oklch(19% 0.012 260)"
+  dark-muted: "oklch(73% 0.01 255)"
+  dark-highlighter: "oklch(40% 0.08 98)"
 typography:
   display:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 680
-    lineHeight: 1.2
-    letterSpacing: "-0.022em"
-  headline:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
+    fontFamily: "Archivo, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
+    fontSize: "2.25rem"
+    fontWeight: 760
+    lineHeight: 1.15
+    letterSpacing: "-0.024em"
+    fontVariation: "'wdth' 106"
+  wordmark:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.5rem"
-    fontWeight: 680
-    lineHeight: 1.2
+    fontWeight: 820
+    lineHeight: 1
+    letterSpacing: "-0.03em"
+    fontVariation: "'wdth' 118"
+  headline:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.625rem"
+    fontWeight: 740
+    lineHeight: 1.15
     letterSpacing: "-0.02em"
+    fontVariation: "'wdth' 104"
   title:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
-    fontSize: "1.125rem"
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.3125rem"
     fontWeight: 650
     lineHeight: 1.3
+    letterSpacing: "-0.012em"
+  tab:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 720
+    lineHeight: 1.3
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
     fontSize: "1rem"
@@ -64,8 +89,9 @@ typography:
   small:
     fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
     fontSize: "0.875rem"
-    fontWeight: 400
+    fontWeight: 500
     lineHeight: 1.5
+    fontFeature: "'tnum'"
   footnote:
     fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
     fontSize: "0.8125rem"
@@ -73,17 +99,12 @@ typography:
   caption:
     fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, sans-serif"
     fontSize: "0.75rem"
-    fontWeight: 600
-  timer:
-    fontFamily: "ui-monospace, SF Mono, Menlo, Consolas, monospace"
-    fontSize: "3.25rem"
-    fontWeight: 400
-    fontFeature: "tnum"
+    fontWeight: 650
+    fontFeature: "'tnum'"
 rounded:
-  sm: "6px"
-  md: "10px"
-  lg: "14px"
-  sheet-top: "18px"
+  sm: "4px"
+  md: "7px"
+  lg: "10px"
   pill: "999px"
 spacing:
   "1": "4px"
@@ -93,116 +114,82 @@ spacing:
   "5": "24px"
   "6": "32px"
   "7": "48px"
-  rail: "232px"
-  measure: "70ch"
 components:
-  button:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    typography: "{typography.control}"
-    rounded: "{rounded.md}"
-    padding: "4px 16px"
-    height: "40px"
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.accent-ink}"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.on-ink}"
     typography: "{typography.control}"
     rounded: "{rounded.md}"
     padding: "4px 16px"
     height: "40px"
   button-primary-hover:
-    backgroundColor: "{colors.accent-hover}"
+    backgroundColor: "{colors.ink-hover}"
+    textColor: "{colors.on-ink}"
+  button-secondary:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    typography: "{typography.control}"
+    rounded: "{rounded.md}"
+    padding: "4px 16px"
+    height: "40px"
   button-danger:
     backgroundColor: "{colors.danger}"
-    textColor: "{colors.accent-ink}"
+    textColor: "{colors.on-ink}"
     rounded: "{rounded.md}"
-  button-small:
-    typography: "{typography.small}"
-    padding: "4px 12px"
-    height: "32px"
-  button-icon:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink-muted}"
-    rounded: "{rounded.md}"
-    size: "40px"
-  button-link:
-    backgroundColor: "transparent"
-    textColor: "{colors.accent-text}"
+    height: "40px"
   input:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
-    typography: "{typography.body}"
     rounded: "{rounded.md}"
     padding: "8px 12px"
     height: "40px"
-  segmented:
-    backgroundColor: "{colors.surface-2}"
-    rounded: "{rounded.md}"
-    padding: "3px"
-  segmented-selected:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-  nav-item:
-    textColor: "{colors.ink}"
+  spine-nav-item:
+    backgroundColor: "{colors.spine}"
+    textColor: "{colors.spine-text}"
     typography: "{typography.control}"
     rounded: "{rounded.md}"
     padding: "4px 12px"
-    height: "38px"
-  nav-item-current:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent-text}"
-  tab:
-    textColor: "{colors.ink-muted}"
-    typography: "{typography.control}"
-    padding: "0 12px"
-    height: "44px"
-  tab-selected:
+    height: "40px"
+  spine-nav-item-current:
+    backgroundColor: "{colors.pressboard}"
     textColor: "{colors.ink}"
-  list-group:
-    backgroundColor: "{colors.surface}"
+  divider:
+    backgroundColor: "{colors.divider-vermilion}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
-  list-row:
-    padding: "12px 16px"
-    height: "56px"
-  card:
-    backgroundColor: "{colors.surface}"
+    padding: "24px 24px 16px"
+  folder-tab:
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: "42px"
+  folder-tab-selected:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+  sheet:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
-    padding: "16px"
+    padding: "24px"
+  binder-tab:
+    backgroundColor: "{colors.divider-cobalt}"
+    textColor: "{colors.ink}"
+    typography: "{typography.tab}"
+    padding: "8px 24px 4px 16px"
   next-step:
-    backgroundColor: "{colors.accent-soft}"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
     typography: "{typography.title}"
     rounded: "{rounded.lg}"
-    padding: "24px"
-  empty-state:
-    backgroundColor: "{colors.surface-2}"
-    textColor: "{colors.ink-muted}"
-    rounded: "{rounded.lg}"
-    padding: "48px 24px"
-  notice:
-    backgroundColor: "{colors.surface-2}"
-    typography: "{typography.small}"
-    rounded: "{rounded.md}"
-    padding: "12px 16px"
-  notice-error:
-    backgroundColor: "{colors.danger-soft}"
-  sheet:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.lg}"
-    width: "560px"
-  toast:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.ground}"
-    typography: "{typography.small}"
-    rounded: "{rounded.lg}"
-  cite:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent-text}"
+    padding: "24px 32px"
+  citation:
+    backgroundColor: "{colors.ink-soft}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.pill}"
     padding: "0 0.45em"
-  studio-tile-icon:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
+  citation-hover:
+    backgroundColor: "{colors.highlighter}"
+  hue-swatch:
+    backgroundColor: "{colors.divider-teal}"
     rounded: "{rounded.md}"
     size: "36px"
 ---
@@ -211,121 +198,201 @@ components:
 
 ## Overview
 
-**The study desk.** amphi is the quiet desk a student comes back to after a lecture: paper-white by day, a deep blue-grey in the evening, one blue that only ever means "here" or "do this". The course is the content and the interface stays out of its way. Things 3 is the bar for calm and finish: native-feeling controls, generous rows, nothing that blinks for attention.
+**Creative North Star: "The Course Binder"**
 
-It is an Operate surface everywhere (lists, tabs, forms, sheets, generated material). Familiar patterns are a feature: a sidebar on iPad and laptop, a tab bar on the phone, grouped lists, native `<dialog>` sheets. Ambition shows as precision: one type scale, one radius family, one way to say "selected", one way to say "sent to whom".
+amphi is the binder a student carries out of the lecture hall. The ground is grey pressboard, the binder's cover; everything one reads or works in is a white paper sheet laid on it; the sidebar is the binder's charcoal spine. Each course is a pressboard divider with its own colour and a tab cut into its edge, and everything inside the course (lessons, sources, studio, chat, progress) is filed behind that divider. The student knows which course they are in from the colour alone, from the course list down to a single artifact or source.
 
-Anti-references: gamified study apps (confetti, streak flames, badges), AI products that dress output in gradients and sparkles, dashboards of same-size cards.
+The world is calm and printed rather than glowing. Colour is spent on identity, never on urgency: seven divider hues at full strength, one per course, and ink black for the one thing on a screen that acts. Density is that of a well-kept folder: sheets with generous padding, ruled groups, counts set in right-aligned tabular columns like a contents page. Display type is Archivo, a sturdy grotesque with a width axis, used where a divider would be printed (titles, tabs, the wordmark, large counts); the body stays in the platform's own sans so long reading and long German strings feel native. In the evening the binder turns black, the sheets charcoal, and the dividers drop a step deeper. The rejected default is the grey SaaS sidebar with white cards and one blue accent everywhere.
+
+**Key Characteristics:**
+- Grey pressboard ground, white paper sheets, a charcoal spine.
+- Seven divider hues, one per course, used as identity only.
+- Ink is the only colour that acts.
+- Folder tabs on the divider's lower edge; the selected tab joins the sheet below.
+- Tab-shaped course markers with cut corners, stepped across the width in the course list.
+- Archivo for the printed voice, the system sans for reading.
+- Counts and durations tabular and right-aligned.
 
 ## Colors
 
-Restrained: warm neutrals, one accent, semantic hues for state only. Tokens live in `:root` of `src/styles.css`; light and dark share names, so a component never branches on the theme.
+A neutral binder of cool greys and paper white, carried by one ink and seven pressboard divider hues.
 
-- **Ground** (`--bg`) is a barely warm off-white, **Rail** (`--rail-bg`) a shade deeper for the sidebar, **Surface** (`--surface`) pure white for anything the student works in (lists, cards, sheets, inputs).
-- **Ink** (`--text`) has a cool cast; **Ink Muted** (`--muted`) carries metadata, hints and inactive tabs. Both pass AA on every surface in both themes.
-- **Study Blue** (`--accent`) is for the one primary action, the current place (sidebar row, tab underline, tab-bar item), focus, and progress. **Accent Text** (`--accent-text`) is the darker (light theme) or lighter (dark theme) variant used when blue is text on a surface or on Accent Soft. **Accent Soft** fills the current sidebar row, the Today hero, Studio tile icons, citations and the user's own chat bubbles.
-- **Semantic:** `--danger` (delete, recording, wrong answer), `--ok` (correct, level meter, "nothing urgent"), `--warn` (partly right). Each has a `-soft` fill for notices and graded answers.
-- **Lines:** `--line` hairlines separate rows and outline groups; `--line-strong` outlines inputs (3:1 against the surface) and hovered buttons.
-- **Visualisation** colours (`--viz-b0`..`--viz-b5` and their soft fills) belong to mind maps, infographics and slides only. Slides are always drawn light (`.slide-frame` pins its own palette) because they are presented, printed and exported.
-- Dark theme: never pure black; surfaces step up in lightness (ground 18.5%, rail 20.5%, surface 22.5%, surface-2 26%), the accent is lifted to 72% lightness with dark ink on it.
+### Primary
+- **Ink** (ink): the one colour that acts. Primary buttons, links, citations, the focus outline and halo, the progress bar, the caret, checkbox and range fills, the selected tab's underline, the outline around the chosen hue swatch. Also the text colour, so action reads as weight and fill, never as a new hue. Hover deepens to **Ink Hover**; text on an ink fill is **On Ink**. In the evening ink inverts to near-white (dark-ink) with dark text on it (dark-on-ink).
+- **Ink Soft** (ink-soft): the resting fill of a citation pill.
+
+### Secondary: the dividers
+The seven divider hues are the course's identity. Each is defined by three numbers (lightness, chroma, hue) and every course role is derived from them, so a course carries one colour through the whole app:
+- **Vermilion** (divider-vermilion), **Saffron** (divider-saffron), **Olive** (divider-olive), **Green** (divider-green), **Teal** (divider-teal), **Cobalt** (divider-cobalt), **Violet** (divider-violet).
+- **Grey Divider** (divider-grey): the plain divider for screens outside a course (Settings, Discover).
+- Derived roles per hue: the full-strength **course** colour (divider band, binder entry, rail and step markers, the course crumb, hue swatches); **course-soft**, a pale wash of the same hue at 93.5% lightness and 40% of its chroma (a lesson or source divider, the icon tile of the next step and empty states, the count on a selected tab); **on-course**, a near-black tinted with the hue, for every word set on a divider.
+- A course's hue is stored with the course and synced; an older course without one takes a hue from a hash of its id, the same on every device. A new course is offered the hue the fewest courses already use, so neighbouring dividers differ.
+- Evening: each divider drops 7 points of lightness and 8% of its chroma; course-soft becomes a dark wash at 33% lightness. A lesson or source divider in the evening is a charcoal sheet (dark-paper-2); its course crumb keeps the full colour.
+
+### Tertiary: the highlighter
+- **Highlighter** (highlighter): a pale marker yellow. Text selection, quoted passages in generated prose (at 70%), a hovered citation, recording marker chips, a marked transcript line. It says "this was marked", as a student marks a printed page. Evening: dark-highlighter.
+
+### Neutral
+- **Pressboard** (pressboard): the page ground, the binder cover. **Pressboard Deep** (pressboard-deep): the track of a segmented control, the count pill on plain tabs.
+- **Paper** (paper): the white paper sheets: every sheet, card, list, input, dialog and the selected folder tab. **Paper 2** (paper-2): notices, table heads, the progress track.
+- **Spine** (spine), **Spine Text** (spine-text), **Spine Muted** (spine-muted): the sidebar and the phone top bar, its labels and its quiet icons and course names.
+- **Line** (line): hairlines between rows and around cards. **Line Strong** (line-strong): input borders, hovered borders, crumb separators.
+- **Muted** (muted): secondary text, metadata, idle tabs, leading icons.
+- **Status**: danger and danger-soft (the confirmed delete, error notices), ok and ok-soft (success notices, the calm next step), warn and warn-soft. Status colours report; they do not decorate.
+
+### Fixed palettes
+Slides, their print sheet and exported material are drawn on their own fixed light palette, with their own blue accent and six chart colours, so a deck looks the same presented, printed or exported in either theme. That palette never leaks into the app, and the app's tokens never restyle a slide.
+
+### Named Rules
+**The Ink Acts Rule.** Only ink acts: primary buttons, links, citations, focus, progress. Text links are always underlined, since their ink matches the body text. If a control, a link or a progress bar is drawn in a divider hue, it is wrong.
+
+**The Identity Rule.** A divider hue says which course, nothing else. It never marks state, urgency, success or selection, and selection is said by shape and weight (the lit rail tab grows, the selected folder tab turns to paper), never by hue alone.
+
+**The Dark Ink On Dividers Rule.** Text on a divider is always the hue's dark on-course ink, in both themes. White text never sits on a divider.
+
+**The Highlighter Rule.** What is selected or quoted is highlighted with the marker yellow, not tinted with ink or a course hue.
 
 ## Typography
 
-The platform's own sans (`ui-sans-serif, system-ui, -apple-system…`): San Francisco on the iPad, iPhone and Mac the students use, Segoe or Roboto elsewhere. A web font was weighed and declined: it would add a download and a CSP entry to buy little over SF on the devices that matter, and the system face handles French and German diacritics everywhere.
+**Display Font:** Archivo (variable weight 100 to 900, width 62% to 125%), self-hosted under the SIL Open Font License, Latin subset, with the system sans as fallback.
+**Body Font:** the platform's system sans (ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue).
+**Mono:** the system monospace, for timers and code.
 
-A fixed scale, about 1.125, as tokens (`--fs-*`): caption 0.75rem, footnote 0.8125rem, small 0.875rem, control 0.9375rem, body 1rem, lead 1.125rem, title 1.25rem, headline 1.5rem, display 1.875rem (1.625rem on phones). No fluid type in the app.
+**Character:** Archivo is the printed label on a pressboard divider: heavy, slightly widened, tight in tracking. The system sans is the handwriting on the sheets: familiar, quiet, fast to read in three languages.
 
-- Page titles (`h1`) are display, 680, tracking -0.022em; editable titles (lesson, artifact) are headline inside an `h1`.
-- Section titles are body 650 with more space above than below; group labels (Studio) are small 650 in Ink Muted.
-- Controls are control 500; selected tabs and the current sidebar row go to 600. Avoid 550: Chromium renders it as semibold.
-- Prose (reports, notes) keeps a 70ch measure and 1.65 line height.
-- Monospace only for measurement: the recording timer and transcript timestamps, with tabular numerals.
+### Hierarchy
+- **Display** (760, 2.25rem, 1.15, width 106%): the page title. 1.75rem on phones.
+- **Wordmark** (820, 1.5rem, 1, width 118%): "amphi" at the head of the spine. 1.375rem on phones.
+- **Headline** (740, 1.625rem, width 104%): the editable title of an artifact and the title on a lesson or source divider.
+- **Title** (650, 1.3125rem, 1.3): the sentence of Today's next step; at 760 for the large counts in a binder entry.
+- **Tab** (720, 1.125rem, 1.3): the course name on a binder tab. The same face at 700 sets section titles and empty-state titles; at 600 to 750 and width 96% it sets plain tabs.
+- **Body** (400, 1rem, 1.55): all reading text, capped at a 70ch measure.
+- **Control** (500, 0.9375rem, 1.25): buttons, sidebar rows; the primary button at 650.
+- **Small / Footnote / Caption** (0.875rem / 0.8125rem / 0.75rem): metadata, hints, counts.
+
+### Named Rules
+**The Printed Voice Rule.** Archivo is for what would be printed on a divider: titles, tabs, the wordmark, large counts. Paragraphs, controls and form labels stay in the system sans.
+
+**The Contents Page Rule.** Numbers that are counted or that change (lesson and source counts, durations, timers, scores) are tabular, and in lists they sit right-aligned in columns.
+
+**The Fixed Scale Rule.** The app uses the fixed type scale; no fluid sizes.
 
 ## Layout
 
-- **Shell.** From 761px: a 232px sidebar (wordmark, Today, Courses, Discover, Settings, then language, sync and theme at the foot) and the page. Up to 760px: a top bar (wordmark left; language, sync, theme right) and a fixed, translucent tab bar at the bottom (the page is felt scrolling under it; labels 11px 600, ellipsised).
-- **Page.** Max 1080px (760px for Settings), padding 32px (16px on phones, plus the tab bar and safe areas at the bottom), 16px between blocks.
-- **Head of a page:** breadcrumbs (small, muted), then the title with its actions on the same line; an editable title takes its own line once the actions would crowd it.
-- **Tabs** under the head. On phones they drop their icons, bleed to the screen edges and fade at the end where more are hidden.
-- **Studio:** what was made comes first (a list), then "Make something new" in three groups, Read (reports, mind map, infographic, slides), Practise (quiz, flashcards), Listen and watch (audio summary, podcast, video), laid out as up to three columns that stack on narrow screens.
-- **Spacing** uses the 4px scale `--space-1`..`--space-7` (4, 8, 12, 16, 24, 32, 48). Tight inside a group, generous between groups.
-- Touch screens (`pointer: coarse`) get 44px controls; small buttons and chips 36px.
+On wide screens the shell is a 248px charcoal spine beside the page. The spine runs the full height and holds, top to bottom: the wordmark, the four places (Today, Courses, Discover, Settings), the courses filed as divider tabs, then the language switch, sync and theme. The page is centred at 1120px (800px for narrow screens such as recording), with 32px top and 48px side padding, 32px below 1100px.
+
+Inside a course every screen opens with its divider: a full-width band in the course colour holding the crumbs, the title, its facts and actions, and on the course screen the folder tabs on its lower edge. The work sits on one paper sheet filed directly under it: the divider loses its lower corners, the sheet loses its upper ones, and the two join with no gap. A lesson, a source or an artifact uses the soft divider of the same hue.
+
+The course list is the binder: one divider per course, stacked 8px apart, whose tabs step across the width in a cycle of four (0, 18%, 36%, 54%), as the tabs of real dividers do. Each entry carries its counts right-aligned in columns and, when there is one, the exam countdown.
+
+Spacing runs on a 4px base (4, 8, 12, 16, 24, 32, 48), with more air above a section (24px) than inside it.
+
+Below 760px the spine becomes a charcoal top bar (wordmark, tools) and the places move to a translucent bottom tab bar; the course list in the spine hides. Dividers and their sheets run edge to edge, square-cornered, inside the safe areas. Below 560px a divider's action buttons drop their visible labels to keep one row (labels remain for assistive tech). On touch screens every target is at least 44px.
+
+### Named Rules
+**The Filed Sheet Rule.** Inside a course, content is filed on one sheet joined to the divider above it, never floated as a separate card below it.
+
+**The Ruled Not Boxed Rule.** Inside a divider's sheet, groups are ruled, not boxed: lists, group lists and concepts drop their outer border, radius and fill, and are separated by hairlines.
+
+**The Stepped Tabs Rule.** In the binder, each tab sits further right than the one above it, in a cycle of four.
 
 ## Elevation & Depth
 
-Mostly flat and tonal: ground, rail and surface differ by lightness, groups are outlined by a hairline. Shadow is reserved for what floats:
+Depth is paper on board: mostly tonal (paper on pressboard, the spine darker than both), with two shadows. Sheets, the next step and secondary buttons rest on a one-pixel paper shadow. Things that float above the binder (dialogs, the toast, the skip link) and a hovered binder entry take the lifted shadow. The phone tab bar is translucent paper with a blur so the page is felt scrolling under it; that is the only glass.
 
-- `--shadow-1`: a 1px lift under buttons and the selected segment.
-- `--shadow-2`: sheets, the chat composer, the toast, the mind map rename field.
-- Dark theme shadows are deeper and the hairlines carry the separation.
+### Shadow Vocabulary
+- **Paper rest** (`box-shadow: 0 1px 2px oklch(20% 0.012 260 / 0.08)`): a sheet lying on the board.
+- **Lifted** (`box-shadow: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07)`): dialogs, the toast, a hovered binder entry.
+- **Focus halo** (`box-shadow: 0 0 0 3px oklch(21% 0.014 260 / 0.22)`): a focused input, with its border turned to ink.
+
+### Named Rules
+**The Paper Lift Rule.** Paper rests flat with a hairline shadow; only what floats over the binder, or a divider being pulled out on hover, lifts.
 
 ## Shapes
 
-One radius family: 6px for small inline things (citation focus, code, transcript rows, slide frames), 10px for controls and notices, 14px for groups, cards, sheets and the toast, 18px for the top corners of a phone's bottom sheet, pills only for counts, chips and citations. No coloured side stripes: a graded quiz card tints its whole 1px border.
+Pressboard corners, barely rounded: 4px for small marks (crumb tab, swatch focus, slide frame), 7px for controls and inputs, 10px for dividers, sheets, cards and dialogs. Full pills only for small counters and chips: tab counts, citation pills, the exam countdown, filter chips. On phones a dialog becomes a bottom sheet with 18px top corners.
 
-Icons: one line set on a 24px grid (`src/ui/icons.tsx`), 1.75 stroke, 2.25 for the current tab-bar item; muted when decorative, blue only where the accent rules allow.
+Course markers are tabs cut by a clip path, not rounded boxes: the binder tab is a trapezoid with 10px chamfers at its top corners; the rail marker and the step marker are small tabs whose right edge is cut in by 3 to 4px; the tab that rises from the next-step sheet has its top right corner cut by 10px.
+
+### Named Rules
+**The Cut Corner Rule.** A course is marked by a tab with a cut corner in its divider colour; never by a dot, a stripe or a coloured border.
 
 ## Components
 
 ### Buttons
-- Default (secondary): white surface, hairline, 1px lift; hover strengthens the border; press scales to 0.98. One **primary** per area (accent fill). **Danger** only for the confirmed delete. **Link** for tertiary actions. **Icon buttons** are transparent with a soft hover.
-- Disabled at 45% opacity, no lift.
+Quiet paper by default, ink for the one thing that matters.
+- **Shape:** 7px corners, 40px tall (44px on touch), 4px by 16px padding.
+- **Primary:** ink fill, on-ink text, weight 650. One per area. Hover deepens to ink hover.
+- **Secondary:** paper fill, a 16% ink hairline, the paper rest shadow; hover strengthens the border to line strong. On a full-colour divider secondary buttons become a lighter card of the divider's own colour with on-course text.
+- **Danger:** danger fill, only for a confirmed delete.
+- **Link and icon buttons:** no fill. Links (text links and link buttons) are ink and always underlined (1px, offset 0.2em; 2px on hover), because ink alone does not set them apart from body text. Icon buttons are muted with a faint wash on hover.
+- **States:** press drops by 1px; disabled at 45% opacity, no shadow. Focus is a 2px ink outline offset by 2px.
 
-### Inputs and forms
-- 1px `--line-strong` border, 10px radius, 40px tall (44px on touch). Focus: accent border plus a 3px soft ring; checkboxes and radios take the accent colour and a 2px outline.
-- Labels above fields (small 600), hints below (footnote, muted). Fieldsets of choices are outlined groups.
-- Before anything leaves the device, a notice says what goes where ("The text of the selected sources is sent to …").
+### Inputs / Fields
+- **Style:** paper fill, line-strong border, 7px corners, 40px tall; labels above (small, 650), hints below (footnote, muted).
+- **Focus:** border turns to ink and the 3px focus halo appears.
+- **Choices:** checkboxes, radios and ranges are filled with ink. Outlined fieldsets hold long choice lists.
 
-### Segmented control
-- Native buttons with `aria-pressed` in a surface-2 track; the selected segment lifts to the surface. It sizes to its content unless `.wide`.
+### Navigation
+- **Spine rows:** spine text at 500 with a muted icon; hover is a faint white wash. The current place is cut from the page: it takes the pressboard ground, ink text at 650, and loses its right-hand corners so it joins the page.
+- **Courses in the spine:** muted rows with a 12px divider tab in the course colour; the open course lights up (spine text, 650) and its tab grows to 22px. The open course stays lit down to its artifacts and sources.
+- **Phone tab bar:** muted label under a 24px icon; the current place in ink with a heavier stroke, no pill.
+- **Crumbs:** muted links separated by slashes; inside a course the first crumb is the course's own small divider tab, filled with its colour.
 
-### Sidebar and tab bar
-- Sidebar rows: ink text, muted icon; hover is a 5% ink wash. Only the current row speaks blue: Accent Soft fill, Accent Text, accent icon, 600.
-- Tab bar items: muted label under a 24px icon; the current item in Accent Text with a heavier stroke, no pill.
+### Divider (signature)
+The head of every screen inside a course, and of Settings and Discover in grey.
+- **Full:** course colour fill, on-course text, 10px corners, 24px padding (16px at the bottom), with crumbs, title, facts (a large Archivo number before each label, tabular) and actions.
+- **Soft:** course-soft fill and ink text, for a lesson, a source, an artifact or a recording; its title drops to headline size.
+- **Folder tabs:** sit on the divider's lower edge with 7px top corners, 42px tall, weight 600. Idle tabs are lighter card cut from the divider (white at 36%, 62% on hover); the selected tab turns to paper with ink text at 700 and joins the sheet below. Outside a divider, tabs are plain text in Archivo over a hairline, the selected one underlined with 3px of ink.
+
+### Binder entry (signature)
+One course in the binder or on Today.
+- **Tab:** course colour, chamfered trapezoid, Archivo course name with its emoji, stepped across the width; it rises 3px on hover.
+- **Body:** course colour, 10px corners (the first entry of each cycle keeps its top-left square so the tab joins it), at least 60px tall; lesson and source counts right-aligned in columns (count in Archivo at title size; a zero count is quiet through weight only, set plain in the body sans at 500, never faded); an exam countdown in a pale pill. Hover lifts the body; focus is a 3px paper gap and 2px of ink around it.
+
+### Next step
+Today's one next action.
+- A paper sheet with 10px corners and 24px by 32px padding: an icon in a course-soft tile, one sentence in Archivo at title size, one primary ink button. When the step belongs to a course, a 112px tab in the course colour rises from its top edge. When nothing is urgent, the icon tile turns ok-soft with a green check. Further steps follow as a compact list, each row marked by a small cut-corner step tab.
 
 ### Lists
-- A grouped list: a white 14px group, rows of at least 56px (48px compact) with a muted leading icon, title and metadata, a faint trailing chevron, a soft hover.
+- Rows of at least 56px (48px compact): a muted leading icon, title at 600, right-aligned tabular metadata, a faint trailing chevron that moves 2px on hover. On their own they are a paper group with a hairline border; on a divider's sheet they are ruled only.
 
-### Studio tiles
-- A row in a grouped list: a 36px Accent Soft tile holding the type's icon, then the name (body 600) and one line of purpose (small, muted). The accessible name starts with the type's name.
-
-### Artifact
-- Breadcrumbs, editable title in an `h1`, Regenerate and Delete; a metadata line (type, age, version, sources); an **Export** toolbar of small buttons labelled by its visible caption; then the type's own view.
-
-### Today
-- One **next step** hero (Accent Soft, icon, one sentence, one primary action); when nothing is urgent it turns surface-2 with a green check. Up to four more steps as a compact list, then the courses.
-
-### Empty states
-- A soft surface-2 panel: an Accent Soft icon tile, a title (lead 650), one teaching sentence and, when there is one, the next action. Where the screen's own controls are the next action (the Studio's tiles), there is no empty state.
-
-### Sheets
-- Native modal `<dialog>`: a centred 560px panel (760px wide variant) with a sticky head; on phones a bottom sheet with 18px top corners inside the safe area. Opens with a short rise; the form's last row puts the primary action last.
-
-### Toast
-- An ink block above the tab bar (bottom centre of the page on wide screens), small text and text actions. Used for "A new version of amphi is ready" (Later, Reload): a new version never takes over mid-task.
-
-### Notices and status
-- Notices: surface-2 for information, danger-soft for errors (`role="alert"`), ok-soft for success. Offline failures say so in the student's language and what still works.
-- Settings → This device states whether the app works offline.
+### Hue swatches
+- The seven dividers as 36px swatches with 7px corners in the course form. The chosen one is outlined in ink (a 2px paper gap, then 2px of ink) and carries a small on-course dot.
 
 ### Citations
-- `S1 §2` pills in Accent Soft inside prose, mind maps and cards; they open the source at the page or the minute.
+- Small pills (0.75em, 600) in ink-soft with a hairline, inside prose, mind maps and cards; hover turns them highlighter yellow. They open the source at the page or the minute.
+
+### Sheets and toast
+- Native modal dialogs: a 560px paper panel (760px wide variant), 10px corners, a hairline and the lifted shadow; a bottom sheet on phones. The toast is an ink block with pressboard text and text actions.
+
+### Empty states
+- A dashed outline with 10px corners, a course-soft icon tile, a title in Archivo, one teaching sentence and, when there is one, the next action in ink.
 
 ### Motion
-- 150ms for hovers, 220ms with an exponential ease-out for sheets and the toast. The recording dot pulses; nothing else loops except progress. Reduced motion drops all of it to instant state changes.
+- Hovers and state changes in 150ms, larger moves in 240ms, on an exponential ease-out (`cubic-bezier(0.16, 1, 0.3, 1)`). As a screen opens its folder tabs and binder tabs rise 10px from behind their divider, one after another, 40ms apart. Dialogs rise 8px. Nothing loops except progress and the recording, typing and sync indicators. Reduced motion makes every change instant.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use the accent only for the primary action, the current place, focus and progress.
-- **Do** route every string through `t(en, fr, de)` and let German wrap; never fix a text width.
-- **Do** say what leaves the device and to whom before it is sent, and say plainly when the network is missing.
-- **Do** keep numbers tabular where they change (timers, scores, counts).
-- **Do** use the tokens (`--fs-*`, `--space-*`, `--radius*`, colours) in every feature section of `src/styles.css`.
+- **Do** give every course one of the seven divider hues and carry it through the course: divider, crumb, rail tab, binder entry, next-step tab.
+- **Do** keep ink as the only colour that acts: primary buttons, links, citations, focus, progress.
+- **Do** highlight selection and quoted passages with the highlighter yellow.
+- **Do** file a course's content on one paper sheet joined to its divider, and rule the groups on it.
+- **Do** set titles, tabs and large counts in Archivo, and reading text in the system sans.
+- **Do** keep counts and durations tabular and right-aligned; quiet a zero count by weight, never by opacity.
+- **Do** underline every text link.
+- **Do** use the tokens (`--fs-*`, `--space-*`, `--radius*`, colours, `--course*`) in every feature section of `src/styles.css`.
+- **Do** let German strings wrap; never fix a text width.
 
 ### Don't:
+- **Don't** use a divider hue for an action, a link, a state or a selection.
+- **Don't** put white text on a divider.
+- **Don't** add a coloured side stripe to a card, notice, list row or transcript line.
+- **Don't** add eyebrow labels (small uppercase, letter-spaced lines above a title).
+- **Don't** box groups inside a divider's sheet.
+- **Don't** restyle slides or exports with the app's tokens; they keep their own fixed palette.
+- **Don't** add a second accent, gradient text or decorative glass (the phone tab bar's blur is the one functional exception).
 - **Don't** add confetti, streaks, badges or celebratory motion: progress is shown, not cheered.
-- **Don't** add a coloured side stripe to a card, notice or list row.
-- **Don't** introduce a second accent, gradient text, or decorative glass (the phone tab bar's blur is the one functional exception).
+- **Don't** load a font, image or script from another origin; Archivo is served from the site itself.
 - **Don't** put inline `style` attributes in HTML strings (the CSP forbids them); React's `style` prop is fine for computed values.
-- **Don't** load a font, image or script from another origin.

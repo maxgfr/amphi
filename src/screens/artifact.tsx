@@ -10,6 +10,7 @@ import { go, href } from "../router.ts";
 import { hasText, MakeSheet } from "../studio/panel.tsx";
 import { studioKind } from "../studio/registry.ts";
 import { cancelJob, useJobs } from "../studio/run.ts";
+import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice, ProgressBar, saveFile } from "../ui/kit.tsx";
 
@@ -29,6 +30,7 @@ export function ArtifactScreen({ id }: { id: string }) {
     ["artifacts", "sources"],
     [id],
   );
+  useOpenCourse(data?.course?.id);
   if (data === undefined) return <div className="page" aria-busy="true" />;
   if (data === null || !data.course)
     return (
@@ -44,99 +46,105 @@ export function ArtifactScreen({ id }: { id: string }) {
   const View = k?.View;
   return (
     // An export error ("render the video first") goes away with the next click, before that click's own handler runs.
-    <div className="page" onClickCapture={() => setError("")}>
-      <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-        <a href={href.course(course.id, "studio")}>{course.title}</a>
-        {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}
-      </nav>
-      <div className="page-head">
-        <h1 className="title-heading">
-          <input
-            className="title-input"
-            aria-label={t("Title", "Titre", "Titel")}
-            defaultValue={artifact.title}
-            key={artifact.title}
-            onBlur={(e) => {
-              const v = e.currentTarget.value.trim();
-              if (v && v !== artifact.title) void update("artifacts", id, { title: v });
-            }}
-          />
-        </h1>
-        <div className="row no-print">
-          {k && artifact.status !== "working" ? (
-            <button type="button" className="secondary" onClick={() => setRegenerating(true)}>
-              <Icon name="refresh" size={18} /> {t("Regenerate", "Régénérer", "Neu erstellen")}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="icon-button"
-            aria-label={t("Delete", "Supprimer", "Löschen")}
-            onClick={async () => {
-              await remove("artifacts", id);
-              go(artifact.lessonId ? href.lesson(artifact.lessonId, "studio") : href.course(course.id, "studio"));
-            }}
-          >
-            <Icon name="trash" size={18} />
-          </button>
-        </div>
-      </div>
-      <p className="meta no-print">
-        {k?.label(t)} · {relative(artifact.updatedAt)} · v{artifact.version} · {t("from", "à partir de", "aus")} {sources.map((s) => s.title).join(", ") || "—"}
-      </p>
-      {artifact.status === "working" ? (
-        job ? (
-          <div className="stack">
-            <ProgressBar ratio={job.progress.ratio} label={job.progress.label || t("Generating…", "Génération…", "Wird erstellt…")} />
-            <p className="meta" role="status">
-              {job.progress.label || t("Generating…", "Génération…", "Wird erstellt…")}
-            </p>
-            <div className="row">
-              <button type="button" className="secondary" onClick={() => cancelJob(id)}>
-                {t("Cancel", "Annuler", "Abbrechen")}
+    <div className="page" data-hue={courseHue(course)} onClickCapture={() => setError("")}>
+      <header className="divider soft">
+        <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+          <a className="crumb-course" href={href.course(course.id, "studio")}>
+            {course.title}
+          </a>
+          {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}
+        </nav>
+        <div className="page-head">
+          <h1 className="title-heading">
+            <input
+              className="title-input"
+              aria-label={t("Title", "Titre", "Titel")}
+              defaultValue={artifact.title}
+              key={artifact.title}
+              onBlur={(e) => {
+                const v = e.currentTarget.value.trim();
+                if (v && v !== artifact.title) void update("artifacts", id, { title: v });
+              }}
+            />
+          </h1>
+          <div className="row no-print">
+            {k && artifact.status !== "working" ? (
+              <button type="button" className="secondary" onClick={() => setRegenerating(true)}>
+                <Icon name="refresh" size={18} /> <span className="btn-label">{t("Regenerate", "Régénérer", "Neu erstellen")}</span>
               </button>
-            </div>
+            ) : null}
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={t("Delete", "Supprimer", "Löschen")}
+              onClick={async () => {
+                await remove("artifacts", id);
+                go(artifact.lessonId ? href.lesson(artifact.lessonId, "studio") : href.course(course.id, "studio"));
+              }}
+            >
+              <Icon name="trash" size={18} />
+            </button>
           </div>
-        ) : (
-          <Notice kind="error">{t("The generation was interrupted (the page closed). Regenerate it.", "La génération a été interrompue (la page s'est fermée). Régénérez-la.", "Die Erstellung wurde unterbrochen (die Seite wurde geschlossen). Erstellen Sie sie neu.")}</Notice>
-        )
-      ) : null}
-      {artifact.status === "error" ? <Notice kind="error">{artifact.error}</Notice> : null}
-      {artifact.status === "ready" && View ? (
-        <>
-          {k.exports?.length ? (
-            <div className="toolbar no-print" role="group" aria-labelledby="artifact-export">
-              <span id="artifact-export" className="toolbar-label">
-                {t("Export", "Exporter", "Exportieren")}
-              </span>
-              {k.exports.map((x) => (
-                <button
-                  key={x.id}
-                  type="button"
-                  className="secondary small"
-                  disabled={exporting === x.id}
-                  onClick={async () => {
-                    setExporting(x.id);
-                    setError("");
-                    try {
-                      const file = await x.run(artifact, { course, lesson, sources });
-                      if (file) saveFile(file.blob, file.filename);
-                    } catch (e) {
-                      setError(e instanceof Error ? e.message : String(e));
-                    } finally {
-                      setExporting("");
-                    }
-                  }}
-                >
-                  <Icon name="download" size={16} /> {x.label(t)}
+        </div>
+        <p className="meta no-print">
+          {k?.label(t)} · {relative(artifact.updatedAt)} · v{artifact.version} · {t("from", "à partir de", "aus")} {sources.map((s) => s.title).join(", ") || "—"}
+        </p>
+      </header>
+      <div className="paper">
+        {artifact.status === "working" ? (
+          job ? (
+            <div className="stack">
+              <ProgressBar ratio={job.progress.ratio} label={job.progress.label || t("Generating…", "Génération…", "Wird erstellt…")} />
+              <p className="meta" role="status">
+                {job.progress.label || t("Generating…", "Génération…", "Wird erstellt…")}
+              </p>
+              <div className="row">
+                <button type="button" className="secondary" onClick={() => cancelJob(id)}>
+                  {t("Cancel", "Annuler", "Abbrechen")}
                 </button>
-              ))}
+              </div>
             </div>
-          ) : null}
-          {error ? <Notice kind="error">{error}</Notice> : null}
-          <View artifact={artifact as Artifact<never>} course={course} sources={sources} onChange={(d) => void update("artifacts", id, { data: d })} />
-        </>
-      ) : null}
+          ) : (
+            <Notice kind="error">{t("The generation was interrupted (the page closed). Regenerate it.", "La génération a été interrompue (la page s'est fermée). Régénérez-la.", "Die Erstellung wurde unterbrochen (die Seite wurde geschlossen). Erstellen Sie sie neu.")}</Notice>
+          )
+        ) : null}
+        {artifact.status === "error" ? <Notice kind="error">{artifact.error}</Notice> : null}
+        {artifact.status === "ready" && View ? (
+          <>
+            {k.exports?.length ? (
+              <div className="toolbar no-print" role="group" aria-labelledby="artifact-export">
+                <span id="artifact-export" className="toolbar-label">
+                  {t("Export", "Exporter", "Exportieren")}
+                </span>
+                {k.exports.map((x) => (
+                  <button
+                    key={x.id}
+                    type="button"
+                    className="secondary small"
+                    disabled={exporting === x.id}
+                    onClick={async () => {
+                      setExporting(x.id);
+                      setError("");
+                      try {
+                        const file = await x.run(artifact, { course, lesson, sources });
+                        if (file) saveFile(file.blob, file.filename);
+                      } catch (e) {
+                        setError(e instanceof Error ? e.message : String(e));
+                      } finally {
+                        setExporting("");
+                      }
+                    }}
+                  >
+                    <Icon name="download" size={16} /> {x.label(t)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {error ? <Notice kind="error">{error}</Notice> : null}
+            <View artifact={artifact as Artifact<never>} course={course} sources={sources} onChange={(d) => void update("artifacts", id, { data: d })} />
+          </>
+        ) : null}
+      </div>
       {regenerating && k ? <MakeSheet k={k} sources={scope} courseId={course.id} lessonId={artifact.lessonId} replace={artifact} onClose={() => setRegenerating(false)} /> : null}
     </div>
   );

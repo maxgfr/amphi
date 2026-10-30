@@ -22,20 +22,22 @@ export function Settings({ section }: { section?: string }) {
   const current: Section = (["ai", "voice", "sync", "security", "device", "privacy"] as const).includes(section as Section) ? (section as Section) : "ai";
   return (
     <div className="page narrow">
-      <h1>{t("Settings", "Réglages", "Einstellungen")}</h1>
-      <Tabs
-        tabs={[
-          { id: "ai", label: t("AI", "IA", "KI"), icon: "sparkle" },
-          { id: "voice", label: t("Voices", "Voix", "Stimmen"), icon: "headphones" },
-          { id: "sync", label: t("Sync", "Synchro", "Sync"), icon: "cloud" },
-          { id: "security", label: t("Keys", "Clés", "Schlüssel"), icon: "lock" },
-          { id: "device", label: t("This device", "Cet appareil", "Dieses Gerät"), icon: "folder" },
-          { id: "privacy", label: t("Privacy", "Confidentialité", "Datenschutz"), icon: "globe" },
-        ]}
-        value={current}
-        onChange={(k) => go(href.settings(k))}
-        label={t("Settings sections", "Sections des réglages", "Bereiche der Einstellungen")}
-      />
+      <header className="divider">
+        <h1>{t("Settings", "Réglages", "Einstellungen")}</h1>
+        <Tabs
+          tabs={[
+            { id: "ai", label: t("AI", "IA", "KI"), icon: "sparkle" },
+            { id: "voice", label: t("Voices", "Voix", "Stimmen"), icon: "headphones" },
+            { id: "sync", label: t("Sync", "Synchro", "Sync"), icon: "cloud" },
+            { id: "security", label: t("Keys", "Clés", "Schlüssel"), icon: "lock" },
+            { id: "device", label: t("This device", "Cet appareil", "Dieses Gerät"), icon: "folder" },
+            { id: "privacy", label: t("Privacy", "Confidentialité", "Datenschutz"), icon: "globe" },
+          ]}
+          value={current}
+          onChange={(k) => go(href.settings(k))}
+          label={t("Settings sections", "Sections des réglages", "Bereiche der Einstellungen")}
+        />
+      </header>
       <div className="tab-panel" role="tabpanel">
         {current === "ai" ? <AiSettings /> : null}
         <Suspense fallback={<div aria-busy="true" />}>

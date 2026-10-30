@@ -12,6 +12,7 @@ import { go, href } from "../router.ts";
 import { isoDay } from "../speech/draft.ts";
 import { elapsed, level, markMoment, pauseRecording, resumeRecording, startRecording, stopRecording, useRecorder } from "../speech/recorder.ts";
 import { RecoveryNotice, useRecovery } from "../speech/recovery.tsx";
+import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Field, Notice } from "../ui/kit.tsx";
 
@@ -35,6 +36,7 @@ export function RecordScreen({ courseId, lessonId }: { courseId: string; lessonI
   );
   const [picked, setPicked] = useState<Id | null>(null);
   useClock(rec.state === "recording");
+  useOpenCourse(data?.course?.id);
   const stopping = useRef(false);
 
   if (data === undefined) return <div className="page" aria-busy="true" />;
@@ -78,90 +80,96 @@ export function RecordScreen({ courseId, lessonId }: { courseId: string; lessonI
             : t("Ready to record", "Prêt à enregistrer", "Bereit zur Aufnahme");
 
   return (
-    <div className="page narrow">
-      <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-        <a href={href.course(course.id)}>{course.title}</a>
-        {recordingLesson && (rec.state !== "idle" || lessonId) ? <a href={href.lesson(recordingLesson.id)}>{recordingLesson.title}</a> : null}
-      </nav>
-      <h1>{t("Record a lecture", "Enregistrer un cours", "Vorlesung aufnehmen")}</h1>
-      {rec.state === "idle" ? <RecoveryNotice /> : null}
-      {rec.error ? <Notice kind="error">{rec.error}</Notice> : null}
-      {rec.state === "idle" && rec.saved ? (
-        <Notice kind="ok">
-          {t("The recording stopped and was saved.", "L'enregistrement s'est arrêté et a été sauvegardé.", "Die Aufnahme wurde beendet und gespeichert.")} <a href={href.source(rec.saved)}>{t("Open it", "L'ouvrir", "Öffnen")}</a>
-        </Notice>
-      ) : null}
-
-      {isCourse && rec.state === "idle" ? (
-        <Field label={t("Lesson", "Séance", "Sitzung")}>
-          <select value={choice} onChange={(e) => setPicked(e.currentTarget.value)}>
-            <option value={NEW}>{t(`A new lesson, dated today (${dateOnly(Date.now())})`, `Une nouvelle séance, datée d'aujourd'hui (${dateOnly(Date.now())})`, `Eine neue Sitzung mit heutigem Datum (${dateOnly(Date.now())})`)}</option>
-            {lessons.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.title}
-                {l.date ? ` · ${dateOnly(new Date(l.date).getTime())}` : ""}
-              </option>
-            ))}
-          </select>
-        </Field>
-      ) : null}
-
-      <section className={`recorder ${rec.state}`} aria-label={t("Recorder", "Enregistreur", "Rekorder")}>
-        <p className="rec-status" role="status">
-          {status}
-        </p>
-        <p className="rec-time" role="timer" aria-label={t("Recorded time", "Durée enregistrée", "Aufgenommene Zeit")}>
-          {clock(live || rec.state === "stopping" ? elapsed() : 0)}
-        </p>
-        <LevelMeter active={live} />
-        {live || rec.state === "stopping" ? (
-          <div className="rec-controls">
-            {rec.state === "paused" ? (
-              <button type="button" className="secondary rec-side" onClick={resumeRecording}>
-                <Icon name="play" /> {t("Resume", "Reprendre", "Fortsetzen")}
-              </button>
-            ) : (
-              <button type="button" className="secondary rec-side" onClick={pauseRecording} disabled={rec.state !== "recording"}>
-                <Icon name="pause" /> {t("Pause", "Pause", "Pause")}
-              </button>
-            )}
-            <button type="button" className="rec-button stop" onClick={() => void stop()} disabled={rec.state === "stopping"} aria-label={t("Stop and save", "Arrêter et sauvegarder", "Beenden und speichern")}>
-              <Icon name="stop" size={32} />
-            </button>
-            <button type="button" className="secondary rec-side" onClick={markMoment} disabled={rec.state === "stopping"}>
-              <Icon name="flag" /> {t("Important", "Important", "Wichtig")}
-            </button>
-          </div>
-        ) : (
-          <div className="rec-controls">
-            <button type="button" className="rec-button" onClick={start} disabled={rec.state === "starting" || busyElsewhere} aria-label={t("Start recording", "Commencer l'enregistrement", "Aufnahme starten")}>
-              <Icon name="mic" size={32} />
-            </button>
-          </div>
-        )}
-        {rec.markers.length ? (
-          <ol className="row wrap rec-markers" aria-label={t("Marked moments", "Moments marqués", "Markierte Stellen")}>
-            {rec.markers.map((m) => (
-              <li key={m.t} className="chip">
-                <Icon name="flag" size={16} /> {clock(m.t)}
-              </li>
-            ))}
-          </ol>
+    <div className="page narrow" data-hue={courseHue(course)}>
+      <header className="divider soft">
+        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+          <a className="crumb-course" href={href.course(course.id)}>
+            {course.title}
+          </a>
+          {recordingLesson && (rec.state !== "idle" || lessonId) ? <a href={href.lesson(recordingLesson.id)}>{recordingLesson.title}</a> : null}
+        </nav>
+        <h1>{t("Record a lecture", "Enregistrer un cours", "Vorlesung aufnehmen")}</h1>
+      </header>
+      <div className="paper">
+        {rec.state === "idle" ? <RecoveryNotice /> : null}
+        {rec.error ? <Notice kind="error">{rec.error}</Notice> : null}
+        {rec.state === "idle" && rec.saved ? (
+          <Notice kind="ok">
+            {t("The recording stopped and was saved.", "L'enregistrement s'est arrêté et a été sauvegardé.", "Die Aufnahme wurde beendet und gespeichert.")} <a href={href.source(rec.saved)}>{t("Open it", "L'ouvrir", "Öffnen")}</a>
+          </Notice>
         ) : null}
-      </section>
-      <p className="meta">
-        {live
-          ? t(
-              "Each ten seconds is saved on this device as you go: if the tab closes, the recording can be recovered. The screen stays on while recording.",
-              "Chaque tranche de dix secondes est sauvegardée sur cet appareil au fil de l'eau : si l'onglet se ferme, l'enregistrement peut être récupéré. L'écran reste allumé pendant l'enregistrement.",
-              "Alle zehn Sekunden wird auf diesem Gerät gesichert: Schließt sich der Tab, lässt sich die Aufnahme wiederherstellen. Der Bildschirm bleibt während der Aufnahme an.",
-            )
-          : t(
-              "The recording stays on this device. Once stopped, you choose how to transcribe it: on this device, or with your AI provider.",
-              "L'enregistrement reste sur cet appareil. Une fois arrêté, vous choisissez comment le transcrire : sur cet appareil, ou avec votre fournisseur d'IA.",
-              "Die Aufnahme bleibt auf diesem Gerät. Danach wählen Sie, wie sie transkribiert wird: auf diesem Gerät oder mit Ihrem KI-Anbieter.",
-            )}
-      </p>
+
+        {isCourse && rec.state === "idle" ? (
+          <Field label={t("Lesson", "Séance", "Sitzung")}>
+            <select value={choice} onChange={(e) => setPicked(e.currentTarget.value)}>
+              <option value={NEW}>{t(`A new lesson, dated today (${dateOnly(Date.now())})`, `Une nouvelle séance, datée d'aujourd'hui (${dateOnly(Date.now())})`, `Eine neue Sitzung mit heutigem Datum (${dateOnly(Date.now())})`)}</option>
+              {lessons.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.title}
+                  {l.date ? ` · ${dateOnly(new Date(l.date).getTime())}` : ""}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
+
+        <section className={`recorder ${rec.state}`} aria-label={t("Recorder", "Enregistreur", "Rekorder")}>
+          <p className="rec-status" role="status">
+            {status}
+          </p>
+          <p className="rec-time" role="timer" aria-label={t("Recorded time", "Durée enregistrée", "Aufgenommene Zeit")}>
+            {clock(live || rec.state === "stopping" ? elapsed() : 0)}
+          </p>
+          <LevelMeter active={live} />
+          {live || rec.state === "stopping" ? (
+            <div className="rec-controls">
+              {rec.state === "paused" ? (
+                <button type="button" className="secondary rec-side" onClick={resumeRecording}>
+                  <Icon name="play" /> {t("Resume", "Reprendre", "Fortsetzen")}
+                </button>
+              ) : (
+                <button type="button" className="secondary rec-side" onClick={pauseRecording} disabled={rec.state !== "recording"}>
+                  <Icon name="pause" /> {t("Pause", "Pause", "Pause")}
+                </button>
+              )}
+              <button type="button" className="rec-button stop" onClick={() => void stop()} disabled={rec.state === "stopping"} aria-label={t("Stop and save", "Arrêter et sauvegarder", "Beenden und speichern")}>
+                <Icon name="stop" size={32} />
+              </button>
+              <button type="button" className="secondary rec-side" onClick={markMoment} disabled={rec.state === "stopping"}>
+                <Icon name="flag" /> {t("Important", "Important", "Wichtig")}
+              </button>
+            </div>
+          ) : (
+            <div className="rec-controls">
+              <button type="button" className="rec-button" onClick={start} disabled={rec.state === "starting" || busyElsewhere} aria-label={t("Start recording", "Commencer l'enregistrement", "Aufnahme starten")}>
+                <Icon name="mic" size={32} />
+              </button>
+            </div>
+          )}
+          {rec.markers.length ? (
+            <ol className="row wrap rec-markers" aria-label={t("Marked moments", "Moments marqués", "Markierte Stellen")}>
+              {rec.markers.map((m) => (
+                <li key={m.t} className="chip">
+                  <Icon name="flag" size={16} /> {clock(m.t)}
+                </li>
+              ))}
+            </ol>
+          ) : null}
+        </section>
+        <p className="meta">
+          {live
+            ? t(
+                "Each ten seconds is saved on this device as you go: if the tab closes, the recording can be recovered. The screen stays on while recording.",
+                "Chaque tranche de dix secondes est sauvegardée sur cet appareil au fil de l'eau : si l'onglet se ferme, l'enregistrement peut être récupéré. L'écran reste allumé pendant l'enregistrement.",
+                "Alle zehn Sekunden wird auf diesem Gerät gesichert: Schließt sich der Tab, lässt sich die Aufnahme wiederherstellen. Der Bildschirm bleibt während der Aufnahme an.",
+              )
+            : t(
+                "The recording stays on this device. Once stopped, you choose how to transcribe it: on this device, or with your AI provider.",
+                "L'enregistrement reste sur cet appareil. Une fois arrêté, vous choisissez comment le transcrire : sur cet appareil, ou avec votre fournisseur d'IA.",
+                "Die Aufnahme bleibt auf diesem Gerät. Danach wählen Sie, wie sie transkribiert wird: auf diesem Gerät oder mit Ihrem KI-Anbieter.",
+              )}
+        </p>
+      </div>
     </div>
   );
 }

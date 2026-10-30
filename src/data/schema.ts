@@ -18,6 +18,8 @@ export interface Course extends Base {
   kind: "course" | "topic";
   title: string;
   emoji?: string;
+  /** Divider colour, 0 to 6 (src/ui/hue.ts); derived from the id when unset. */
+  hue?: number;
   /** Spoken and written language of the material (BCP 47, "fr"); the interface's when unset. */
   language?: string;
   /** YYYY-MM-DD. */

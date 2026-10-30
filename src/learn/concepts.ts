@@ -89,3 +89,13 @@ export async function generateConcepts(course: Course, sources: Source[], signal
   for (const c of records) await put("concepts", c);
   return records;
 }
+
+/**
+ * The course's concept names as a prompt rule, so quizzes and cards name what
+ * they test the way Progress does ("" when the course has no concepts yet).
+ */
+export function conceptRule(concepts: readonly Pick<Concept, "title">[]): string {
+  if (!concepts.length) return "";
+  const names = concepts.map((c) => JSON.stringify(c.title)).join(", ");
+  return ` The course's concepts are: ${names}. When an item tests one of them, use that name exactly as its "concept"; otherwise name a new concept in 1 to 4 words.`;
+}

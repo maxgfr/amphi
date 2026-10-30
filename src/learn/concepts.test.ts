@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { ConceptsAnswer, conceptRecords, conceptTree } from "./concepts.ts";
+import { ConceptsAnswer, conceptRecords, conceptRule as rule, conceptTree } from "./concepts.ts";
 
 test("concepts keep their order, once each, with prerequisites linked by name", () => {
   const raw = ConceptsAnswer.parse({
@@ -40,4 +40,11 @@ test("the topic's mind map hangs each concept under its last prerequisite", () =
   expect(b.title).toBe("Work");
   // Four levels at most: Entropy goes beside Energy rather than under it.
   expect(b.children.map((n) => n.title)).toEqual(["Energy", "Entropy"]);
+});
+
+test("quizzes and cards are told the course's concept names", () => {
+  expect(rule([])).toBe("");
+  const r = rule([{ title: "Entropy" }, { title: 'The "second" law' }]);
+  expect(r).toContain('"Entropy", "The \\"second\\" law"');
+  expect(r).toContain("use that name exactly");
 });

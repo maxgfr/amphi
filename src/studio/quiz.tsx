@@ -8,7 +8,8 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { budgetFor, buildContext } from "../ai/context.ts";
 import { capabilities, writeIn } from "../ai/llm.ts";
 import { askJson } from "../ai/structured.ts";
-import { fresh, put } from "../data/db.ts";
+import { fresh, list, put } from "../data/db.ts";
+import { conceptRule } from "../learn/concepts.ts";
 import type { Artifact } from "../data/schema.ts";
 import { clock, trIn, useLang } from "../i18n.ts";
 import { openCitation } from "../ui/cite.ts";
@@ -455,9 +456,10 @@ export const quiz = kind<QuizData, QuizOptions>({
       : null,
   async generate(ctx, o) {
     ctx.progress({ label: "" });
+    const concepts = conceptRule((await list("concepts", "courseId", ctx.course.id)).sort((a, b) => a.order - b.order));
     const context = buildContext(ctx.sources, { query: o.focus || undefined, budget: budgetFor(capabilities().contextWindow) });
     const questions = await askJson(QuizAnswer, {
-      system: `You write a quiz for a university student from their own course sources. Write ${o.count} questions; ${KIND_RULE[o.kinds]}; difficulty ${DIFFICULTY_RULE[o.difficulty]}. Each question tests one concept, named in "concept" (1 to 4 words, the same name for questions on the same concept). Multiple choice: 4 plausible choices, exactly one right, "answer" is its 0-based index. True/false: "answer" is true or false. Short answer: "answer" is the expected answer in a few words or one sentence. "explanation" says why in one to three sentences and cites the passages with their labels in square brackets, e.g. [S1 p.3]; "cite" is the main label. Use only labels that appear in the sources and only what the sources say. Write in ${writeIn(ctx.language)}.`,
+      system: `You write a quiz for a university student from their own course sources. Write ${o.count} questions; ${KIND_RULE[o.kinds]}; difficulty ${DIFFICULTY_RULE[o.difficulty]}. Each question tests one concept, named in "concept" (1 to 4 words, the same name for questions on the same concept). Multiple choice: 4 plausible choices, exactly one right, "answer" is its 0-based index. True/false: "answer" is true or false. Short answer: "answer" is the expected answer in a few words or one sentence. "explanation" says why in one to three sentences and cites the passages with their labels in square brackets, e.g. [S1 p.3]; "cite" is the main label. Use only labels that appear in the sources and only what the sources say. Write in ${writeIn(ctx.language)}.${concepts}`,
       prompt: `${o.focus ? `Focus on: ${o.focus}\n\n` : ""}${context.text}`,
       shape: SHAPE,
       signal: ctx.signal,

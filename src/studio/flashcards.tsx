@@ -8,7 +8,8 @@ import { z } from "zod";
 import { budgetFor, buildContext } from "../ai/context.ts";
 import { capabilities, writeIn } from "../ai/llm.ts";
 import { askJson } from "../ai/structured.ts";
-import { fresh, newId, put } from "../data/db.ts";
+import { fresh, list, newId, put } from "../data/db.ts";
+import { conceptRule } from "../learn/concepts.ts";
 import type { Artifact } from "../data/schema.ts";
 import { type T, trIn, useLang } from "../i18n.ts";
 import { openCitation } from "../ui/cite.ts";
@@ -300,9 +301,10 @@ export const flashcards = kind<FlashcardsData, FlashcardsOptions>({
   Options,
   async generate(ctx, o) {
     ctx.progress({ label: "" });
+    const concepts = conceptRule((await list("concepts", "courseId", ctx.course.id)).sort((a, b) => a.order - b.order));
     const context = buildContext(ctx.sources, { query: o.focus || undefined, budget: budgetFor(capabilities().contextWindow) });
     const reply = await askJson(AnswerSchema, {
-      system: `You write flashcards for a university student from their own course sources. Write ${o.count} cards, each testing one idea that matters for an exam, short and unambiguous, answerable without seeing the other cards. ${KINDS[o.kinds]} Give each card its "concept": the notion it tests in 1 to 4 words, worded the same for every card on that notion. Give each card its "source": the label of the passage it comes from, exactly as written in the sources (e.g. S1 p.3). Ground every card in the sources; never invent facts they do not support. Cards may use Markdown and $…$ for math. Write in ${writeIn(ctx.language)}.`,
+      system: `You write flashcards for a university student from their own course sources. Write ${o.count} cards, each testing one idea that matters for an exam, short and unambiguous, answerable without seeing the other cards. ${KINDS[o.kinds]} Give each card its "concept": the notion it tests in 1 to 4 words, worded the same for every card on that notion. Give each card its "source": the label of the passage it comes from, exactly as written in the sources (e.g. S1 p.3). Ground every card in the sources; never invent facts they do not support. Cards may use Markdown and $…$ for math. Write in ${writeIn(ctx.language)}.${concepts}`,
       prompt: `${o.focus ? `Focus on: ${o.focus}\n\n` : ""}${context.text}`,
       shape: SHAPE,
       signal: ctx.signal,

@@ -1,0 +1,48 @@
+amphi — licences of the published site
+======================================
+
+amphi's own source code is under the MIT licence:
+https://github.com/maxgfr/amphi/blob/main/LICENSE
+
+The site as published (https://maxgfr.github.io/amphi/) also ships eSpeak NG,
+which the voices of this device use to turn text into phonemes. eSpeak NG is
+under the GNU General Public License, version 3 or later, so the site taken
+as a whole is distributed under GPL-3.0-or-later. Its text is in GPL-3.0.txt,
+next to this file.
+
+eSpeak NG in this site
+----------------------
+
+  vendor/piper_phonemize.wasm   eSpeak NG and piper-phonemize, compiled to
+                                WebAssembly by @diffusionstudio/piper-wasm 1.0.0
+  vendor/espeak-ng.data         eSpeak NG's data, kept to the English, French
+                                and German dictionaries by scripts/espeak.ts
+  voice.js                      the Emscripten loader of that build, with its
+                                file list rewritten by scripts/espeak.ts
+
+Corresponding source
+--------------------
+
+  amphi, its build and the trimming of eSpeak NG's data:
+    https://github.com/maxgfr/amphi
+  The WebAssembly build, with the exact steps that produced it:
+    https://www.npmjs.com/package/@diffusionstudio/piper-wasm/v/1.0.0
+  eSpeak NG (the fork it was built from):
+    https://github.com/rhasspy/espeak-ng
+  piper-phonemize:
+    https://github.com/wide-video/piper-phonemize
+
+Other parts
+-----------
+
+The rest of the bundled code keeps its own licence, all compatible with the
+GPL: MIT (React, onnxruntime-web, sql.js, pptxgenjs, marked, minisearch,
+fflate, @noble/hashes, zod, llm-connect, llm-models), ISC (idb), Apache-2.0
+(the AI SDK, Transformers.js, pdf.js), MPL-2.0 (mediabunny) and
+MPL-2.0 or Apache-2.0 (DOMPurify). The Archivo font is under the SIL Open
+Font License (fonts/OFL.txt).
+
+Speech models are downloaded from Hugging Face when first used, not shipped
+with the site: Kokoro (Apache-2.0), Piper voices for French (Jessica, Pierre:
+CC-BY-SA 4.0; Siwis: CC-BY 4.0) and German (Kerstin, Thorsten: CC0), and the
+transcription models, each under the licence shown on its model page.

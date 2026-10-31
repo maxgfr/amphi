@@ -51,6 +51,10 @@ export function VoiceSettings() {
           "Kokoro (Apache-2.0) lit l'anglais ; des voix Piper lisent le français (Jessica et Pierre : CC-BY-SA 4.0, Siwis : CC-BY 4.0) et l'allemand (Kerstin, Thorsten : CC0). eSpeak NG (GPL-3.0) transforme le texte en phonèmes. Les autres langues utilisent la voix du fournisseur.",
           "Kokoro (Apache-2.0) liest Englisch; Piper-Stimmen lesen Französisch (Jessica und Pierre: CC-BY-SA 4.0, Siwis: CC-BY 4.0) und Deutsch (Kerstin, Thorsten: CC0). eSpeak NG (GPL-3.0) wandelt den Text in Phoneme um. Andere Sprachen nutzen die Stimme des Anbieters.",
         )}
+        {" "}
+        <a href="./licenses/NOTICE.txt" target="_blank" rel="noopener">
+          {t("Licences and source code", "Licences et code source", "Lizenzen und Quellcode")}
+        </a>
       </p>
     </div>
   );

@@ -24,4 +24,6 @@ AMPHI_LIVE_KEY=… bun run e2e:live   # the whole path against a real provider, 
 
 ## License
 
-MIT
+amphi's source code is under the [MIT licence](LICENSE).
+
+The published site also ships [eSpeak NG](https://github.com/rhasspy/espeak-ng), compiled to WebAssembly, which the voices of the device use to turn text into phonemes. eSpeak NG is under the GPL, version 3 or later, so the site taken as a whole is distributed under GPL-3.0-or-later. [public/licenses/NOTICE.txt](public/licenses/NOTICE.txt) lists what is shipped, where its source is and the licences of the other parts. The site serves that file and the [GPL text](public/licenses/GPL-3.0.txt) under `licenses/`.

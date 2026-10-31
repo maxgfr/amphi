@@ -136,3 +136,12 @@ test("the voices settings show what each language downloads before anything is f
   await expect(de.getByText(/To download once: 63(\.\d)? MB/)).toBeVisible();
   await w.assertClean();
 });
+
+test("the voice settings link to the licences the site ships under, with eSpeak NG's GPL", async ({ page }) => {
+  await page.goto(`${siteURL}#/settings/voice`);
+  const link = page.getByRole("link", { name: "Licences and source code" });
+  const notice = await page.request.get(new URL((await link.getAttribute("href"))!, siteURL).href);
+  expect(await notice.text()).toContain("distributed under GPL-3.0-or-later");
+  const gpl = await page.request.get(`${siteURL}licenses/GPL-3.0.txt`);
+  expect(await gpl.text()).toContain("GNU GENERAL PUBLIC LICENSE");
+});

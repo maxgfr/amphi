@@ -55,13 +55,29 @@ export async function askJson<S extends z.ZodType>(schema: S, o: AskJsonOptions)
   const system = `${o.system}\n\nAnswer with JSON only, no prose and no code fence, of this shape:\n${o.shape}`;
   let prompt = o.prompt;
   let previous = "";
+  let budget = o.maxOutputTokens;
+  let cut = false;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const { text } = await ask({ ...o, system, messages: previous ? [{ role: "user", content: o.prompt }, { role: "assistant", content: previous }, { role: "user", content: prompt }] : undefined, prompt });
+    const { text, truncated } = await ask({ ...o, system, maxOutputTokens: budget, messages: previous ? [{ role: "user", content: o.prompt }, { role: "assistant", content: previous }, { role: "user", content: prompt }] : undefined, prompt });
     const value = extractJson(text);
     const parsed = schema.safeParse(value);
     if (parsed.success) return parsed.data;
+    cut = Boolean(truncated);
+    if (truncated) {
+      // Cut off at the cap: showing the model its half answer helps nothing; ask afresh with twice the room.
+      previous = "";
+      prompt = o.prompt;
+      budget = budget ? budget * 2 : undefined;
+      continue;
+    }
     previous = text.slice(0, 20_000);
     prompt = value === null ? "That was not valid JSON. Answer again with the JSON only." : `That JSON does not fit the shape: ${issuesOf(parsed.error)}. Answer again with the corrected JSON only.`;
   }
+  if (cut)
+    throw new AiError(
+      tr("The model's answer was cut off before it ended; try a shorter length, fewer sources, or another model.", "La réponse du modèle a été coupée avant la fin ; essayez une durée plus courte, moins de sources ou un autre modèle.", "Die Antwort des Modells wurde vor dem Ende abgeschnitten; versuchen Sie eine kürzere Länge, weniger Quellen oder ein anderes Modell."),
+      "bad-json",
+      true,
+    );
   throw new AiError(tr("The model's answer did not have the expected form; try again or pick another model.", "La réponse du modèle n'avait pas la forme attendue ; réessayez ou changez de modèle.", "Die Antwort des Modells hatte nicht die erwartete Form; versuchen Sie es erneut oder wählen Sie ein anderes Modell."), "bad-json", true);
 }

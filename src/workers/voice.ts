@@ -12,6 +12,7 @@ import createPiperPhonemize from "@diffusionstudio/piper-wasm/build/piper_phonem
 import * as ort from "onnxruntime-web/wasm";
 import type { DeviceVoice, ModelFile, VoiceModel } from "../voice/catalog.ts";
 import { kokoroPhonemes } from "../voice/mix.ts";
+import { recycling } from "./recycle.ts";
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 const CACHE = "amphi-voices";
@@ -74,34 +75,33 @@ async function download(id: number, files: ModelFile[]) {
   }
 }
 
-// eSpeak NG, loaded once; `callMain` can run again on the same instance.
+// eSpeak NG: its files are fetched once; `callMain` runs again on the same
+// instance, which is renewed every 20 runs (its heap fills up and aborts after some fifty).
 type Phonemizer = { callMain(args: string[]): void };
-let espeak: Promise<{ module: Phonemizer; lines: string[] }> | null = null;
-function phonemizer() {
-  espeak ??= (async () => {
-    const [wasm, data] = await Promise.all(["./vendor/piper_phonemize.wasm", "./vendor/espeak-ng.data"].map(async (p) => (await fetch(here(p))).arrayBuffer()));
-    const lines: string[] = [];
-    const module = (await createPiperPhonemize({
-      print: (l: string) => lines.push(l),
-      printErr: () => {},
-      wasmBinary: wasm,
-      getPreloadedPackage: () => data,
-      locateFile: (p: string) => here(`./vendor/${p}`),
-    })) as Phonemizer;
-    return { module, lines };
-  })().catch((e) => {
-    espeak = null;
+const lines: string[] = [];
+let espeakFiles: Promise<ArrayBuffer[]> | null = null;
+const espeak = recycling(async () => {
+  espeakFiles ??= Promise.all(["./vendor/piper_phonemize.wasm", "./vendor/espeak-ng.data"].map(async (p) => (await fetch(here(p))).arrayBuffer())).catch((e) => {
+    espeakFiles = null;
     throw e;
   });
-  return espeak;
-}
+  const [wasm, data] = await espeakFiles;
+  return (await createPiperPhonemize({
+    print: (l: string) => lines.push(l),
+    printErr: () => {},
+    wasmBinary: wasm,
+    getPreloadedPackage: () => data,
+    locateFile: (p: string) => here(`./vendor/${p}`),
+  })) as Phonemizer;
+}, 20);
 
 /** Each text's phonemes, as eSpeak NG writes them (one entry per code point, punctuation kept). */
-async function phonemize(voice: string, texts: string[]): Promise<string[][]> {
-  const { module, lines } = await phonemizer();
-  lines.length = 0;
-  module.callMain(["-l", voice, "--input", JSON.stringify(texts.map((text) => ({ text }))), "--espeak_data", "/espeak-ng-data"]);
-  return lines.map((l) => (JSON.parse(l) as { phonemes: string[] }).phonemes);
+function phonemize(voice: string, texts: string[]): Promise<string[][]> {
+  return espeak((module) => {
+    lines.length = 0;
+    module.callMain(["-l", voice, "--input", JSON.stringify(texts.map((text) => ({ text }))), "--espeak_data", "/espeak-ng-data"]);
+    return lines.map((l) => (JSON.parse(l) as { phonemes: string[] }).phonemes);
+  });
 }
 
 const sessions = new Map<string, Promise<{ session: ort.InferenceSession; config: unknown }>>();

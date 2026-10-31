@@ -56,6 +56,25 @@ export const go = (h: string) => {
   location.hash = h.replace(/^#/, "");
 };
 
+// Each in-app step is numbered in its history entry, so a screen knows whether
+// the browser's back would stay in amphi.
+let depth = 0;
+function number(next: number) {
+  const state = history.state as { amphiDepth?: number } | null;
+  if (typeof state?.amphiDepth === "number") depth = state.amphiDepth;
+  else {
+    depth = next;
+    history.replaceState({ ...state, amphiDepth: depth }, "");
+  }
+}
+if (typeof window !== "undefined") {
+  number(0);
+  addEventListener("hashchange", () => number(depth + 1));
+}
+
+/** Whether going back stays in the app (something was opened from here). */
+export const canGoBack = () => depth > 0;
+
 export function useRoute(): Route {
   const hash = useSyncExternalStore(
     (fn) => {

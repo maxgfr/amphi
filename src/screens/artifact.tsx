@@ -12,7 +12,7 @@ import { studioKind } from "../studio/registry.ts";
 import { cancelJob, useJobs } from "../studio/run.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
-import { Empty, Notice, ProgressBar, saveFile } from "../ui/kit.tsx";
+import { Back, Empty, Notice, ProgressBar, saveFile } from "../ui/kit.tsx";
 
 export function ArtifactScreen({ id }: { id: string }) {
   const { t } = useLang();
@@ -48,12 +48,15 @@ export function ArtifactScreen({ id }: { id: string }) {
     // An export error ("render the video first") goes away with the next click, before that click's own handler runs.
     <div className="page" data-hue={courseHue(course)} onClickCapture={() => setError("")}>
       <header className="divider soft">
-        <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-          <a className="crumb-course" href={href.course(course.id, "studio")}>
-            {course.title}
-          </a>
-          {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}
-        </nav>
+        <div className="crumbs-bar">
+          <Back />
+          <nav className="crumbs no-print" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+            <a className="crumb-course" href={href.course(course.id, "studio")}>
+              {course.title}
+            </a>
+            {lesson ? <a href={href.lesson(lesson.id, "studio")}>{lesson.title}</a> : null}
+          </nav>
+        </div>
         <div className="page-head">
           <h1 className="title-heading">
             <input

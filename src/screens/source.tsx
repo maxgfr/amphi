@@ -10,7 +10,7 @@ import { clock, useLang } from "../i18n.ts";
 import { href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
-import { Empty, Notice } from "../ui/kit.tsx";
+import { Back, Empty, Notice } from "../ui/kit.tsx";
 import { Markdown } from "../ui/markdown.tsx";
 import { SOURCE_ICON, sourceMeta } from "./sources.tsx";
 
@@ -40,14 +40,17 @@ export function SourceScreen({ id, at }: { id: string; at?: { page?: number; t?:
   return (
     <div className="page" data-hue={course ? courseHue(course) : undefined}>
       <header className="divider soft">
-        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-          {course ? (
-            <a className="crumb-course" href={href.course(course.id, "sources")}>
-              {course.title}
-            </a>
-          ) : null}
-          {lesson ? <a href={href.lesson(lesson.id)}>{lesson.title}</a> : null}
-        </nav>
+        <div className="crumbs-bar">
+          <Back />
+          <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+            {course ? (
+              <a className="crumb-course" href={href.course(course.id, "sources")}>
+                {course.title}
+              </a>
+            ) : null}
+            {lesson ? <a href={href.lesson(lesson.id)}>{lesson.title}</a> : null}
+          </nav>
+        </div>
         <div className="page-head">
           <h1>
             <Icon name={SOURCE_ICON[source.kind]} size={24} /> {source.title}

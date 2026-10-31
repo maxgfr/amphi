@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect, useId, useRef } from "react";
 import { useLang } from "../i18n.ts";
+import { canGoBack } from "../router.ts";
 import { Icon, type IconName } from "./icons.tsx";
 
 /** A modal sheet on <dialog>: focus is trapped, Escape closes it. */
@@ -134,4 +135,15 @@ export function slug(s: string, fallback = "amphi"): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
   return out || fallback;
+}
+
+/** Back to the screen this one was opened from, when it was opened inside amphi. */
+export function Back() {
+  const { t } = useLang();
+  if (!canGoBack()) return null;
+  return (
+    <button type="button" className="back" onClick={() => history.back()}>
+      <Icon name="chevron-left" size={16} /> {t("Back", "Retour", "Zurück")}
+    </button>
+  );
 }

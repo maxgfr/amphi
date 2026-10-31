@@ -34,9 +34,22 @@ test("a report cites its sources, and a chat answer is summarised into a note", 
   await expect(page.getByText("Entropy measures disorder")).toBeVisible();
   // Grouped labels become links too.
   await expect(page.getByRole("button", { name: "S1 §1" })).toHaveCount(3);
+  // A citation shows its passage over the page, which stays where it was.
+  const summary = page.url();
   await page.getByRole("button", { name: "S1 §1" }).first().click();
-  await expect(page.getByRole("heading", { name: "Entropy" })).toBeVisible();
-  await page.goBack();
+  const passage = page.getByRole("dialog");
+  await expect(passage.getByRole("heading", { name: "Entropy" })).toBeVisible();
+  await expect(passage.getByText("Entropy measures disorder")).toBeVisible();
+  expect(page.url()).toBe(summary);
+  await passage.getByRole("button", { name: "Close" }).click();
+  await expect(passage).toBeHidden();
+  // From the sheet, the whole source is one click away.
+  await page.getByRole("button", { name: "S1 §1" }).first().click();
+  await passage.getByRole("link", { name: "Open the source" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Entropy" })).toBeVisible();
+  await expect(passage).toBeHidden();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page).toHaveURL(summary);
 
   await page.getByRole("link", { name: "Lesson 1" }).click();
   await page.getByRole("tab", { name: "Chat" }).click();
@@ -44,6 +57,13 @@ test("a report cites its sources, and a chat answer is summarised into a note", 
   await expect(page.getByText("Passages of 1 source go to 127.0.0.1:9 with each question.")).toBeVisible();
   await page.getByLabel("Your question").fill("Can entropy decrease?");
   await page.getByLabel("Your question").press("Enter");
+  await expect(page.getByText("never decreases in an isolated system")).toBeVisible();
+  const chat = page.url();
+  await page.locator(".messages").getByRole("button", { name: "S1 §1" }).click();
+  await expect(page.getByRole("dialog").getByText("Entropy measures disorder")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  expect(page.url()).toBe(chat);
   await expect(page.getByText("never decreases in an isolated system")).toBeVisible();
   expect(calls.find((c) => c.stream)?.last).toBe("Can entropy decrease?");
   await page.getByRole("button", { name: "Summarise the exchange" }).click();

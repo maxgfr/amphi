@@ -142,7 +142,8 @@ test("the report is cited and exported", async () => {
   const md = await download(exportButton("Markdown"));
   expect(md.bytes.toString()).toMatch(/\[S1[^\]]*\]/);
   await cite.click();
-  await expect(page.getByRole("heading", { name: "Premier principe" })).toBeVisible();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "Premier principe" })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
 });
 
 test("the mind map and the infographic export as images", async () => {

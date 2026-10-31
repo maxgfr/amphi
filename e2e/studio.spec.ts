@@ -116,7 +116,7 @@ test("a quiz is taken, graded, scored, retried and exported", async ({ page }) =
   await page.getByRole("radio", { name: "False" }).check();
   await page.getByRole("button", { name: "Check" }).click();
   await page.getByRole("button", { name: "S1 §1" }).first().click();
-  await expect(page.getByRole("heading", { name: "Entropy" })).toBeVisible();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "Entropy" })).toBeVisible();
   await w.assertClean();
 });
 
@@ -199,6 +199,6 @@ test("an infographic is drawn from blocks, cites its sources and exports as imag
   expect(png.bytes.subarray(0, 4).equals(PNG)).toBe(true);
 
   await figure.getByRole("button", { name: "S1 §1" }).first().click();
-  await expect(page.getByRole("heading", { name: "Entropy" })).toBeVisible();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "Entropy" })).toBeVisible();
   await w.assertClean();
 });

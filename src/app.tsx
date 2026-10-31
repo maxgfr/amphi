@@ -13,6 +13,7 @@ import { loadVault, vault } from "./secrets.ts";
 import { list } from "./data/db.ts";
 import { useLive } from "./data/hooks.ts";
 import { SyncBadge } from "./sync/badge.tsx";
+import { CitationSheet } from "./ui/citation-sheet.tsx";
 import { courseHue, useOpenCourseId } from "./ui/hue.ts";
 import { Icon, type IconName } from "./ui/icons.tsx";
 
@@ -135,6 +136,7 @@ export function App() {
           </Suspense>
         )}
       </main>
+      <CitationSheet />
       <UpdateToast />
     </div>
   );

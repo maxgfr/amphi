@@ -110,8 +110,20 @@ function wrap(e: unknown, s: LlmSettings): never {
   throw new AiError(d.message, d.code, d.retryable);
 }
 
+/** Room for a reasoning model's thinking, which counts against the output cap, on top of an answer's own budget. */
+export const THINKING_ROOM = 16_000;
+
+/** The output cap to send for an answer of `answer` tokens: thinking room for a model that reasons, within the model's own cap. */
+export function outputCap(answer: number | undefined, caps: Pick<Capabilities, "reasoning" | "maxOutput">): number | undefined {
+  if (!answer) return undefined;
+  const want = caps.reasoning ? answer + THINKING_ROOM : answer;
+  return caps.maxOutput > 0 ? Math.min(want, caps.maxOutput) : want;
+}
+
 export interface AskResult {
   text: string;
+  /** The answer stopped at the output cap, so it is likely incomplete. */
+  truncated?: boolean;
   /** Sources the provider's web search returned, when tools included it. */
   sources: { url: string; title?: string }[];
 }
@@ -125,12 +137,12 @@ export async function ask(o: AskOptions): Promise<AskResult> {
       instructions: o.system,
       messages,
       tools: o.tools,
-      maxOutputTokens: o.maxOutputTokens,
+      maxOutputTokens: outputCap(o.maxOutputTokens, capabilities(s)),
       maxRetries: 1,
       abortSignal: o.signal,
     });
     const sources = (res.sources ?? []).flatMap((x) => (x.sourceType === "url" ? [{ url: x.url, title: x.title }] : []));
-    return { text: res.text, sources };
+    return { text: res.text, sources, truncated: res.finishReason === "length" };
   } catch (e) {
     wrap(e, s);
   }
@@ -145,7 +157,7 @@ export async function* askStream(o: AskOptions): AsyncGenerator<string> {
     model: await loadModel(s),
     instructions: o.system,
     messages,
-    maxOutputTokens: o.maxOutputTokens,
+    maxOutputTokens: outputCap(o.maxOutputTokens, capabilities(s)),
     maxRetries: 1,
     abortSignal: o.signal,
     onError: ({ error }) => {

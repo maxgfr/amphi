@@ -15,3 +15,12 @@ test("issues are short and say where", () => {
   expect(r.success).toBe(false);
   if (!r.success) expect(issuesOf(r.error)).toContain("items.0");
 });
+
+test("a reasoning model gets room to think on top of the answer, within its cap", async () => {
+  const { outputCap, THINKING_ROOM } = await import("./llm.ts");
+  expect(outputCap(4500, { reasoning: true, maxOutput: 64_000 })).toBe(4500 + THINKING_ROOM);
+  expect(outputCap(4500, { reasoning: false, maxOutput: 64_000 })).toBe(4500);
+  expect(outputCap(9000, { reasoning: true, maxOutput: 16_000 })).toBe(16_000);
+  expect(outputCap(4500, { reasoning: true, maxOutput: 0 })).toBe(4500 + THINKING_ROOM);
+  expect(outputCap(undefined, { reasoning: true, maxOutput: 64_000 })).toBeUndefined();
+});

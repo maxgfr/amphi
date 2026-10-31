@@ -51,7 +51,7 @@ test("a topic is discovered without web search: a plan, unsourced readings, conc
   await setUpAi(page);
   await page.goto(`${siteURL}#/discover`);
   await page.getByLabel("Topic").fill("Thermodynamics");
-  await page.getByLabel("Your goal").selectOption("exam");
+  await page.getByLabel("Your goal").fill("Pass an exam");
   // The mocked server has no web search: said before anything is sent.
   await expect(page.getByText(/This model cannot search the web/)).toBeVisible();
   await expect(page.getByText(/Your topic, level and goal are sent to 127\.0\.0\.1:9/)).toBeVisible();
@@ -62,7 +62,7 @@ test("a topic is discovered without web search: a plan, unsourced readings, conc
   const call = calls.find((c) => c.system.includes("You map a topic"))!;
   expect(call.system).toContain("Never give a URL");
   expect(call.last).toContain("Topic: Thermodynamics");
-  expect(call.last).toContain("pass an exam");
+  expect(call.last).toContain("Their goal, in their own words: Pass an exam");
 
   // Readings: unsourced, never with the URL the model made up, unticked until chosen.
   const readings = page.getByRole("group", { name: "Reading suggestions (unsourced, to verify)" });
@@ -72,10 +72,20 @@ test("a topic is discovered without web search: a plan, unsourced readings, conc
   await expect(fermi).not.toBeChecked();
   await fermi.check();
   await expect(page.getByText("Creates the topic with 3 concepts, 1 note and a mind map.")).toBeVisible();
+
+  // A reload keeps the map, the form and the ticks as a draft: nothing is asked again.
+  const before = calls.length;
+  await page.reload();
+  await expect(page.getByText("Picked up where you left off: this map is not a topic yet.")).toBeVisible();
+  await expect(page.getByLabel("Your goal")).toHaveValue("Pass an exam");
+  await expect(fermi).toBeChecked();
+  expect(calls.length).toBe(before);
   await page.getByRole("button", { name: "Create the topic" }).click();
 
   await expect(page.getByRole("heading", { name: "Thermodynamics", level: 1 })).toBeVisible();
   await expect(page.getByRole("link", { name: /Fermi, Thermodynamics/ })).toBeVisible();
+  // Created: the draft is gone.
+  expect(await page.evaluate(() => localStorage.getItem("amphi-discover-draft"))).toBeNull();
   await page.getByRole("link", { name: /Fermi, Thermodynamics/ }).click();
   await expect(page.getByText("Suggested without a web search: unsourced, to verify.")).toBeVisible();
   await page.goBack();

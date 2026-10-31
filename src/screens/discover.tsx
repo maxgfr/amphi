@@ -1,13 +1,14 @@
 // Discover a new topic: what, at which level, for what; the provider's web
 // search maps it and proposes sources (src/learn/discover.ts), the student
 // keeps the ones they want, and the topic is created with its concepts, its
-// notes and a mind map.
+// notes and a mind map. Until then everything is kept as a draft on this
+// device, so a reload does not throw away a map already paid for.
 
 import { useEffect, useRef, useState } from "react";
 import { loadLlm, recipient, savedSettings } from "../ai/llm.ts";
 import { useLive } from "../data/hooks.ts";
 import { count, languageLabel, useLang } from "../i18n.ts";
-import { canSearch, createTopic, type DiscoverInput, discoverTopic, type Goal, type Level, type Proposal, type TopicMap } from "../learn/discover.ts";
+import { canSearch, clearDraft, createTopic, type DiscoverInput, discoverTopic, type Level, loadDraft, type Proposal, saveDraft, type TopicMap } from "../learn/discover.ts";
 import { go, href } from "../router.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Field, Notice } from "../ui/kit.tsx";
@@ -16,13 +17,26 @@ import { MATERIAL_LANGS } from "./course-form.tsx";
 
 export function Discover() {
   const { t, lang } = useLang();
-  const [input, setInput] = useState<DiscoverInput>({ topic: "", level: "beginner", goal: "general", language: lang });
-  const [map, setMap] = useState<TopicMap | null>(null);
-  const [chosen, setChosen] = useState<Set<number>>(new Set());
+  const [draft] = useState(loadDraft);
+  const blank: DiscoverInput = { topic: "", level: "beginner", goal: "", language: lang };
+  const [input, setInput] = useState<DiscoverInput>(draft?.input ?? blank);
+  const [map, setMap] = useState<TopicMap | null>(draft?.map ?? null);
+  const [chosen, setChosen] = useState<Set<number>>(new Set(draft?.chosen));
   const [busy, setBusy] = useState<"" | "mapping" | "creating">("");
   const [error, setError] = useState("");
+  const [interrupted, setInterrupted] = useState(Boolean(draft?.mapping && !draft.map));
   const abort = useRef<AbortController | null>(null);
   useEffect(() => () => abort.current?.abort(), []);
+  useEffect(() => {
+    if (busy !== "creating") saveDraft({ input, map, chosen: [...chosen], mapping: busy === "mapping" });
+  }, [input, map, chosen, busy]);
+  // A reload while the model works would lose the answer: ask first.
+  useEffect(() => {
+    if (!busy) return;
+    const hold = (e: BeforeUnloadEvent) => e.preventDefault();
+    addEventListener("beforeunload", hold);
+    return () => removeEventListener("beforeunload", hold);
+  }, [busy]);
   const ai = useLive(
     async () => {
       await loadLlm();
@@ -36,6 +50,7 @@ export function Discover() {
 
   const run = async () => {
     setError("");
+    setInterrupted(false);
     setBusy("mapping");
     abort.current = new AbortController();
     try {
@@ -59,6 +74,7 @@ export function Discover() {
         map,
         map.proposals.filter((_, i) => chosen.has(i)),
       );
+      clearDraft();
       go(href.course(course.id));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -69,6 +85,16 @@ export function Discover() {
   const set = <K extends keyof DiscoverInput>(k: K, v: DiscoverInput[K]) => {
     setInput((x) => ({ ...x, [k]: v }));
     setMap(null);
+  };
+
+  const restart = () => {
+    abort.current?.abort();
+    clearDraft();
+    setInput(blank);
+    setMap(null);
+    setChosen(new Set());
+    setError("");
+    setInterrupted(false);
   };
 
   return (
@@ -89,6 +115,11 @@ export function Discover() {
             {t("Discover uses your own AI provider.", "Découvrir utilise votre propre fournisseur d'IA.", "Entdecken nutzt Ihren eigenen KI-Anbieter.")} <a href={href.settings("ai")}>{t("Set one up", "En configurer un", "Einen einrichten")}</a>
           </Notice>
         ) : null}
+        {interrupted ? (
+          <Notice>{t("The page was reloaded while the map was being made, so it was lost. Your topic is still here: map it again.", "La page a été rechargée pendant la carte du sujet, qui a été perdue. Votre sujet est conservé : relancez la carte.", "Die Seite wurde während der Kartierung neu geladen, die Karte ging verloren. Ihr Thema ist noch da: Kartieren Sie es erneut.")}</Notice>
+        ) : draft?.map && map === draft.map ? (
+          <Notice>{t("Picked up where you left off: this map is not a topic yet.", "Repris là où vous en étiez : cette carte n'est pas encore un sujet.", "Dort fortgesetzt, wo Sie aufgehört haben: Diese Karte ist noch kein Thema.")}</Notice>
+        ) : null}
         <form
           className="stack"
           onSubmit={(e) => {
@@ -108,11 +139,12 @@ export function Discover() {
               </select>
             </Field>
             <Field label={t("Your goal", "Votre objectif", "Ihr Ziel")}>
-              <select value={input.goal} onChange={(e) => set("goal", e.currentTarget.value as Goal)}>
-                <option value="exam">{t("Pass an exam", "Réussir un examen", "Eine Prüfung bestehen")}</option>
-                <option value="general">{t("General knowledge", "Culture générale", "Allgemeinwissen")}</option>
-                <option value="project">{t("A project", "Un projet", "Ein Projekt")}</option>
-              </select>
+              <input value={input.goal} list="discover-goals" maxLength={300} onChange={(e) => set("goal", e.currentTarget.value)} placeholder={t("e.g. pass the June exam", "ex. réussir l'examen de juin", "z. B. die Prüfung im Juni bestehen")} />
+              <datalist id="discover-goals">
+                <option value={t("Pass an exam", "Réussir un examen", "Eine Prüfung bestehen")} />
+                <option value={t("General knowledge", "Culture générale", "Allgemeinwissen")} />
+                <option value={t("A project", "Un projet", "Ein Projekt")} />
+              </datalist>
             </Field>
             <Field label={t("Language", "Langue", "Sprache")}>
               <select value={input.language} onChange={(e) => set("language", e.currentTarget.value)}>
@@ -153,6 +185,11 @@ export function Discover() {
                 <Icon name="compass" size={18} /> {map ? t("Map it again", "Refaire la carte", "Neu kartieren") : t("Map the topic", "Cartographier le sujet", "Thema kartieren")}
               </button>
             )}
+            {busy !== "mapping" && (input.topic || input.goal || map) ? (
+              <button type="button" className="link" disabled={busy !== ""} onClick={restart}>
+                {t("Start over", "Recommencer", "Neu beginnen")}
+              </button>
+            ) : null}
             {busy === "mapping" ? (
               <span className="meta" role="status">
                 {ai.web ? t("Searching the web and mapping the topic…", "Recherche sur le web et carte du sujet…", "Websuche und Kartierung des Themas…") : t("Mapping the topic…", "Carte du sujet en cours…", "Thema wird kartiert…")}

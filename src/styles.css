@@ -49,13 +49,13 @@
   --shadow-2: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07);
   --focus-ring: 0 0 0 3px oklch(21% 0.014 260 / 0.22);
 
-  /* The course's divider colour. Outside a course: a plain grey divider. */
-  --l: 0.8;
-  --c: 0.012;
-  --h: 250;
+  /* The course's divider colour. Outside a course: a plain slate divider. */
+  --l: 0.46;
+  --c: 0.014;
+  --h: 255;
   --course: oklch(var(--l) var(--c) var(--h));
-  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
-  --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
+  --course-soft: oklch(0.94 calc(var(--c) * 0.3) var(--h));
+  --on-course: oklch(0.985 calc(var(--c) * 0.12) var(--h));
 
   /* Type: a fixed scale, no fluid sizes in the app. */
   --fs-caption: 0.75rem;
@@ -87,46 +87,46 @@
   --base: 0.24s;
 }
 
-/* The seven pressboard dividers. Text on a divider is always dark ink. */
+/* The seven pressboard dividers: deep, quiet stock. Text on a divider is always paper white. */
 [data-hue="0"] {
-  --l: 0.71;
-  --c: 0.155;
-  --h: 36;
+  --l: 0.52;
+  --c: 0.12;
+  --h: 32;
 }
 [data-hue="1"] {
-  --l: 0.83;
-  --c: 0.14;
-  --h: 82;
+  --l: 0.55;
+  --c: 0.1;
+  --h: 72;
 }
 [data-hue="2"] {
-  --l: 0.81;
-  --c: 0.135;
-  --h: 120;
+  --l: 0.53;
+  --c: 0.09;
+  --h: 128;
 }
 [data-hue="3"] {
-  --l: 0.76;
-  --c: 0.125;
-  --h: 158;
+  --l: 0.52;
+  --c: 0.075;
+  --h: 178;
 }
 [data-hue="4"] {
-  --l: 0.77;
-  --c: 0.095;
-  --h: 204;
+  --l: 0.52;
+  --c: 0.085;
+  --h: 232;
 }
 [data-hue="5"] {
-  --l: 0.73;
-  --c: 0.115;
-  --h: 258;
+  --l: 0.5;
+  --c: 0.105;
+  --h: 276;
 }
 [data-hue="6"] {
-  --l: 0.74;
-  --c: 0.12;
-  --h: 312;
+  --l: 0.5;
+  --c: 0.105;
+  --h: 342;
 }
 [data-hue] {
   --course: oklch(var(--l) var(--c) var(--h));
-  --course-soft: oklch(0.935 calc(var(--c) * 0.4) var(--h));
-  --on-course: oklch(0.2 calc(var(--c) * 0.35) var(--h));
+  --course-soft: oklch(0.94 calc(var(--c) * 0.3) var(--h));
+  --on-course: oklch(0.985 calc(var(--c) * 0.12) var(--h));
 }
 
 /* Evening: a black binder, charcoal sheets, the dividers a step deeper. */
@@ -163,12 +163,12 @@
     --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
     --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
     --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
-    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
+    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.9) var(--h));
+    --course-soft: oklch(0.31 calc(var(--c) * 0.4) var(--h));
   }
   :root:not([data-theme="light"]) [data-hue] {
-    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-    --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
+    --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.9) var(--h));
+    --course-soft: oklch(0.31 calc(var(--c) * 0.4) var(--h));
   }
 }
 :root[data-theme="dark"] {
@@ -203,13 +203,13 @@
   --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.32);
   --shadow-2: 0 18px 44px -10px oklch(0% 0 0 / 0.6);
   --focus-ring: 0 0 0 3px oklch(94% 0.005 245 / 0.3);
-  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
+  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.9) var(--h));
+  --course-soft: oklch(0.31 calc(var(--c) * 0.4) var(--h));
   color-scheme: dark;
 }
 :root[data-theme="dark"] [data-hue] {
-  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.92) var(--h));
-  --course-soft: oklch(0.33 calc(var(--c) * 0.45) var(--h));
+  --course: oklch(calc(var(--l) - 0.07) calc(var(--c) * 0.9) var(--h));
+  --course-soft: oklch(0.31 calc(var(--c) * 0.4) var(--h));
 }
 :root[data-theme="light"] {
   color-scheme: light;
@@ -589,7 +589,7 @@ main:focus-visible {
 }
 .crumbs .crumb-course:hover {
   color: var(--on-course);
-  background: color-mix(in oklab, var(--course) 88%, var(--on-course));
+  background: color-mix(in oklab, var(--course) 86%, black);
 }
 .lead {
   color: var(--muted);
@@ -720,14 +720,14 @@ main:focus-visible {
 }
 .divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]),
 .divider:not(.soft) .button:not(.primary) {
-  background: color-mix(in oklab, white 62%, var(--course));
-  border-color: color-mix(in oklab, var(--on-course) 22%, transparent);
+  background: color-mix(in oklab, var(--on-course) 12%, transparent);
+  border-color: color-mix(in oklab, var(--on-course) 38%, transparent);
   color: var(--on-course);
   box-shadow: none;
 }
 .divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]):hover:not(:disabled) {
-  background: color-mix(in oklab, white 85%, var(--course));
-  border-color: color-mix(in oklab, var(--on-course) 40%, transparent);
+  background: color-mix(in oklab, var(--on-course) 22%, transparent);
+  border-color: color-mix(in oklab, var(--on-course) 60%, transparent);
 }
 .divider:not(.soft) h1 .icon {
   color: inherit;
@@ -754,8 +754,9 @@ main:focus-visible {
 .divider input[type="date"] {
   min-height: 34px;
   padding-block: 2px;
-  background: color-mix(in oklab, var(--surface) 70%, transparent);
-  border-color: color-mix(in oklab, currentColor 30%, transparent);
+  background: var(--surface);
+  border-color: transparent;
+  color: var(--text);
   font-size: var(--fs-small);
 }
 /* Folder tabs on the divider's lower edge; the selected one joins the sheet under it. */
@@ -783,12 +784,12 @@ main:focus-visible {
   background: color-mix(in oklab, var(--surface) 75%, transparent);
   color: inherit;
 }
-/* On a full-colour divider the tabs are cut from lighter card, whatever the theme. */
+/* On a full-colour divider the tabs are cut from a lighter layer of the same stock. */
 .divider:not(.soft) .tabs button:not([aria-selected="true"]) {
-  background: color-mix(in oklab, white 36%, transparent);
+  background: color-mix(in oklab, var(--on-course) 14%, transparent);
 }
 .divider:not(.soft) .tabs button:not([aria-selected="true"]):hover:not(:disabled) {
-  background: color-mix(in oklab, white 62%, transparent);
+  background: color-mix(in oklab, var(--on-course) 24%, transparent);
 }
 .divider .tabs button[aria-selected="true"] {
   box-shadow: none;
@@ -888,24 +889,19 @@ main:focus-visible {
     opacity: 0;
   }
 }
-.divider .tabs button,
-.binder-tab {
+.divider .tabs button {
   animation: tab-rise 0.36s var(--ease) backwards;
 }
-.divider .tabs button:nth-child(2),
-.binder li:nth-child(2) .binder-tab {
+.divider .tabs button:nth-child(2) {
   animation-delay: 40ms;
 }
-.divider .tabs button:nth-child(3),
-.binder li:nth-child(3) .binder-tab {
+.divider .tabs button:nth-child(3) {
   animation-delay: 80ms;
 }
-.divider .tabs button:nth-child(4),
-.binder li:nth-child(4) .binder-tab {
+.divider .tabs button:nth-child(4) {
   animation-delay: 120ms;
 }
-.divider .tabs button:nth-child(n + 5),
-.binder li:nth-child(n + 5) .binder-tab {
+.divider .tabs button:nth-child(n + 5) {
   animation-delay: 160ms;
 }
 
@@ -1458,135 +1454,144 @@ textarea {
   margin-top: var(--space-2);
 }
 
-/* ── The binder: courses as a stack of dividers whose tabs step across. ── */
-.binder {
+/* ── The contents page: the courses listed on one sheet, each behind its divider tab. ── */
+.contents {
   list-style: none;
   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
-.binder li {
-  --step: 0;
-  display: flex;
-  flex-direction: column;
+.contents li + li .contents-row {
+  border-top: 1px solid var(--line);
 }
-.binder li:nth-child(4n + 2) {
-  --step: 1;
-}
-.binder li:nth-child(4n + 3) {
-  --step: 2;
-}
-.binder li:nth-child(4n + 4) {
-  --step: 3;
-}
-.binder-link {
-  display: flex;
-  flex-direction: column;
-  color: var(--on-course);
+.contents-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  min-height: 60px;
+  padding: var(--space-3) var(--space-5);
+  color: var(--text);
   text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--fast) var(--ease);
 }
-.binder-link:focus-visible {
-  outline: none;
+.contents li:first-child .contents-row {
+  border-start-start-radius: var(--radius-lg);
+  border-start-end-radius: var(--radius-lg);
 }
-.binder-tab {
-  align-self: flex-start;
-  margin-inline-start: calc(var(--step) * 18%);
-  max-width: min(46%, 26rem);
+.contents-row:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.contents-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+/* The divider's tab, cut into the margin; it pulls out on hover, as in the spine. */
+.contents-tab {
+  justify-self: start;
+  inline-size: 12px;
+  block-size: 22px;
+  background: var(--course);
+  clip-path: polygon(0 0, 100% 4px, 100% calc(100% - 4px), 0 100%);
+  transition: inline-size var(--base) var(--ease);
+}
+.contents-row:hover .contents-tab,
+.contents-row:focus-visible .contents-tab {
+  inline-size: 22px;
+}
+.contents-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-5) var(--space-1) var(--space-4);
-  background: var(--course);
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+  min-width: 0;
   font-family: var(--display);
-  font-weight: 720;
+  font-weight: 700;
   font-stretch: 100%;
   font-size: var(--fs-lead);
   letter-spacing: -0.01em;
   line-height: 1.3;
-  transition: transform var(--base) var(--ease);
 }
-.binder-tab span:last-child {
+.contents-title span:last-child {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.binder-body {
+.contents-meta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-5);
-  min-height: 60px;
-  padding: var(--space-3) var(--space-5);
-  border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
-  background: var(--course);
+  gap: var(--space-2);
   font-size: var(--fs-small);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  transition: box-shadow var(--base) var(--ease);
+  font-weight: 600;
+  white-space: nowrap;
 }
-.binder li:not(:nth-child(4n + 1)) .binder-body {
-  border-radius: var(--radius-lg);
+.contents-exam {
+  padding: 2px var(--space-3);
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.contents-kind {
+  color: var(--muted);
 }
 /* Counts sit right, in columns, as on a contents page. */
-.binder-counts {
-  margin-inline-start: auto;
+.contents-counts {
   display: flex;
-  gap: var(--space-5);
+  gap: var(--space-4);
+  font-size: var(--fs-small);
+  color: var(--muted);
 }
-.binder-count {
-  min-inline-size: 7.5em;
+.contents-count {
+  min-inline-size: 6.5em;
   text-align: end;
   white-space: nowrap;
 }
-.binder-count strong {
+.contents-count strong {
+  margin-inline-end: 0.15em;
   font-family: var(--display);
-  font-size: var(--fs-title);
-  font-weight: 760;
+  font-size: var(--fs-lead);
+  font-weight: 720;
+  color: var(--text);
 }
-.binder-count.zero strong {
+.contents-count.zero strong {
   font-family: var(--font);
   font-size: inherit;
   font-weight: 500;
-}
-.binder-kind {
-  font-weight: 650;
-}
-.binder-exam {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 2px var(--space-3);
-  border-radius: 999px;
-  background: color-mix(in oklab, white 55%, transparent);
-  font-weight: 650;
-}
-.binder-link:hover .binder-tab {
-  transform: translateY(-3px);
-}
-.binder-link:hover .binder-body {
-  box-shadow: var(--shadow-2);
-}
-.binder-link:focus-visible .binder-body {
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent);
+  color: var(--muted);
 }
 @media (max-width: 760px) {
-  .binder-tab {
-    margin-inline-start: calc(var(--step) * 12%);
-    max-width: 78%;
-    font-size: var(--fs-body);
+  .contents {
+    border-radius: 0;
   }
-  .binder-body {
-    gap: var(--space-1) var(--space-4);
+  .contents-row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "tab title meta"
+      ". counts counts";
+    gap: var(--space-1) var(--space-3);
     padding: var(--space-3) var(--space-4);
   }
-  .binder-counts {
-    margin-inline-start: 0;
+  .contents li:first-child .contents-row {
+    border-radius: 0;
+  }
+  .contents-tab {
+    grid-area: tab;
+  }
+  .contents-title {
+    grid-area: title;
+    font-size: var(--fs-body);
+  }
+  .contents-meta {
+    grid-area: meta;
+  }
+  .contents-counts {
+    grid-area: counts;
     gap: var(--space-4);
   }
-  .binder-count {
+  .contents-count {
     min-inline-size: 0;
     text-align: start;
   }

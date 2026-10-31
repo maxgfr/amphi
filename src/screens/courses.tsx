@@ -39,37 +39,38 @@ export function examLabel(date: string, t: T): string {
 function Counted({ n, text }: { n: number; text: string }) {
   const i = text.indexOf(" ");
   return (
-    <span className={n ? "binder-count" : "binder-count zero"}>
+    <span className={n ? "contents-count" : "contents-count zero"}>
       <strong>{text.slice(0, i)}</strong> {text.slice(i + 1)}
     </span>
   );
 }
 
-/** The courses as a binder's dividers: a coloured tab per course, its tabs stepping across like a real set. */
+/** The courses as a contents page: one row per course, behind its divider's coloured tab. */
 export function Binder({ rows }: { rows: CourseSummary[] }) {
   const { t } = useLang();
   return (
-    <ol className="binder">
+    <ul className="contents">
       {rows.map(({ course, lessons, sources, artifacts }) => (
         <li key={course.id} data-hue={courseHue(course)}>
-          <a className="binder-link" href={href.course(course.id)}>
-            <span className="binder-tab">
+          <a className="contents-row" href={href.course(course.id)}>
+            <span className="contents-tab" aria-hidden="true" />
+            <span className="contents-title">
               {course.emoji ? <span aria-hidden="true">{course.emoji}</span> : null}
               <span>{course.title}</span>
             </span>
-            <span className="binder-body">
-              {course.examDate ? <span className="binder-exam">{examLabel(course.examDate, t)}</span> : null}
-              {course.kind === "topic" ? <span className="binder-kind">{t("Topic", "Sujet", "Thema")}</span> : null}
-              <span className="binder-counts">
-                {course.kind === "course" ? <Counted n={lessons} text={count(lessons, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])} /> : null}
-                <Counted n={sources} text={count(sources, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} />
-                <Counted n={artifacts} text={count(artifacts, ["study aid", "study aids"], ["création", "créations"], ["Lernhilfe", "Lernhilfen"])} />
-              </span>
+            <span className="contents-meta">
+              {course.examDate ? <span className="contents-exam">{examLabel(course.examDate, t)}</span> : null}
+              {course.kind === "topic" ? <span className="contents-kind">{t("Topic", "Sujet", "Thema")}</span> : null}
+            </span>
+            <span className="contents-counts">
+              {course.kind === "course" ? <Counted n={lessons} text={count(lessons, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])} /> : null}
+              <Counted n={sources} text={count(sources, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} />
+              <Counted n={artifacts} text={count(artifacts, ["study aid", "study aids"], ["création", "créations"], ["Lernhilfe", "Lernhilfen"])} />
             </span>
           </a>
         </li>
       ))}
-    </ol>
+    </ul>
   );
 }
 

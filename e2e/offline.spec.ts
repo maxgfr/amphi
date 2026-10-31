@@ -33,7 +33,7 @@ async function make(page: Page, tile: RegExp, link: RegExp): Promise<string> {
   await page.getByRole("button", { name: tile }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Generate" }).click();
   await page.getByRole("link", { name: link }).click();
-  await expect(page.getByRole("textbox", { name: "Title" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Title", exact: true })).toBeVisible();
   const url = page.url();
   await page.goBack();
   return url;

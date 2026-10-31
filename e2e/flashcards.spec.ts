@@ -113,7 +113,8 @@ test("flashcards are generated, edited, reviewed into study events, and exported
 
   // A card's citation opens its passage.
   await list.getByRole("button", { name: "S1 §1" }).first().click();
-  await expect(page.getByRole("heading", { name: "Entropy" })).toBeVisible();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "Entropy" })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
 
   // The whole course, from its page.
   await page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Thermodynamics" }).click();

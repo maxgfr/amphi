@@ -553,6 +553,36 @@ main:focus-visible {
 .page-head h1 .icon {
   color: var(--muted);
 }
+/* Back to where a link was followed from, then the crumbs. */
+.crumbs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 28px;
+  padding: 0 var(--space-2) 0 2px;
+  margin-inline-start: -2px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font-size: var(--fs-small);
+  font-weight: 650;
+}
+.back:hover:not(:disabled) {
+  background: var(--hover);
+  color: inherit;
+}
+.crumbs-bar:has(.back) .crumbs {
+  padding-inline-start: var(--space-3);
+  border-inline-start: 1px solid color-mix(in oklab, currentColor 25%, transparent);
+}
 .crumbs {
   display: flex;
   flex-wrap: wrap;
@@ -718,14 +748,14 @@ main:focus-visible {
   color: inherit;
   background: color-mix(in oklab, var(--on-course) 10%, transparent);
 }
-.divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]),
+.divider:not(.soft) button:not(.primary, .danger, .icon-button, .back, [role="tab"]),
 .divider:not(.soft) .button:not(.primary) {
   background: color-mix(in oklab, var(--on-course) 12%, transparent);
   border-color: color-mix(in oklab, var(--on-course) 38%, transparent);
   color: var(--on-course);
   box-shadow: none;
 }
-.divider:not(.soft) button:not(.primary, .danger, .icon-button, [role="tab"]):hover:not(:disabled) {
+.divider:not(.soft) button:not(.primary, .danger, .icon-button, .back, [role="tab"]):hover:not(:disabled) {
   background: color-mix(in oklab, var(--on-course) 22%, transparent);
   border-color: color-mix(in oklab, var(--on-course) 60%, transparent);
 }
@@ -2345,6 +2375,30 @@ textarea {
   color: var(--accent-text);
   box-shadow: inset 0 0 0 1px var(--line);
 }
+/* The cited passage, shown over the screen that cites it. */
+.cite-where {
+  margin: 0;
+}
+.cite-where .cite {
+  font-size: var(--fs-small);
+  vertical-align: 0;
+}
+.cite-passage {
+  max-height: min(55dvh, 32rem);
+  overflow: auto;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+  line-height: 1.6;
+}
+.cite-passage[aria-busy="true"] {
+  min-height: 6rem;
+}
+.cite-passage > p {
+  margin: 0;
+  white-space: pre-wrap;
+}
 .cite:hover:not(:disabled) {
   background: var(--mark);
 }
@@ -3301,3 +3355,8 @@ fieldset:disabled .quiz-choice {
   font-size: var(--fs-small);
 }
 /* ── end Progress and Discover ────────────────────────────────────────── */
+@media print {
+  .back {
+    display: none;
+  }
+}

@@ -5,7 +5,7 @@ import { useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
-import { Empty, Tabs } from "../ui/kit.tsx";
+import { Back, Empty, Tabs } from "../ui/kit.tsx";
 import { SourceList } from "./sources.tsx";
 
 const StudioPanel = lazy(() => import("../studio/panel.tsx").then((m) => ({ default: m.StudioPanel })));
@@ -42,12 +42,15 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
   return (
     <div className="page" data-hue={courseHue(course)}>
       <header className="divider soft">
-        <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
-          <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>
-          <a className="crumb-course" href={href.course(course.id)}>
-            {course.title}
-          </a>
-        </nav>
+        <div className="crumbs-bar">
+          <Back />
+          <nav className="crumbs" aria-label={t("Breadcrumb", "Fil d'Ariane", "Brotkrumen")}>
+            <a href={href.courses()}>{t("Courses", "Cours", "Kurse")}</a>
+            <a className="crumb-course" href={href.course(course.id)}>
+              {course.title}
+            </a>
+          </nav>
+        </div>
         <div className="page-head">
           <h1 className="title-heading">
             <input

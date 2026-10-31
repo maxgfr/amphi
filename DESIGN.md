@@ -23,14 +23,15 @@ colors:
   ok-soft: "oklch(95% 0.035 152)"
   warn: "oklch(55% 0.13 70)"
   warn-soft: "oklch(95.5% 0.045 85)"
-  divider-grey: "oklch(80% 0.012 250)"
-  divider-vermilion: "oklch(71% 0.155 36)"
-  divider-saffron: "oklch(83% 0.14 82)"
-  divider-olive: "oklch(81% 0.135 120)"
-  divider-green: "oklch(76% 0.125 158)"
-  divider-teal: "oklch(77% 0.095 204)"
-  divider-cobalt: "oklch(73% 0.115 258)"
-  divider-violet: "oklch(74% 0.12 312)"
+  on-divider: "oklch(98.5% 0.01 255)"
+  divider-slate: "oklch(46% 0.014 255)"
+  divider-brick: "oklch(52% 0.12 32)"
+  divider-ochre: "oklch(55% 0.1 72)"
+  divider-moss: "oklch(53% 0.09 128)"
+  divider-pine: "oklch(52% 0.075 178)"
+  divider-petrol: "oklch(52% 0.085 232)"
+  divider-indigo: "oklch(50% 0.105 276)"
+  divider-plum: "oklch(50% 0.105 342)"
   dark-pressboard: "oklch(17.5% 0.008 258)"
   dark-pressboard-deep: "oklch(21% 0.009 258)"
   dark-paper: "oklch(22.5% 0.009 258)"
@@ -154,12 +155,12 @@ components:
     backgroundColor: "{colors.pressboard}"
     textColor: "{colors.ink}"
   divider:
-    backgroundColor: "{colors.divider-vermilion}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.divider-brick}"
+    textColor: "{colors.on-divider}"
     rounded: "{rounded.lg}"
     padding: "24px 24px 16px"
   folder-tab:
-    textColor: "{colors.ink}"
+    textColor: "{colors.on-divider}"
     rounded: "{rounded.md}"
     height: "42px"
   folder-tab-selected:
@@ -170,11 +171,11 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
     padding: "24px"
-  binder-tab:
-    backgroundColor: "{colors.divider-cobalt}"
+  contents-row:
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
     typography: "{typography.tab}"
-    padding: "8px 24px 4px 16px"
+    padding: "12px 24px"
   next-step:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
@@ -189,7 +190,7 @@ components:
   citation-hover:
     backgroundColor: "{colors.highlighter}"
   hue-swatch:
-    backgroundColor: "{colors.divider-teal}"
+    backgroundColor: "{colors.divider-petrol}"
     rounded: "{rounded.md}"
     size: "36px"
 ---
@@ -209,7 +210,7 @@ The world is calm and printed rather than glowing. Colour is spent on identity, 
 - Seven divider hues, one per course, used as identity only.
 - Ink is the only colour that acts.
 - Folder tabs on the divider's lower edge; the selected tab joins the sheet below.
-- Tab-shaped course markers with cut corners, stepped across the width in the course list.
+- Tab-shaped course markers with cut corners, in the spine, on the contents page and on Today.
 - Archivo for the printed voice, the system sans for reading.
 - Counts and durations tabular and right-aligned.
 
@@ -223,11 +224,11 @@ A neutral binder of cool greys and paper white, carried by one ink and seven pre
 
 ### Secondary: the dividers
 The seven divider hues are the course's identity. Each is defined by three numbers (lightness, chroma, hue) and every course role is derived from them, so a course carries one colour through the whole app:
-- **Vermilion** (divider-vermilion), **Saffron** (divider-saffron), **Olive** (divider-olive), **Green** (divider-green), **Teal** (divider-teal), **Cobalt** (divider-cobalt), **Violet** (divider-violet).
-- **Grey Divider** (divider-grey): the plain divider for screens outside a course (Settings, Discover).
-- Derived roles per hue: the full-strength **course** colour (divider band, binder entry, rail and step markers, the course crumb, hue swatches); **course-soft**, a pale wash of the same hue at 93.5% lightness and 40% of its chroma (a lesson or source divider, the icon tile of the next step and empty states, the count on a selected tab); **on-course**, a near-black tinted with the hue, for every word set on a divider.
+- **Brick** (divider-brick), **Ochre** (divider-ochre), **Moss** (divider-moss), **Pine** (divider-pine), **Petrol** (divider-petrol), **Indigo** (divider-indigo), **Plum** (divider-plum): deep, quiet pressboard stock, never pastel.
+- **Slate Divider** (divider-slate): the plain divider for screens outside a course (Settings, Discover).
+- Derived roles per hue: the full-strength **course** colour (divider band, the tab on the contents page, rail and step markers, the course crumb, hue swatches); **course-soft**, a pale wash of the same hue at 94% lightness and 30% of its chroma (a lesson or source divider, the icon tile of the next step and empty states, the count on a selected tab); **on-course**, a paper white tinted with the hue, for every word set on a divider.
 - A course's hue is stored with the course and synced; an older course without one takes a hue from a hash of its id, the same on every device. A new course is offered the hue the fewest courses already use, so neighbouring dividers differ.
-- Evening: each divider drops 7 points of lightness and 8% of its chroma; course-soft becomes a dark wash at 33% lightness. A lesson or source divider in the evening is a charcoal sheet (dark-paper-2); its course crumb keeps the full colour.
+- Evening: each divider drops 7 points of lightness and 10% of its chroma; course-soft becomes a dark wash at 31% lightness. A lesson or source divider in the evening is a charcoal sheet (dark-paper-2); its course crumb keeps the full colour.
 
 ### Tertiary: the highlighter
 - **Highlighter** (highlighter): a pale marker yellow. Text selection, quoted passages in generated prose (at 70%), a hovered citation, recording marker chips, a marked transcript line. It says "this was marked", as a student marks a printed page. Evening: dark-highlighter.
@@ -248,7 +249,7 @@ Slides, their print sheet and exported material are drawn on their own fixed lig
 
 **The Identity Rule.** A divider hue says which course, nothing else. It never marks state, urgency, success or selection, and selection is said by shape and weight (the lit rail tab grows, the selected folder tab turns to paper), never by hue alone.
 
-**The Dark Ink On Dividers Rule.** Text on a divider is always the hue's dark on-course ink, in both themes. White text never sits on a divider.
+**The Paper White On Dividers Rule.** Text on a divider is always the hue's paper-white on-course, in both themes; controls on a divider are cut from the same stock, a lighter layer of it, never from white card. Dark text never sits on a divider.
 
 **The Highlighter Rule.** What is selected or quoted is highlighted with the marker yellow, not tinted with ink or a course hue.
 
@@ -264,8 +265,8 @@ Slides, their print sheet and exported material are drawn on their own fixed lig
 - **Display** (760, 2.25rem, 1.15, width 106%): the page title. 1.75rem on phones.
 - **Wordmark** (820, 1.5rem, 1, width 118%): "amphi" at the head of the spine. 1.375rem on phones.
 - **Headline** (740, 1.625rem, width 104%): the editable title of an artifact and the title on a lesson or source divider.
-- **Title** (650, 1.3125rem, 1.3): the sentence of Today's next step; at 760 for the large counts in a binder entry.
-- **Tab** (720, 1.125rem, 1.3): the course name on a binder tab. The same face at 700 sets section titles and empty-state titles; at 600 to 750 and width 96% it sets plain tabs.
+- **Title** (650, 1.3125rem, 1.3): the sentence of Today's next step.
+- **Tab** (700, 1.125rem, 1.3): the course name on the contents page, and its counts at 720. The same face at 700 sets section titles and empty-state titles; at 600 to 750 and width 96% it sets plain tabs.
 - **Body** (400, 1rem, 1.55): all reading text, capped at a 70ch measure.
 - **Control** (500, 0.9375rem, 1.25): buttons, sidebar rows; the primary button at 650.
 - **Small / Footnote / Caption** (0.875rem / 0.8125rem / 0.75rem): metadata, hints, counts.
@@ -283,7 +284,7 @@ On wide screens the shell is a 248px charcoal spine beside the page. The spine r
 
 Inside a course every screen opens with its divider: a full-width band in the course colour holding the crumbs, the title, its facts and actions, and on the course screen the folder tabs on its lower edge. The work sits on one paper sheet filed directly under it: the divider loses its lower corners, the sheet loses its upper ones, and the two join with no gap. A lesson, a source or an artifact uses the soft divider of the same hue.
 
-The course list is the binder: one divider per course, stacked 8px apart, whose tabs step across the width in a cycle of four (0, 18%, 36%, 54%), as the tabs of real dividers do. Each entry carries its counts right-aligned in columns and, when there is one, the exam countdown.
+The course list is the binder's contents page: one paper sheet, one ruled row per course. Each row opens on the course's divider tab, a small cut of its colour that pulls out on hover as in the spine, then the course name, the exam countdown when there is one, and the counts right-aligned in columns. Colour stays on the tab; the row itself is paper.
 
 Spacing runs on a 4px base (4, 8, 12, 16, 24, 32, 48), with more air above a section (24px) than inside it.
 
@@ -294,25 +295,25 @@ Below 760px the spine becomes a charcoal top bar (wordmark, tools) and the place
 
 **The Ruled Not Boxed Rule.** Inside a divider's sheet, groups are ruled, not boxed: lists, group lists and concepts drop their outer border, radius and fill, and are separated by hairlines.
 
-**The Stepped Tabs Rule.** In the binder, each tab sits further right than the one above it, in a cycle of four.
+**The Contents Page Rule.** A list of courses is a contents page on one sheet, never a stack of coloured cards: colour lives on the tab alone.
 
 ## Elevation & Depth
 
-Depth is paper on board: mostly tonal (paper on pressboard, the spine darker than both), with two shadows. Sheets, the next step and secondary buttons rest on a one-pixel paper shadow. Things that float above the binder (dialogs, the toast, the skip link) and a hovered binder entry take the lifted shadow. The phone tab bar is translucent paper with a blur so the page is felt scrolling under it; that is the only glass.
+Depth is paper on board: mostly tonal (paper on pressboard, the spine darker than both), with two shadows. Sheets, the next step and secondary buttons rest on a one-pixel paper shadow. Things that float above the binder (dialogs, the toast, the skip link) take the lifted shadow. The phone tab bar is translucent paper with a blur so the page is felt scrolling under it; that is the only glass.
 
 ### Shadow Vocabulary
 - **Paper rest** (`box-shadow: 0 1px 2px oklch(20% 0.012 260 / 0.08)`): a sheet lying on the board.
-- **Lifted** (`box-shadow: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07)`): dialogs, the toast, a hovered binder entry.
+- **Lifted** (`box-shadow: 0 14px 34px -10px oklch(20% 0.012 260 / 0.28), 0 2px 6px oklch(20% 0.012 260 / 0.07)`): dialogs, the toast.
 - **Focus halo** (`box-shadow: 0 0 0 3px oklch(21% 0.014 260 / 0.22)`): a focused input, with its border turned to ink.
 
 ### Named Rules
-**The Paper Lift Rule.** Paper rests flat with a hairline shadow; only what floats over the binder, or a divider being pulled out on hover, lifts.
+**The Paper Lift Rule.** Paper rests flat with a hairline shadow; only what floats over the binder lifts.
 
 ## Shapes
 
 Pressboard corners, barely rounded: 4px for small marks (crumb tab, swatch focus, slide frame), 7px for controls and inputs, 10px for dividers, sheets, cards and dialogs. Full pills only for small counters and chips: tab counts, citation pills, the exam countdown, filter chips. On phones a dialog becomes a bottom sheet with 18px top corners.
 
-Course markers are tabs cut by a clip path, not rounded boxes: the binder tab is a trapezoid with 10px chamfers at its top corners; the rail marker and the step marker are small tabs whose right edge is cut in by 3 to 4px; the tab that rises from the next-step sheet has its top right corner cut by 10px.
+Course markers are tabs cut by a clip path, not rounded boxes: the rail marker, the contents tab and the step marker are small tabs whose right edge is cut in by 3 to 4px; the tab that rises from the next-step sheet has its top right corner cut by 10px.
 
 ### Named Rules
 **The Cut Corner Rule.** A course is marked by a tab with a cut corner in its divider colour; never by a dot, a stripe or a coloured border.
@@ -343,12 +344,12 @@ Quiet paper by default, ink for the one thing that matters.
 The head of every screen inside a course, and of Settings and Discover in grey.
 - **Full:** course colour fill, on-course text, 10px corners, 24px padding (16px at the bottom), with crumbs, title, facts (a large Archivo number before each label, tabular) and actions.
 - **Soft:** course-soft fill and ink text, for a lesson, a source, an artifact or a recording; its title drops to headline size.
-- **Folder tabs:** sit on the divider's lower edge with 7px top corners, 42px tall, weight 600. Idle tabs are lighter card cut from the divider (white at 36%, 62% on hover); the selected tab turns to paper with ink text at 700 and joins the sheet below. Outside a divider, tabs are plain text in Archivo over a hairline, the selected one underlined with 3px of ink.
+- **Folder tabs:** sit on the divider's lower edge with 7px top corners, 42px tall, weight 600. Idle tabs are a lighter layer of the divider (on-course at 14%, 24% on hover); the selected tab turns to paper with ink text at 700 and joins the sheet below. Outside a divider, tabs are plain text in Archivo over a hairline, the selected one underlined with 3px of ink.
 
-### Binder entry (signature)
-One course in the binder or on Today.
-- **Tab:** course colour, chamfered trapezoid, Archivo course name with its emoji, stepped across the width; it rises 3px on hover.
-- **Body:** course colour, 10px corners (the first entry of each cycle keeps its top-left square so the tab joins it), at least 60px tall; lesson and source counts right-aligned in columns (count in Archivo at title size; a zero count is quiet through weight only, set plain in the body sans at 500, never faded); an exam countdown in a pale pill. Hover lifts the body; focus is a 3px paper gap and 2px of ink around it.
+### Contents row (signature)
+One course on the contents page or on Today, a ruled row of one paper sheet.
+- **Tab:** a 12 by 22px cut of the course colour, right edge cut in by 4px; it pulls out to 22px on hover and focus, as the open course does in the spine.
+- **Row:** at least 60px tall, 12px by 24px padding; the course name in Archivo at 700 with its emoji, then an exam countdown in a paper-2 pill with a hairline, then the counts right-aligned in columns (count in Archivo at lead size; a zero count is quiet through weight only, set plain in the body sans at 500, never faded). Hover lays the hover wash over the row; focus is 2px of ink inside it. Below 760px the counts drop under the name.
 
 ### Next step
 Today's one next action.
@@ -370,12 +371,12 @@ Today's one next action.
 - A dashed outline with 10px corners, a course-soft icon tile, a title in Archivo, one teaching sentence and, when there is one, the next action in ink.
 
 ### Motion
-- Hovers and state changes in 150ms, larger moves in 240ms, on an exponential ease-out (`cubic-bezier(0.16, 1, 0.3, 1)`). As a screen opens its folder tabs and binder tabs rise 10px from behind their divider, one after another, 40ms apart. Dialogs rise 8px. Nothing loops except progress and the recording, typing and sync indicators. Reduced motion makes every change instant.
+- Hovers and state changes in 150ms, larger moves in 240ms, on an exponential ease-out (`cubic-bezier(0.16, 1, 0.3, 1)`). As a screen opens its folder tabs rise 10px from behind their divider, one after another, 40ms apart. Dialogs rise 8px. Nothing loops except progress and the recording, typing and sync indicators. Reduced motion makes every change instant.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** give every course one of the seven divider hues and carry it through the course: divider, crumb, rail tab, binder entry, next-step tab.
+- **Do** give every course one of the seven divider hues and carry it through the course: divider, crumb, rail tab, contents tab, next-step tab.
 - **Do** keep ink as the only colour that acts: primary buttons, links, citations, focus, progress.
 - **Do** highlight selection and quoted passages with the highlighter yellow.
 - **Do** file a course's content on one paper sheet joined to its divider, and rule the groups on it.

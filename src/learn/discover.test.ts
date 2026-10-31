@@ -4,7 +4,7 @@ import { list, resetDbForTests } from "../data/db.ts";
 import type { MindmapData } from "../studio/render/mindmap-tree.ts";
 import { createTopic, type DiscoverDeps, type DiscoverInput, discoverTopic, proposalNote, TopicAnswer, toTopicMap, urlKey } from "./discover.ts";
 
-const INPUT: DiscoverInput = { topic: "Thermodynamics", level: "beginner", goal: "exam", language: "en" };
+const INPUT: DiscoverInput = { topic: "Thermodynamics", level: "beginner", goal: "Pass the June exam", language: "en" };
 
 const ANSWER = TopicAnswer.parse({
   title: "Thermodynamics",
@@ -84,8 +84,20 @@ test("without a search tool, one call asks for a plan without URLs", async () =>
   expect(calls).toHaveLength(1);
   expect(calls[0]!.system).toContain("cannot search the web");
   expect(calls[0]!.system).toContain("Never give a URL");
+  expect(calls[0]!.prompt).toContain("Their goal, in their own words: Pass the June exam");
   expect(map.web).toBe(false);
   expect(map.proposals.every((p) => p.url === undefined && p.status === "unsourced")).toBe(true);
+});
+
+test("an empty goal is left out of the prompt and of the topic", async () => {
+  const calls: { system: string; prompt?: string; tools?: unknown }[] = [];
+  const input = { ...INPUT, goal: "  " };
+  await discoverTopic(input, { deps: fakeDeps(false, calls) });
+  expect(calls[0]!.prompt).not.toContain("goal");
+  globalThis.indexedDB = new IDBFactory();
+  resetDbForTests();
+  const course = await createTopic(input, toTopicMap(ANSWER, input, [], false), []);
+  expect(course.goal).toBeUndefined();
 });
 
 beforeEach(() => {
@@ -96,7 +108,7 @@ beforeEach(() => {
 test("creating the topic makes the course, the notes, the concepts and a mind map", async () => {
   const map = toTopicMap(ANSWER, INPUT, [{ url: "https://en.wikipedia.org/wiki/Thermodynamics" }], true);
   const course = await createTopic(INPUT, map, map.proposals.slice(0, 1));
-  expect(course).toMatchObject({ kind: "topic", title: "Thermodynamics", goal: "exam", level: "beginner", language: "en" });
+  expect(course).toMatchObject({ kind: "topic", title: "Thermodynamics", goal: "Pass the June exam", level: "beginner", language: "en" });
   const [sources, concepts, artifacts] = await Promise.all([list("sources", "courseId", course.id), list("concepts", "courseId", course.id), list("artifacts", "courseId", course.id)]);
   expect(sources.map((s) => [s.kind, s.title, s.url, s.status])).toEqual([["web", "Thermodynamics (Wikipedia)", "https://en.wikipedia.org/wiki/Thermodynamics", "ready"]]);
   expect(sources[0]!.text).toBe("Thermodynamics deals with heat and work.\n\n_An overview_");

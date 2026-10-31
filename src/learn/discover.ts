@@ -20,12 +20,12 @@ import { freeHue } from "../ui/hue.ts";
 import { conceptRecords, conceptTree, RawConcept } from "./concepts.ts";
 
 export type Level = "beginner" | "intermediate" | "advanced";
-export type Goal = "exam" | "general" | "project";
 
 export interface DiscoverInput {
   topic: string;
   level: Level;
-  goal: Goal;
+  /** What the student wants, in their own words ("pass the bar exam in June"); may be empty. */
+  goal: string;
   /** Code of the language to write in ("fr"). */
   language: string;
 }
@@ -78,7 +78,6 @@ const PLAN_SHAPE = `{ "title": string, "overview": string, ${CONCEPTS_PART},
   "readings": [ { "title": string, "why": string, "level": string } ] }`;
 
 const LEVEL: Record<Level, string> = { beginner: "a beginner (no prior knowledge)", intermediate: "an intermediate learner (knows the basics)", advanced: "an advanced learner" };
-const GOAL: Record<Goal, string> = { exam: "pass an exam on it", general: "build general knowledge of it", project: "use it in a project" };
 
 const MAX_PROPOSALS = 10;
 
@@ -143,7 +142,8 @@ export function canSearch(): boolean {
 }
 
 function brief(input: DiscoverInput) {
-  return `Topic: ${input.topic.trim()}\nThe student is ${LEVEL[input.level]} and wants to ${GOAL[input.goal]}.`;
+  const goal = input.goal.trim();
+  return `Topic: ${input.topic.trim()}\nThe student is ${LEVEL[input.level]}.${goal ? `\nTheir goal, in their own words: ${goal}` : ""}`;
 }
 
 const PLAN_RULE =
@@ -190,7 +190,7 @@ export function proposalNote(p: Proposal, language: string): string {
 
 /** The topic, its chosen sources as notes, its concepts and their mind map. */
 export async function createTopic(input: DiscoverInput, map: TopicMap, chosen: readonly Proposal[]): Promise<Course> {
-  const course = await put("courses", { ...fresh(), kind: "topic", title: map.title, hue: freeHue(await list("courses")), language: input.language, goal: input.goal, level: input.level });
+  const course = await put("courses", { ...fresh(), kind: "topic", title: map.title, hue: freeHue(await list("courses")), language: input.language, goal: input.goal.trim() || undefined, level: input.level });
   const where = { courseId: course.id };
   for (const p of chosen) await addNote(where, p.title, proposalNote(p, input.language), p.url && p.status !== "unsourced" ? { kind: "web", url: p.url } : {});
   const concepts = conceptRecords(map.concepts, course.id);
@@ -210,4 +210,42 @@ export async function createTopic(input: DiscoverInput, map: TopicMap, chosen: r
   };
   await put("artifacts", artifact as Artifact);
   return course;
+}
+
+/** What Discover was doing, kept on this device so a reload loses neither the form nor a map already paid for. */
+export interface DiscoverDraft {
+  input: DiscoverInput;
+  map: TopicMap | null;
+  /** Indexes of the ticked proposals. */
+  chosen: number[];
+  /** A map was being made when the page went away. */
+  mapping?: boolean;
+}
+
+const DRAFT_KEY = "amphi-discover-draft";
+
+export function loadDraft(): DiscoverDraft | null {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null") as DiscoverDraft | null;
+    return d && typeof d.input?.topic === "string" ? { ...d, input: { ...d.input, goal: d.input.goal ?? "" }, chosen: Array.isArray(d.chosen) ? d.chosen : [] } : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveDraft(d: DiscoverDraft): void {
+  try {
+    if (!d.input.topic.trim() && !d.input.goal.trim() && !d.map) localStorage.removeItem(DRAFT_KEY);
+    else localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+  } catch {
+    // Storage full or blocked: the draft is a convenience.
+  }
+}
+
+export function clearDraft(): void {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // Nothing to clear.
+  }
 }

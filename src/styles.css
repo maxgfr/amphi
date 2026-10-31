@@ -3297,6 +3297,9 @@ fieldset:disabled .quiz-choice {
 .discover-options {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
+.discover-options input[list]::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+}
 .discover-result h2 {
   margin-block-end: 0;
 }

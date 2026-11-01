@@ -40,6 +40,8 @@ export interface Course extends Base {
   seed?: "topic" | "question" | "work" | "skill";
   /** When Discover last searched the web for this course's sources. */
   searchedAt?: number;
+  /** Part of the demo (Settings), which removes it in one go. */
+  demo?: boolean;
 }
 
 export interface Lesson extends Base {

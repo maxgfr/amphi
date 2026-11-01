@@ -103,6 +103,11 @@ export function Today() {
           })}
         </ul>
       ) : null}
+      {data.courses.length ? null : (
+        <p className="meta">
+          <a href={href.settings("demo")}>{t("Or look around a demo course first", "Ou faites d'abord le tour d'un cours de démo", "Oder sehen Sie sich zuerst einen Demo-Kurs an")}</a>
+        </p>
+      )}
       <Suspense fallback={<div aria-busy="true" />}>
         <DiscoverSection />
       </Suspense>

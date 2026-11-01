@@ -1,25 +1,28 @@
 // Settings: the AI provider, how keys are protected, sync, this device's
-// storage, and what leaves the device.
+// storage, what leaves the device, and the demo.
 
 import { ENDPOINT_PRESETS } from "llm-connect";
 import { useLlmSettings } from "llm-connect/react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { llm, loadLlm, reloadLlm } from "../ai/llm.ts";
-import { persist } from "../data/db.ts";
+import { getMeta, persist } from "../data/db.ts";
+import { hasDemo, loadDemo, removeDemo } from "../data/demo.ts";
+import { useLive } from "../data/hooks.ts";
 import { bytes, useLang } from "../i18n.ts";
 import { useOfflineReady } from "../pwa.ts";
 import { go, href } from "../router.ts";
 import { protectWithPassphrase, removePassphrase, vaultMode } from "../secrets.ts";
+import { Icon } from "../ui/icons.tsx";
 import { Field, Notice, Tabs } from "../ui/kit.tsx";
 
 const SyncSettings = lazy(() => import("../sync/settings.tsx").then((m) => ({ default: m.SyncSettings })));
 const VoiceSettings = lazy(() => import("../voice/settings.tsx").then((m) => ({ default: m.VoiceSettings })));
 
-type Section = "ai" | "voice" | "sync" | "security" | "device" | "privacy";
+type Section = "ai" | "voice" | "sync" | "security" | "device" | "privacy" | "demo";
 
 export function Settings({ section }: { section?: string }) {
   const { t } = useLang();
-  const current: Section = (["ai", "voice", "sync", "security", "device", "privacy"] as const).includes(section as Section) ? (section as Section) : "ai";
+  const current: Section = (["ai", "voice", "sync", "security", "device", "privacy", "demo"] as const).includes(section as Section) ? (section as Section) : "ai";
   return (
     <div className="page narrow">
       <header className="divider">
@@ -32,6 +35,7 @@ export function Settings({ section }: { section?: string }) {
             { id: "security", label: t("Keys", "Clés", "Schlüssel"), icon: "lock" },
             { id: "device", label: t("This device", "Cet appareil", "Dieses Gerät"), icon: "folder" },
             { id: "privacy", label: t("Privacy", "Confidentialité", "Datenschutz"), icon: "globe" },
+            { id: "demo", label: t("Demo", "Démo", "Demo"), icon: "play" },
           ]}
           value={current}
           onChange={(k) => go(href.settings(k))}
@@ -47,7 +51,55 @@ export function Settings({ section }: { section?: string }) {
         {current === "security" ? <KeySettings /> : null}
         {current === "device" ? <DeviceSettings /> : null}
         {current === "privacy" ? <Privacy /> : null}
+        {current === "demo" ? <DemoSettings /> : null}
       </div>
+    </div>
+  );
+}
+
+/** A course and a topic already filled in, to try everything; they leave in one click. */
+function DemoSettings() {
+  const { t, lang } = useLang();
+  const [n, setN] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const state = useLive(async () => ({ on: await hasDemo(), sync: Boolean(await getMeta("sync-config")) }), ["courses"], [n]);
+  if (!state) return <div aria-busy="true" />;
+  const act = async (fn: () => Promise<unknown>) => {
+    setBusy(true);
+    try {
+      await fn();
+    } finally {
+      setBusy(false);
+      setN((x) => x + 1);
+    }
+  };
+  return (
+    <div className="stack">
+      <p className="lead">
+        {t(
+          "Try amphi before importing your own courses: a thermodynamics course with its lessons, notes, concepts, a summary, a quiz, flashcards and a mind map, and a topic on photosynthesis with its sources and a learning path. No AI key is needed to look around.",
+          "Essayez amphi avant d'importer vos propres cours : un cours de thermodynamique avec ses séances, notes, notions, un résumé, un quiz, des cartes et une carte mentale, et un sujet sur la photosynthèse avec ses sources et un parcours. Aucune clé d'IA n'est nécessaire pour faire le tour.",
+          "Probieren Sie amphi aus, bevor Sie eigene Kurse importieren: ein Thermodynamik-Kurs mit Sitzungen, Notizen, Begriffen, einer Zusammenfassung, einem Quiz, Lernkarten und einer Mindmap, und ein Thema zur Photosynthese mit Quellen und Lernpfad. Zum Umsehen braucht es keinen KI-Schlüssel.",
+        )}
+      </p>
+      {state.sync ? <Notice>{t("Sync is set up: the demo goes to your repository too, and so does its removal.", "La synchro est configurée : la démo part aussi dans votre dépôt, tout comme sa suppression.", "Die Synchronisierung ist eingerichtet: Die Demo landet auch in Ihrem Repository, ebenso ihre Entfernung.")}</Notice> : null}
+      <div className="row">
+        {state.on ? (
+          <>
+            <a className="button primary" href={href.today()}>
+              {t("Open Today", "Ouvrir Aujourd'hui", "Heute öffnen")}
+            </a>
+            <button type="button" className="secondary" disabled={busy} onClick={() => void act(removeDemo)}>
+              <Icon name="trash" size={18} /> {t("Remove the demo", "Retirer la démo", "Demo entfernen")}
+            </button>
+          </>
+        ) : (
+          <button type="button" className="primary" disabled={busy} onClick={() => void act(async () => go(href.course((await loadDemo(lang)).id)))}>
+            <Icon name="play" size={18} /> {t("Load the demo", "Charger la démo", "Demo laden")}
+          </button>
+        )}
+      </div>
+      <p className="meta">{t("The demo is in French or English. Removing it deletes its course and topic for good, with whatever you added to them.", "La démo est en français ou en anglais. La retirer supprime définitivement son cours et son sujet, avec ce que vous y avez ajouté.", "Die Demo ist auf Französisch oder Englisch. Beim Entfernen werden ihr Kurs und ihr Thema endgültig gelöscht, mit allem, was Sie hinzugefügt haben.")}</p>
     </div>
   );
 }

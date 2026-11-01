@@ -16,6 +16,7 @@ const PDFJS = /^assets\/pdf-[\w.-]*\.js$/;
 
 // pptxgenjs (with JSZip), loaded only to export a slide deck.
 const PPTX = /^assets\/pptxgen[\w.-]*\.js$/;
+const SETTINGS = /^assets\/settings-[\w-]*\.js$/;
 
 // Hosts that may appear as inert strings, each with the reason it is safe,
 // and the files they may appear in when that is narrower than every file.
@@ -63,6 +64,8 @@ const ALLOWED_HOSTS: [string, string, RegExp?][] = [
   ["stuk.github.io", "JSZip's documentation link in its license header and error messages, never requested", PPTX],
   ["raw.github.com", "JSZip's license link in its header comment, never requested", PPTX],
   ["stuartk.com", "JSZip's author link in its license header, never requested", PPTX],
+  ["en.wikipedia.org", "the demo topic's web sources (src/data/demo.ts): links the student may open, never requested", SETTINGS],
+  ["fr.wikipedia.org", "the demo topic's web sources (src/data/demo.ts): links the student may open, never requested", SETTINGS],
 ];
 
 const URL_RE = /\bhttps?:\/\/([a-z0-9.-]+\.[a-z]{2,})/gi;

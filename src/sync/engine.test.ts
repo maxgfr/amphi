@@ -147,6 +147,31 @@ describe("sync engine (plain)", () => {
     expect(fake.text("amphi/deleted/lessons.jsonl")).toContain(l.id);
   });
 
+  test("the trash syncs: a trashed source keeps its file, a restore comes back, a purge is a deletion", async () => {
+    const { fake, run } = setup();
+    const a = new Device();
+    const b = new Device();
+    const c = a.edit("courses", course());
+    const pdf = await a.putBlob(new Uint8Array([37, 80, 68, 70]), "application/pdf");
+    const s = a.edit("sources", note(c, "", { kind: "pdf", blobId: pdf, mime: "application/pdf", text: undefined }));
+    a.edit("sources", { ...s, trashedAt: Date.now() });
+    await run(a);
+    await run(b);
+    expect(b.get<Source>("sources", s.id)?.trashedAt).toBeNumber();
+    expect(b.blobs.has(pdf)).toBe(true);
+    expect(paths(fake)).toContain(`amphi/blobs/${pdf}.pdf`);
+    const back = { ...b.get<Source>("sources", s.id)! };
+    delete back.trashedAt;
+    b.edit("sources", back);
+    await run(b);
+    await run(a);
+    expect(a.get<Source>("sources", s.id)?.trashedAt).toBeUndefined();
+    a.edit("sources", { ...a.get<Source>("sources", s.id)!, deletedAt: Date.now() });
+    await run(a);
+    await run(b);
+    expect(b.live("sources")).toHaveLength(0);
+  });
+
   test("another device pushing during the round: read again, merged, nothing lost", async () => {
     const { fake, run } = setup();
     const a = new Device();

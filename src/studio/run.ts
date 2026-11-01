@@ -3,7 +3,7 @@
 // "ready" with its data and media, or "error" with the reason.
 
 import { useSyncExternalStore } from "react";
-import { fresh, get, list, put, putBlob } from "../data/db.ts";
+import { fresh, get, list, peek, put, putBlob } from "../data/db.ts";
 import type { Artifact, ArtifactType, Id } from "../data/schema.ts";
 import { currentLang } from "../i18n.ts";
 import type { Progress, StudioKind } from "./types.ts";
@@ -88,13 +88,16 @@ export async function runStudio(k: StudioKind, input: RunInput): Promise<Id> {
       );
       const media: Record<string, Id> = {};
       for (const [name, blob] of Object.entries(out.media ?? {})) media[name] = await putBlob(blob);
-      const cur = (await get("artifacts", saved.id)) ?? saved;
+      // Deleted meanwhile: nothing to bring back. In the trash: it stays there, finished.
+      const cur = await peek("artifacts", saved.id);
+      if (!cur) return;
       await put("artifacts", { ...cur, title: out.title, data: out.data, media: out.media ? media : cur.media, status: "ready", error: undefined });
     } catch (e) {
-      const cur = (await get("artifacts", saved.id)) ?? saved;
+      const cur = await peek("artifacts", saved.id);
+      if (!cur) return;
       const aborted = job.abort.signal.aborted;
       // A cancelled first version leaves nothing behind; a cancelled regeneration keeps the previous one.
-      if (aborted && input.replace) await put("artifacts", { ...input.replace });
+      if (aborted && input.replace) await put("artifacts", { ...input.replace, trashedAt: cur.trashedAt, trashedWith: cur.trashedWith });
       else if (aborted) await put("artifacts", { ...cur, status: "error", error: "cancelled", deletedAt: Date.now() });
       else await put("artifacts", { ...cur, status: "error", error: e instanceof Error ? e.message : String(e) });
     } finally {

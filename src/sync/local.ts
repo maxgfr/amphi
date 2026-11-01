@@ -32,7 +32,7 @@ async function recordsOf(store: LocalStore): Promise<RecordsByTable> {
   return out;
 }
 
-/** Blob ids live records point to, that this device has. */
+/** Blob ids live and trashed records point to, that this device has. */
 async function liveBlobs(store: LocalStore, records: RecordsByTable): Promise<string[]> {
   const refs = new Set<string>();
   for (const t of TABLES) for (const r of records[t] ?? []) if (!r.deletedAt) blobRefs(r, refs);

@@ -35,10 +35,11 @@ export async function nextSteps(configured: boolean, now = Date.now()): Promise<
   const steps: Step[] = [];
   if (!courses.length) steps.push({ kind: "create-course", weight: 100 });
   if (!configured) steps.push({ kind: "setup-ai", weight: courses.length ? 90 : 50 });
-  for (const s of sources) {
-    if (s.status === "pending") steps.push({ kind: "transcribe", courseId: s.courseId, lessonId: s.lessonId, sourceId: s.id, title: s.title, weight: 80 });
-  }
   const byCourse = new Map<Id, Course>(courses.map((c) => [c.id, c]));
+  for (const s of sources) {
+    // A source synced in while its course was being thrown away belongs nowhere.
+    if (s.status === "pending" && byCourse.has(s.courseId)) steps.push({ kind: "transcribe", courseId: s.courseId, lessonId: s.lessonId, sourceId: s.id, title: s.title, weight: 80 });
+  }
   for (const c of courses) {
     if (!c.examDate) continue;
     const days = daysUntil(c.examDate, now);

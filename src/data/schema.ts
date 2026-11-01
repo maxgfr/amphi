@@ -1,7 +1,9 @@
 // What amphi keeps. IndexedDB is the source of truth on each device; sync
 // (src/sync) writes the same records to the user's repository. Every record
 // carries its own times, and a deletion is a tombstone (`deletedAt`) so it
-// reaches the other devices.
+// reaches the other devices. Deleting in the interface first moves a record to
+// the trash (`trashedAt`), an ordinary synced edit; the tombstone comes when the
+// trash is emptied or after TRASH_DAYS.
 
 export type Id = string;
 
@@ -11,7 +13,14 @@ export interface Base {
   updatedAt: number;
   /** Set when deleted: the record stays as a tombstone so the deletion syncs. */
   deletedAt?: number;
+  /** Set when moved to the trash: hidden everywhere, restorable until purged. */
+  trashedAt?: number;
+  /** The course or lesson this record went to the trash with: it comes back and goes with it. */
+  trashedWith?: Id;
 }
+
+/** How long the trash keeps what it holds. */
+export const TRASH_DAYS = 30;
 
 /** A course the student follows, or a topic they discover on their own: both hold lessons, sources and the Studio. */
 export interface Course extends Base {

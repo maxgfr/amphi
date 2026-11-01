@@ -19,6 +19,9 @@
 //     or a report's Markdown that loses is kept as a "conflict copy" beside the
 //     winner, and a chat keeps the messages of both sides. A deletion and an
 //     edit at once: the later wins, and a losing edited note survives as a copy.
+//   - moving to the trash and restoring are ordinary edits (`trashedAt`); only
+//     emptying the trash makes tombstones, after a round so a restore made
+//     elsewhere has arrived first.
 // A file deleted by hand in the repository is written again (a deletion is a
 // tombstone, made in amphi); files amphi does not know are left untouched.
 
@@ -334,6 +337,7 @@ async function round(o: SyncOptions): Promise<SyncResult> {
   const blobChanges: Change[] = [];
   if (o.media) {
     const refs = new Set<string>();
+    // Live or in the trash: a trashed source keeps its file until it is purged.
     for (const t of TABLES) for (const r of snapshot[t] ?? []) if (!r.deletedAt) blobRefs(r, refs);
     const local = new Set(await store.blobIds());
     const download: string[] = [];

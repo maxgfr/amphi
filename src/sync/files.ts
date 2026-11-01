@@ -12,6 +12,7 @@
 //   courses/<c>[/lessons/<l>]/studio/<type>/<title>-<id8>.json + .md when it has Markdown or a script
 //   courses/<c>/<table>.jsonl                    every other table (concepts, events, tables added later): one record per line
 //   deleted/<table>.jsonl                        tombstones, reduced to id and times, so deletions reach every device
+//                                                (a record in the trash stays where it is, with its `trashedAt`)
 //   blobs/<sha256>.<ext>                         the original files (PDF, audio, video), named by their hash
 //
 // Files live in blobs/ rather than beside their source: one file can belong
@@ -329,7 +330,7 @@ export function encode(s: Snapshot, header?: Header): Map<string, Uint8Array> {
 
 // ---- files → model (untrusted: every record is checked)
 
-const base = z.looseObject({ id: z.string().min(1).max(200), createdAt: z.number(), updatedAt: z.number(), deletedAt: z.number().optional() });
+const base = z.looseObject({ id: z.string().min(1).max(200), createdAt: z.number(), updatedAt: z.number(), deletedAt: z.number().optional(), trashedAt: z.number().optional(), trashedWith: z.string().min(1).max(200).optional() });
 const inCourse = base.extend({ courseId: z.string().min(1) });
 const SCHEMAS: Partial<Record<Table, z.ZodType>> = {
   courses: base.extend({ title: z.string() }),

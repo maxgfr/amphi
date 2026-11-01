@@ -15,9 +15,9 @@ export function courseHue(course: { id: string; hue?: number }): number {
 }
 
 /** The colour for a new course: the one the fewest courses already use, so neighbouring dividers differ. */
-export function freeHue(courses: readonly { id: string; hue?: number; deletedAt?: number }[]): number {
+export function freeHue(courses: readonly { id: string; hue?: number; deletedAt?: number; trashedAt?: number }[]): number {
   const used = Array.from({ length: HUES }, () => 0);
-  for (const c of courses) if (!c.deletedAt) used[courseHue(c)]! += 1;
+  for (const c of courses) if (!c.deletedAt && !c.trashedAt) used[courseHue(c)]! += 1;
   return used.indexOf(Math.min(...used));
 }
 

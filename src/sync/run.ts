@@ -6,7 +6,7 @@
 // rate limit's wait. One sync at a time across tabs (Web Locks).
 
 import { useSyncExternalStore } from "react";
-import { getMeta, onChange, setMeta } from "../data/db.ts";
+import { getMeta, onChange, purgeTrash, setMeta } from "../data/db.ts";
 import { getSecret } from "../secrets.ts";
 import type { Mode, SyncResult } from "./engine.ts";
 import type { SyncErrorKind } from "./github.ts";
@@ -138,6 +138,8 @@ async function runOnce(): Promise<SyncResult | null> {
     const last: Last = { at: Date.now(), mode: result.mode, skipped: result.skipped };
     await setMeta(LAST_KEY, last);
     set({ ...last, error: undefined });
+    // Only now: a restore made on another device has arrived and is not purged under it.
+    await purgeTrash().catch(() => {});
     // Edits made during the sync go with the next one.
     await refreshPending().catch(() => {});
     if (status.config?.auto && status.pending > 0) later(DEBOUNCE_MS);
@@ -176,6 +178,8 @@ export function startAutoSync(): void {
   const auto = () => Boolean(status.config?.auto);
   void loadSync().then(() => {
     if (auto()) void syncNow();
+    // Without sync the trash is emptied of what is old at start; with it, after each round.
+    else if (!status.config) void purgeTrash().catch(() => {});
   });
   onChange(() => {
     if (applying) return;

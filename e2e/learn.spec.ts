@@ -44,6 +44,7 @@ const DIG = {
 };
 
 function reply(c: { system: string; last: string }): string {
+  if (c.system.includes("You suggest what a student could learn next")) return JSON.stringify({ suggestions: [{ title: "Statistical mechanics", kind: "further", why: "Where entropy comes from.", level: "intermediate", from: 1 }] });
   if (c.system.includes("You map a topic") && c.system.includes("sub-concepts")) return JSON.stringify(DIG);
   if (c.system.includes("You map a topic")) return JSON.stringify(PLAN);
   if (c.system.includes("concepts a student must master")) return JSON.stringify(CONCEPTS);
@@ -178,6 +179,29 @@ test("Discover sits in Today, and a concept of the topic is dug into: an explana
   await page.getByRole("link", { name: "Find new sources on the web" }).click();
   await expect(page.getByText(/new sources need a web search/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Find new sources" })).toBeDisabled();
+  await w.assertClean();
+});
+
+test("Today suggests topics from the courses, only when asked, keeps them, and maps one in a click", async ({ page }) => {
+  const w = await watch(page);
+  const calls = await mockAi(page, reply);
+  await setUpAi(page);
+  await courseWithNote(page);
+  await page.goto(siteURL);
+  const today = page.getByRole("region", { name: "Discover" });
+  await expect(today.getByText(/Your course and topic titles, their concepts' names and how well you know them are sent to 127\.0\.0\.1:9/)).toBeVisible();
+  expect(calls).toHaveLength(0);
+  await today.getByRole("button", { name: "Suggest topics from my courses" }).click();
+  await expect(today.getByText("Where entropy comes from.")).toBeVisible();
+  expect(calls.at(-1)!.last).toContain("[1] Course: Thermodynamics");
+  const asked = calls.length;
+  await page.reload();
+  await expect(today.getByText("Go further · Thermodynamics")).toBeVisible();
+  expect(calls.length).toBe(asked);
+  await today.getByRole("button", { name: "Map “Statistical mechanics”" }).click();
+  await expect(today.getByRole("heading", { name: "Thermodynamics", level: 3 })).toBeVisible();
+  expect(calls.at(-1)!.last).toContain("Topic: Statistical mechanics");
+  expect(calls.at(-1)!.last).toContain("Their goal, in their own words: Go further after “Thermodynamics”");
   await w.assertClean();
 });
 

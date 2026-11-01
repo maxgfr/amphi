@@ -13,6 +13,7 @@ import { list } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Course } from "../data/schema.ts";
 import { count, languageLabel, type T, useLang } from "../i18n.ts";
+import { dismissSuggestion, loadSuggestions, type Suggestion, type SuggestionKind, suggestTopics } from "../learn/suggest.ts";
 import { applyDiscovery, canSearch, clearDraft, type DiscoverContext, type DiscoverInput, type DiscoverTarget, discover, type Intent, intentOf, type Level, loadDiscoverContext, loadDraft, type Proposal, SEED_KINDS, type SeedKind, saveDraft, type TopicMap } from "../learn/discover.ts";
 import { go, href } from "../router.ts";
 import { courseHue } from "../ui/hue.ts";
@@ -88,21 +89,136 @@ export function Discover({ target = {} }: { target?: DiscoverTarget }) {
   );
 }
 
-/** Discover, on Today: one line to start, the rest under Options. */
+/** Discover, on Today: one line to start, the rest under Options, and topics suggested from the courses. */
 export function DiscoverSection() {
   const { t } = useLang();
+  const [start, setStart] = useState<Start>();
+  const flow = useRef<HTMLDivElement>(null);
   return (
     <section className="discover-today" aria-labelledby="discover-today">
       <h2 className="section-title" id="discover-today">
         {t("Discover", "Découvrir", "Entdecken")}
       </h2>
       <p className="meta">{t("Something to learn, a question, a book, a skill: amphi maps it, finds sources and makes it a topic, or adds it to a course.", "Un sujet, une question, un livre, une compétence : amphi le cartographie, trouve des sources et en fait un sujet, ou l'ajoute à un cours.", "Ein Thema, eine Frage, ein Buch, eine Fähigkeit: amphi kartiert es, findet Quellen und macht ein Thema daraus oder fügt es einem Kurs hinzu.")}</p>
-      <DiscoverFlow target={{}} compact />
+      <div ref={flow}>
+        <DiscoverFlow target={{}} compact start={start} />
+      </div>
+      <Suggestions
+        onPick={(s) => {
+          setStart((x) => ({ n: (x?.n ?? 0) + 1, suggestion: s }));
+          flow.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+      />
     </section>
   );
 }
 
-function DiscoverFlow({ target, ctx, compact }: { target: DiscoverTarget; ctx?: DiscoverContext; compact?: boolean }) {
+/** A suggestion picked on Today: the flow fills itself with it and runs. */
+interface Start {
+  n: number;
+  suggestion: Suggestion;
+}
+
+function kindLabel(kind: SuggestionKind, t: T): string {
+  switch (kind) {
+    case "further":
+      return t("Go further", "Aller plus loin", "Weiter gehen");
+    case "prerequisite":
+      return t("Needed first", "Prérequis", "Vorher nötig");
+    case "related":
+      return t("Next to it", "À côté", "Daneben");
+  }
+}
+
+/** Topics suggested from the courses: made only when asked, kept on this device until the courses change. */
+function Suggestions({ onPick }: { onPick: (s: Suggestion) => void }) {
+  const { t, lang } = useLang();
+  const [n, setN] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const data = useLive(
+    async () => {
+      await loadLlm();
+      return { ...(await loadSuggestions()), configured: Boolean(savedSettings()), to: recipient(), courses: await list("courses") };
+    },
+    ["courses", "concepts"],
+    [n],
+  );
+  if (!data || !data.courses.length) return null;
+  const titleOf = (id?: string) => data.courses.find((c) => c.id === id)?.title;
+  const ask = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await suggestTopics(lang);
+      setN((x) => x + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const askButton = (label: string) => (
+    <button type="button" className={data.items.length ? "link" : "secondary"} disabled={!data.configured || busy} onClick={() => void ask()}>
+      <Icon name="sparkle" size={16} /> {busy ? t("Thinking of topics…", "Recherche de sujets…", "Themen werden gesucht…") : label}
+    </button>
+  );
+  return (
+    <div className="suggestions" aria-labelledby="suggestions-title">
+      <h3 className="section-title" id="suggestions-title">
+        {t("Suggested from your courses", "Suggéré d'après vos cours", "Vorschläge aus Ihren Kursen")}
+      </h3>
+      {data.items.length ? (
+        <ul className="suggestion-list">
+          {data.items.map((s) => {
+            const from = titleOf(s.courseId);
+            return (
+              <li key={s.title} className="suggestion">
+                <div className="suggestion-main">
+                  <span className="meta suggestion-kind">
+                    {kindLabel(s.kind, t)}
+                    {from ? ` · ${from}` : ""}
+                  </span>
+                  <span className="list-title">{s.title}</span>
+                  {s.why ? <span className="meta">{s.why}</span> : null}
+                </div>
+                <span className="row">
+                  <button type="button" className="secondary small" disabled={!data.configured} onClick={() => onPick(s)} aria-label={t(`Map “${s.title}”`, `Cartographier « ${s.title} »`, `„${s.title}“ kartieren`)}>
+                    <Icon name="compass" size={16} /> {t("Map it", "Cartographier", "Kartieren")}
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={t(`Set “${s.title}” aside`, `Écarter « ${s.title} »`, `„${s.title}“ beiseitelegen`)}
+                    onClick={() => void dismissSuggestion(s.title).then(() => setN((x) => x + 1))}
+                  >
+                    <Icon name="x" size={16} />
+                  </button>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      {data.stale ? <p className="meta">{t("Your courses changed since these were suggested.", "Vos cours ont changé depuis ces suggestions.", "Ihre Kurse haben sich seit diesen Vorschlägen geändert.")}</p> : null}
+      <div className="row">
+        {askButton(data.items.length ? t("Suggest others", "En suggérer d'autres", "Andere vorschlagen") : t("Suggest topics from my courses", "Suggérer des sujets d'après mes cours", "Themen aus meinen Kursen vorschlagen"))}
+      </div>
+      {data.configured ? (
+        <p className="meta">
+          {t(
+            `Your course and topic titles, their concepts' names and how well you know them are sent to ${data.to}. Nothing is searched until you map one.`,
+            `Les titres de vos cours et sujets, les noms de leurs notions et votre maîtrise sont envoyés à ${data.to}. Rien n'est cherché tant que vous n'en cartographiez pas un.`,
+            `Die Titel Ihrer Kurse und Themen, die Namen ihrer Begriffe und wie gut Sie sie kennen, werden an ${data.to} gesendet. Gesucht wird erst, wenn Sie eines kartieren.`,
+          )}
+        </p>
+      ) : null}
+      {error ? <Notice kind="error">{error}</Notice> : null}
+    </div>
+  );
+}
+
+function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget; ctx?: DiscoverContext; compact?: boolean; start?: Start }) {
   const { t, lang } = useLang();
   const fixed = intentOf(target);
   const [draft] = useState(() => loadDraft(target));
@@ -139,22 +255,36 @@ function DiscoverFlow({ target, ctx, compact }: { target: DiscoverTarget; ctx?: 
     [],
   );
   const courses = useLive(async () => (await list("courses")).sort((a, b) => b.updatedAt - a.updatedAt), ["courses"], []);
+  const targetOf = (where: string): DiscoverTarget => (fixed === "map" && where ? { courseId: where } : target);
+  // A suggestion picked: a topic of its own, or, for what a course lacks, into that course.
+  useEffect(() => {
+    if (!start || busy) return;
+    const s = start.suggestion;
+    const from = courses?.find((c) => c.id === s.courseId);
+    const goal = !from ? input.goal : s.kind === "prerequisite" ? t(`What “${from.title}” needs first`, `Ce dont « ${from.title} » a besoin d'abord`, `Was „${from.title}“ zuerst braucht`) : t(`Go further after “${from.title}”`, `Aller plus loin après « ${from.title} »`, `Weiter nach „${from.title}“`);
+    const next: DiscoverInput = { ...input, kind: "topic", topic: s.title, level: s.level, goal, language: from?.language ?? input.language };
+    const where = s.kind === "prerequisite" && from ? from.id : "";
+    setInput(next);
+    setInto(where);
+    void run(next, where);
+  }, [start?.n]);
   if (!ai || !courses) return <div aria-busy="true" />;
 
-  const effective: DiscoverTarget = fixed === "map" && into ? { courseId: into } : target;
+  const effective = targetOf(into);
   const intent = intentOf(effective);
   const destination: Course | undefined = course ?? courses.find((c) => c.id === into);
   const seed = seedText(input.kind, t);
   const needsText = intent === "map" || intent === "extend";
   const blocked = !ai.configured || (needsText && !input.topic.trim()) || (intent === "refresh" && !ai.web) || busy !== "";
 
-  const run = async () => {
+  async function run(what = input, where = into) {
     setError("");
     setInterrupted(false);
+    setMap(null);
     setBusy("mapping");
     abort.current = new AbortController();
     try {
-      const m = await discover(input, effective, { signal: abort.current.signal });
+      const m = await discover(what, targetOf(where), { signal: abort.current.signal });
       setMap(m);
       setChosen(new Set(m.proposals.flatMap((p, i) => (p.suggested ? [i] : []))));
       setConcepts(new Set(m.concepts.flatMap((c, i) => (c.match ? [] : [i]))));
@@ -163,7 +293,7 @@ function DiscoverFlow({ target, ctx, compact }: { target: DiscoverTarget; ctx?: 
     } finally {
       setBusy("");
     }
-  };
+  }
 
   const create = async () => {
     if (!map) return;

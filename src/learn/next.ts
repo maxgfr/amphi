@@ -4,7 +4,7 @@
 import { list } from "../data/db.ts";
 import type { Course, Id } from "../data/schema.ts";
 
-export type StepKind = "setup-ai" | "create-course" | "transcribe" | "summarize-lesson" | "exam-soon" | "review-concept";
+export type StepKind = "setup-ai" | "create-course" | "transcribe" | "summarize-lesson" | "exam-soon" | "review-concept" | "next-lesson";
 
 export interface Step {
   kind: StepKind;
@@ -45,9 +45,9 @@ export async function nextSteps(configured: boolean, now = Date.now()): Promise<
     const days = daysUntil(c.examDate, now);
     if (days >= 0 && days <= 21) steps.push({ kind: "exam-soon", courseId: c.id, title: c.title, days, weight: 95 - 2 * days });
   }
-  // Recent lessons with sources and nothing made from them yet.
+  // Recent lessons with sources and nothing made from them yet; a learning path's lessons have their own step.
   for (const l of lessons) {
-    if (now - l.createdAt > 14 * DAY || !byCourse.has(l.courseId)) continue;
+    if (now - l.createdAt > 14 * DAY || !byCourse.has(l.courseId) || l.conceptIds?.length) continue;
     const has = sources.some((s) => s.lessonId === l.id && s.status === "ready");
     const made = artifacts.some((a) => a.lessonId === l.id);
     if (has && !made) steps.push({ kind: "summarize-lesson", courseId: l.courseId, lessonId: l.id, title: l.title, weight: 60 - (now - l.createdAt) / DAY });

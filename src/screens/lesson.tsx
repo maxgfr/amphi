@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { get, list, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
-import { useLang } from "../i18n.ts";
+import { colon, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
@@ -22,9 +22,10 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
       if (!lesson) return null;
       const course = await get("courses", lesson.courseId);
       const sources = (await list("sources", "lessonId", id)).sort((a, b) => a.createdAt - b.createdAt);
-      return { lesson, course, sources };
+      const concepts = lesson.conceptIds?.length ? (await list("concepts", "courseId", lesson.courseId)).filter((c) => lesson.conceptIds!.includes(c.id)).sort((a, b) => a.order - b.order) : [];
+      return { lesson, course, sources, concepts };
     },
-    ["lessons", "courses", "sources"],
+    ["lessons", "courses", "sources", "concepts"],
     [id],
   );
   useOpenCourse(data?.course?.id);
@@ -37,7 +38,7 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
         </Empty>
       </div>
     );
-  const { lesson, course, sources } = data;
+  const { lesson, course, sources, concepts } = data;
   const current: Tab = (["sources", "studio", "chat"] as const).includes(tab as Tab) ? (tab as Tab) : "sources";
   return (
     <div className="page" data-hue={courseHue(course)}>
@@ -75,6 +76,18 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
             </button>
           </div>
         </div>
+        {lesson.goal ? <p className="divider-lead">{lesson.goal}</p> : null}
+        {concepts.length ? (
+          <p className="divider-facts">
+            {colon(t("Concepts", "Notions", "Begriffe"))}{" "}
+            {concepts.map((c, i) => (
+              <span key={c.id}>
+                {i ? ", " : ""}
+                <a href={href.course(course.id, "progress")}>{c.title}</a>
+              </span>
+            ))}
+          </p>
+        ) : null}
         <Tabs
           tabs={[
             { id: "sources", label: t("Sources", "Sources", "Quellen"), icon: "file", count: sources.length },

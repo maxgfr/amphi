@@ -44,6 +44,7 @@ const DIG = {
 };
 
 function reply(c: { system: string; last: string }): string {
+  if (c.system.includes("You plan a path of lessons")) return JSON.stringify({ lessons: [{ title: "What energy is", goal: "Say what energy is.", concepts: ["Energy"], sources: [1] }, { title: "Disorder and the second law", concepts: ["Entropy", "The second law"] }] });
   if (c.system.includes("You suggest what a student could learn next")) return JSON.stringify({ suggestions: [{ title: "Statistical mechanics", kind: "further", why: "Where entropy comes from.", level: "intermediate", from: 1 }] });
   if (c.system.includes("You map a topic") && c.system.includes("sub-concepts")) return JSON.stringify(DIG);
   if (c.system.includes("You map a topic")) return JSON.stringify(PLAN);
@@ -202,6 +203,33 @@ test("Today suggests topics from the courses, only when asked, keeps them, and m
   await expect(today.getByRole("heading", { name: "Thermodynamics", level: 3 })).toBeVisible();
   expect(calls.at(-1)!.last).toContain("Topic: Statistical mechanics");
   expect(calls.at(-1)!.last).toContain("Their goal, in their own words: Go further after “Thermodynamics”");
+  await w.assertClean();
+});
+
+test("a topic's concepts become a path of lessons, and Today points to the next one", async ({ page }) => {
+  const w = await watch(page);
+  const calls = await mockAi(page, reply);
+  await setUpAi(page);
+  await page.goto(`${siteURL}#/discover`);
+  await page.getByLabel("Topic").fill("Thermodynamics");
+  await page.getByRole("button", { name: "Map the topic" }).click();
+  await page.getByRole("checkbox", { name: /Fermi, Thermodynamics/ }).check();
+  await page.getByRole("button", { name: "Create the topic" }).click();
+  await page.getByRole("tab", { name: "Progress" }).click();
+  const path = page.getByRole("region", { name: "Learning path" });
+  await expect(path.getByText("The topic's title, its concepts and the beginning of its sources go to 127.0.0.1:9.")).toBeVisible();
+  await path.getByRole("button", { name: "Turn the concepts into lessons" }).click();
+  await expect(path.getByText("Concepts: Entropy, The second law")).toBeVisible();
+  expect(calls.at(-1)!.last).toContain("[1] Fermi, Thermodynamics");
+  await path.getByRole("button", { name: "Create 2 lessons" }).click();
+
+  await expect(page.getByRole("tab", { name: /Lessons/ })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("link", { name: /What energy is/ }).click();
+  await expect(page.getByText("Say what energy is.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Energy", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Fermi, Thermodynamics/ })).toBeVisible();
+  await page.goto(siteURL);
+  await expect(page.getByText("Next in your path: “What energy is”.")).toBeVisible();
   await w.assertClean();
 });
 

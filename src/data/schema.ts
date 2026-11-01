@@ -48,6 +48,9 @@ export interface Lesson extends Base {
   /** YYYY-MM-DD. */
   date?: string;
   order: number;
+  /** A lesson of a learning path (Progress): the concepts it teaches, and what the student can do after it. */
+  conceptIds?: Id[];
+  goal?: string;
 }
 
 export interface SourcePage {

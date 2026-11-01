@@ -38,6 +38,8 @@ function describe(s: Step, t: T): { icon: IconName; text: string; action: string
       };
     case "summarize-lesson":
       return { icon: "report", text: t(`“${s.title}” has sources but nothing made from them yet.`, `« ${s.title} » a des sources mais rien n'en a encore été tiré.`, `„${s.title}“ hat Quellen, aber noch nichts daraus erstellt.`), action: t("Make a summary", "Faire un résumé", "Zusammenfassung erstellen"), to: href.lesson(s.lessonId!, "studio") };
+    case "next-lesson":
+      return { icon: "layers", text: t(`Next in your path: “${s.title}”.`, `Suite de votre parcours : « ${s.title} ».`, `Als Nächstes auf Ihrem Pfad: „${s.title}“.`), action: t("Open the lesson", "Ouvrir la séance", "Sitzung öffnen"), to: href.lesson(s.lessonId!) };
     case "review-concept":
       return { icon: "target", text: t(`Review “${s.title}”: it is still shaky.`, `Revoyez « ${s.title} » : c'est encore fragile.`, `Wiederholen Sie „${s.title}“: Es sitzt noch nicht.`), action: t("Review", "Revoir", "Wiederholen"), to: href.course(s.courseId!, "progress") };
   }

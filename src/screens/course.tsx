@@ -43,9 +43,11 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
       </div>
     );
   const { course, lessons, sources } = data;
-  const current: Tab = (["lessons", "sources", "studio", "chat", "progress"] as const).includes(tab as Tab) ? (tab as Tab) : course.kind === "topic" ? "sources" : "lessons";
+  // A topic shows lessons once it has a learning path.
+  const withLessons = course.kind === "course" || lessons.length > 0;
+  const current: Tab = (["lessons", "sources", "studio", "chat", "progress"] as const).includes(tab as Tab) ? (tab as Tab) : withLessons ? "lessons" : "sources";
   const tabs = [
-    ...(course.kind === "course" ? [{ id: "lessons" as const, label: t("Lessons", "Séances", "Sitzungen"), icon: "layers" as const, count: lessons.length }] : []),
+    ...(withLessons ? [{ id: "lessons" as const, label: t("Lessons", "Séances", "Sitzungen"), icon: "layers" as const, count: lessons.length }] : []),
     { id: "sources" as const, label: t("Sources", "Sources", "Quellen"), icon: "file" as const, count: sources.length },
     { id: "studio" as const, label: t("Studio", "Studio", "Studio"), icon: "sparkle" as const },
     { id: "chat" as const, label: t("Chat", "Chat", "Chat"), icon: "chat" as const },
@@ -122,7 +124,11 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
                       <a className="list-link" href={href.lesson(l.id)}>
                         <span className="list-main">
                           <span className="list-title">{l.title}</span>
-                          <span className="meta">{count(n, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])}</span>
+                          {l.goal ? <span className="meta">{l.goal}</span> : null}
+                          <span className="meta">
+                            {l.conceptIds?.length ? `${count(l.conceptIds.length, ["concept", "concepts"], ["notion", "notions"], ["Begriff", "Begriffe"])} · ` : ""}
+                            {count(n, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])}
+                          </span>
                         </span>
                         {l.date ? <span className="list-end">{dateOnly(new Date(l.date).getTime())}</span> : null}
                         <Icon name="chevron-right" />

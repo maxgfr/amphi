@@ -10,7 +10,7 @@ import { fresh, get, list, put, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Artifact, Concept, Course, Id, Source } from "../data/schema.ts";
 import { colon, count, currentLang, dateOnly, relative, useLang } from "../i18n.ts";
-import { href } from "../router.ts";
+import { go, href } from "../router.ts";
 import { hasText } from "../studio/panel.tsx";
 import type { QuizData } from "../studio/quiz-core.ts";
 import { openCitation } from "../ui/cite.ts";
@@ -20,6 +20,7 @@ import { moveToTrash } from "../ui/trash.ts";
 import { Markdown } from "../ui/markdown.tsx";
 import { generateConcepts } from "./concepts.ts";
 import { daysUntil } from "./next.ts";
+import { applyPath, pathBasis, type PlannedLesson, planPath } from "./path.ts";
 import { type Mastery, masteryByConcept } from "./progress.ts";
 import { endTutorSession, hasStudentTurn, type SessionEnd, tutorChat, tutorSystem } from "./tutor.ts";
 
@@ -90,6 +91,7 @@ export function ProgressPanel({ courseId }: { courseId: Id }) {
         <FindConcepts course={course} sources={sources} configured={configured} />
       )}
       {error ? <Notice kind="error">{error}</Notice> : null}
+      {course.kind === "topic" && concepts.length ? <PathPlanner course={course} configured={configured} /> : null}
       <AddConcept courseId={courseId} next={(concepts.at(-1)?.order ?? 0) + 1} />
       <h2 className="section-title">{t("Quizzes", "Quiz", "Quizze")}</h2>
       {quizzes.length ? (
@@ -137,6 +139,87 @@ export function ProgressPanel({ courseId }: { courseId: Id }) {
       ) : (
         <p className="meta">{t("Nothing made yet.", "Rien de réalisé pour l'instant.", "Noch nichts erstellt.")}</p>
       )}
+    </section>
+  );
+}
+
+/** A topic's concepts made into lessons: planned, shown, then created. */
+function PathPlanner({ course, configured }: { course: Course; configured: boolean }) {
+  const { t } = useLang();
+  const [plan, setPlan] = useState<PlannedLesson[] | null>(null);
+  const [busy, setBusy] = useState<"" | "planning" | "creating">("");
+  const [error, setError] = useState("");
+  const abort = useRef<AbortController | null>(null);
+  useEffect(() => () => abort.current?.abort(), []);
+  const basis = useLive(() => pathBasis(course.id), ["concepts", "sources", "lessons"], [course.id]);
+  if (!basis || (!basis.concepts.length && !plan)) return null;
+  const nameOf = (id: Id) => basis.concepts.find((c) => c.id === id)?.title ?? "";
+  const sourceOf = (id: Id) => basis.sources.find((s) => s.id === id)?.title ?? "";
+  const n = count(basis.concepts.length, ["concept", "concepts"], ["notion", "notions"], ["Begriff", "Begriffe"]);
+  const run = async () => {
+    setBusy("planning");
+    setError("");
+    abort.current = new AbortController();
+    try {
+      setPlan(await planPath(course, { signal: abort.current.signal }));
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy("");
+    }
+  };
+  const create = async () => {
+    if (!plan) return;
+    setBusy("creating");
+    await applyPath(course.id, plan);
+    go(href.course(course.id, "lessons"));
+  };
+  return (
+    <section className="path-planner stack" aria-labelledby="path-title">
+      <h2 className="section-title" id="path-title">
+        {t("Learning path", "Parcours", "Lernpfad")}
+      </h2>
+      <p className="meta">
+        {basis.lessons.length
+          ? t(`${n} are in no lesson yet: plan lessons for them, after those the topic has.`, `${n} ne sont encore dans aucune séance : planifiez-leur des séances, après celles du sujet.`, `${n} sind noch in keiner Sitzung: Planen Sie Sitzungen dafür, nach den vorhandenen.`)
+          : t("Turn the concepts into a few lessons to follow one by one, each with the sources to read for it.", "Transformez les notions en quelques séances à suivre une à une, chacune avec les sources à lire.", "Machen Sie aus den Begriffen einige Sitzungen, eine nach der anderen, jede mit den Quellen dazu.")}
+      </p>
+      {plan ? (
+        plan.length ? (
+          <ol className="path-plan">
+            {plan.map((l) => (
+              <li key={l.title}>
+                <strong>{l.title}</strong>
+                {l.goal ? <p className="meta">{l.goal}</p> : null}
+                <p className="meta">
+                  {colon(t("Concepts", "Notions", "Begriffe"))} {l.conceptIds.map(nameOf).join(", ") || "—"}
+                  {l.sourceIds.length ? ` · ${colon(t("Sources", "Sources", "Quellen"))} ${l.sourceIds.map(sourceOf).join(", ")}` : ""}
+                </p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="meta">{t("Nothing to plan.", "Rien à planifier.", "Nichts zu planen.")}</p>
+        )
+      ) : configured ? (
+        <p className="meta">{t(`The topic's title, its concepts and the beginning of its sources go to ${recipient()}.`, `Le titre du sujet, ses notions et le début de ses sources vont à ${recipient()}.`, `Der Titel des Themas, seine Begriffe und der Anfang seiner Quellen gehen an ${recipient()}.`)}</p>
+      ) : null}
+      <div className="row">
+        {plan?.length ? (
+          <button type="button" className="primary" disabled={busy !== ""} onClick={() => void create()}>
+            <Icon name="layers" size={18} /> {t(`Create ${count(plan.length, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])}`, `Créer ${count(plan.length, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])}`, `${count(plan.length, ["lesson", "lessons"], ["séance", "séances"], ["Sitzung", "Sitzungen"])} erstellen`)}
+          </button>
+        ) : null}
+        <button type="button" className={plan ? "secondary" : "primary"} disabled={!configured || busy !== ""} onClick={() => void run()}>
+          <Icon name="sparkle" size={18} /> {busy === "planning" ? t("Planning…", "Planification…", "Wird geplant…") : plan ? t("Plan again", "Replanifier", "Neu planen") : t("Turn the concepts into lessons", "Transformer les notions en séances", "Begriffe in Sitzungen verwandeln")}
+        </button>
+        {plan ? (
+          <button type="button" className="link" disabled={busy !== ""} onClick={() => setPlan(null)}>
+            {t("Cancel", "Annuler", "Abbrechen")}
+          </button>
+        ) : null}
+      </div>
+      {error ? <Notice kind="error">{error}</Notice> : null}
     </section>
   );
 }

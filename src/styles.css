@@ -3351,6 +3351,9 @@ fieldset:disabled .quiz-choice {
   margin-block-end: 0;
 }
 .discover-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   padding: var(--space-4);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -3363,6 +3366,11 @@ fieldset:disabled .quiz-choice {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+/* Four choices: they wrap on a phone rather than scroll out of sight. */
+.discover-seed .segmented {
+  flex-wrap: wrap;
 }
 .suggestions > .section-title,
 .suggestions > p {

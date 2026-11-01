@@ -142,10 +142,11 @@ export async function loadDemo(lang: string, now = Date.now()): Promise<Course> 
   const scores = [1, 0.75, 0.2, 0.5];
   for (const [i, c] of concepts.entries()) for (const k of [0, 1]) await put("events", { ...fresh(now - (k + 1) * DAY), courseId: course.id, conceptId: c.id, kind: "self", score: scores[i]!, at: now - (k + 1) * DAY });
   const sourceIds: Id[] = sources.map((s) => s.id);
-  const made = (type: Artifact["type"], title: string, data: unknown): Artifact => ({ ...fresh(now), courseId: course.id, type, title: `${title} · ${m.course}`, sourceIds, options: {}, language, data, status: "ready", version: 1 });
-  await put("artifacts", made("report", m.words.summary, { format: "summary", markdown: m.summary } satisfies ReportData));
+  const made = (type: Artifact["type"], title: string, data: unknown, lessonId?: Id): Artifact => ({ ...fresh(now), courseId: course.id, lessonId, type, title: `${title} · ${m.course}`, sourceIds, options: {}, language, data, status: "ready", version: 1 });
+  // Made from each lesson, so Today does not ask for them again.
+  await put("artifacts", made("report", m.words.summary, { format: "summary", markdown: m.summary } satisfies ReportData, lessons[0]!.id));
   await put("artifacts", made("quiz", m.words.quiz, { questions: m.quiz } satisfies QuizData));
-  await put("artifacts", made("flashcards", m.words.cards, { cards: m.cards } satisfies FlashcardsData));
+  await put("artifacts", made("flashcards", m.words.cards, { cards: m.cards } satisfies FlashcardsData, lessons[1]!.id));
   await put("artifacts", { ...made("mindmap", m.words.map, { root: conceptTree(m.course, concepts) } satisfies MindmapData), sourceIds: [] });
   const junk = await put("sources", { ...fresh(now), courseId: course.id, kind: "text", title: m.trashed[0], text: m.trashed[1], status: "ready" });
   await trash("sources", junk.id, now - 3 * DAY);

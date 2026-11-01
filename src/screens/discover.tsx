@@ -421,7 +421,9 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
         >
           {needsText ? (
             <>
-              <Segmented options={SEED_KINDS.map((k) => ({ id: k, label: seedText(k, t).tab }))} value={input.kind} onChange={(k) => set("kind", k)} label={t("What you bring", "Ce que vous apportez", "Was Sie mitbringen")} />
+              <div className="discover-seed">
+                <Segmented options={SEED_KINDS.map((k) => ({ id: k, label: seedText(k, t).tab }))} value={input.kind} onChange={(k) => set("kind", k)} label={t("What you bring", "Ce que vous apportez", "Was Sie mitbringen")} />
+              </div>
               <Field label={seed.label}>
                 <input value={input.topic} required maxLength={500} onChange={(e) => set("topic", e.currentTarget.value)} placeholder={seed.placeholder} />
               </Field>

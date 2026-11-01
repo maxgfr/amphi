@@ -12,7 +12,8 @@ export type Route =
   | { page: "source"; id: string; at?: { page?: number; t?: number } }
   | { page: "artifact"; id: string }
   | { page: "record"; courseId: string; lessonId?: string }
-  | { page: "settings"; section?: string };
+  | { page: "settings"; section?: string }
+  | { page: "trash" };
 
 export function parse(hash: string): Route {
   const [path = "", query = ""] = hash.replace(/^#\/?/, "").split("?");
@@ -21,6 +22,7 @@ export function parse(hash: string): Route {
   switch (a) {
     case "courses":
     case "discover":
+    case "trash":
       return { page: a };
     case "c":
       return b ? { page: "course", id: b, tab: c } : { page: "courses" };
@@ -50,6 +52,7 @@ export const href = {
   artifact: (id: string) => `#/a/${encodeURIComponent(id)}`,
   record: (courseId: string, lessonId?: string) => `#/record/${encodeURIComponent(courseId)}${lessonId ? `/${encodeURIComponent(lessonId)}` : ""}`,
   settings: (section?: string) => `#/settings${section ? `/${section}` : ""}`,
+  trash: () => "#/trash",
 };
 
 export const go = (h: string) => {

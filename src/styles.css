@@ -1429,6 +1429,26 @@ textarea {
 .list-link:focus-visible {
   outline-offset: -2px;
 }
+.trash-entry {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+.trash-entry > .icon {
+  color: var(--muted);
+}
+.trash-link {
+  margin-block-start: var(--space-6);
+}
+.trash-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--muted);
+}
 .list-main {
   flex: 1;
   min-width: 0;
@@ -2027,7 +2047,9 @@ textarea {
   inset-inline: 0;
   inset-block-end: var(--space-5);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
   padding-inline: var(--space-4);
   pointer-events: none;
 }
@@ -2054,6 +2076,10 @@ textarea {
 .toast .link {
   color: var(--bg);
   opacity: 0.85;
+}
+.toast .icon-button,
+.toast .icon-button:hover:not(:disabled) {
+  color: var(--bg);
 }
 @media (min-width: 761px) {
   .toast-region {

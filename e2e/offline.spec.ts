@@ -88,6 +88,7 @@ test("after a first visit, every screen, the Studio's views and its exports work
     [`${siteURL}#/`, "Today"],
     [`${siteURL}#/courses`, "Courses"],
     [`${siteURL}#/discover`, "Discover a topic"],
+    [`${siteURL}#/trash`, "Trash"],
     [course, "Thermodynamics"],
     [`${course}/sources`, "Thermodynamics"],
     [`${course}/progress`, "Thermodynamics"],

@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { loadLlm, recipient, savedSettings } from "../ai/llm.ts";
 import { ChatPanel } from "../chat/panel.tsx";
-import { fresh, get, list, put, remove, update } from "../data/db.ts";
+import { fresh, get, list, put, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Artifact, Concept, Course, Id, Source } from "../data/schema.ts";
 import { colon, count, currentLang, dateOnly, relative, useLang } from "../i18n.ts";
@@ -16,6 +16,7 @@ import type { QuizData } from "../studio/quiz-core.ts";
 import { openCitation } from "../ui/cite.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 import { Markdown } from "../ui/markdown.tsx";
 import { generateConcepts } from "./concepts.ts";
 import { daysUntil } from "./next.ts";
@@ -221,7 +222,6 @@ const SELF: { score: number; label: (t: ReturnType<typeof useLang>["t"]) => stri
 function ConceptItem({ concept: c, index, concepts, mastery, sources, configured, onTutor }: { concept: Concept; index: number; concepts: Concept[]; mastery: Mastery; sources: Source[]; configured: boolean; onTutor: () => void }) {
   const { t } = useLang();
   const [renaming, setRenaming] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const after = c.prerequisites.map((id) => concepts.find((x) => x.id === id)?.title).filter((x) => x !== undefined);
   const sourceIds = sources.map((s) => s.id);
   const move = async (delta: -1 | 1) => {
@@ -296,15 +296,9 @@ function ConceptItem({ concept: c, index, concepts, mastery, sources, configured
           <button type="button" className="icon-button move-down" disabled={index === concepts.length - 1} aria-label={t(`Move “${c.title}” down`, `Descendre « ${c.title} »`, `„${c.title}“ nach unten`)} onClick={() => void move(1)}>
             <Icon name="chevron-right" size={16} />
           </button>
-          {confirmDelete ? (
-            <button type="button" className="danger small" onClick={() => void remove("concepts", c.id)}>
-              {t("Delete", "Supprimer", "Löschen")}
-            </button>
-          ) : (
-            <button type="button" className="icon-button" aria-label={t(`Delete “${c.title}”`, `Supprimer « ${c.title} »`, `„${c.title}“ löschen`)} onClick={() => setConfirmDelete(true)}>
-              <Icon name="trash" size={16} />
-            </button>
-          )}
+          <button type="button" className="icon-button" aria-label={t(`Delete “${c.title}”`, `Supprimer « ${c.title} »`, `„${c.title}“ löschen`)} onClick={() => void moveToTrash("concepts", c.id, c.title)}>
+            <Icon name="trash" size={16} />
+          </button>
         </span>
       </div>
     </li>

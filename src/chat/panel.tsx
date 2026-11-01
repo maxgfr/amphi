@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { loadLlm, recipient, savedSettings } from "../ai/llm.ts";
-import { fresh, get, list, put, remove } from "../data/db.ts";
+import { fresh, get, list, put } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Chat, Id, Source } from "../data/schema.ts";
 import { count, currentLang, relative, useLang } from "../i18n.ts";
@@ -13,6 +13,7 @@ import { hasText } from "../studio/panel.tsx";
 import { openCitation } from "../ui/cite.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 import { Markdown } from "../ui/markdown.tsx";
 import { answer, needsSummary, summarizeChat } from "./chat.ts";
 
@@ -75,7 +76,7 @@ export function ChatPanel({ courseId, lessonId, chatId, extraSystem }: ChatPanel
                   {needsSummary(c) ? <span className="hint">{t("Long exchange: summarise it to keep what you learned.", "Échange long : résumez-le pour garder ce que vous avez appris.", "Langes Gespräch: Fassen Sie es zusammen, um das Gelernte zu behalten.")}</span> : null}
                 </span>
               </button>
-              <button type="button" className="icon-button" aria-label={t("Delete", "Supprimer", "Löschen")} onClick={() => void remove("chats", c.id)}>
+              <button type="button" className="icon-button" aria-label={t("Delete", "Supprimer", "Löschen")} onClick={() => void moveToTrash("chats", c.id, c.title)}>
                 <Icon name="trash" size={18} />
               </button>
             </li>

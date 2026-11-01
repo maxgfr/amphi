@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { list } from "../data/db.ts";
+import { list, listTrash } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
-import type { Course } from "../data/schema.ts";
+import { type Course, TABLES } from "../data/schema.ts";
 import { count, dateOnly, type T, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { daysUntil } from "../learn/next.ts";
@@ -80,6 +80,7 @@ export function Courses() {
   const rows = useLive(courseSummaries, ["courses", "lessons", "sources", "artifacts"], []);
   const courses = rows?.filter((r) => r.course.kind === "course") ?? [];
   const topics = rows?.filter((r) => r.course.kind === "topic") ?? [];
+  const trashed = useLive(async () => (await listTrash()).length, TABLES, []);
   return (
     <div className="page">
       <div className="page-head">
@@ -103,6 +104,12 @@ export function Courses() {
           <Binder rows={topics} />
         </>
       ) : null}
+      <p className="trash-link">
+        <a href={href.trash()}>
+          <Icon name="trash" size={16} /> {t("Trash", "Corbeille", "Papierkorb")}
+          {trashed ? ` · ${trashed}` : ""}
+        </a>
+      </p>
       {creating ? <CourseForm open onClose={() => setCreating(false)} onSaved={(c) => go(href.course(c.id))} /> : null}
     </div>
   );

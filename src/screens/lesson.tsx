@@ -1,11 +1,12 @@
-import { lazy, Suspense, useState } from "react";
-import { get, list, removeLesson, update } from "../data/db.ts";
+import { lazy, Suspense } from "react";
+import { get, list, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import { useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Back, Empty, Tabs } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 import { SourceList } from "./sources.tsx";
 
 const StudioPanel = lazy(() => import("../studio/panel.tsx").then((m) => ({ default: m.StudioPanel })));
@@ -15,7 +16,6 @@ type Tab = "sources" | "studio" | "chat";
 
 export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
   const { t } = useLang();
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const data = useLive(
     async () => {
       const lesson = await get("lessons", id);
@@ -70,22 +70,9 @@ export function LessonScreen({ id, tab }: { id: string; tab?: string }) {
               defaultValue={lesson.date}
               onChange={(e) => void update("lessons", id, { date: e.currentTarget.value || undefined })}
             />
-            {confirmDelete ? (
-              <button
-                type="button"
-                className="danger"
-                onClick={async () => {
-                  await removeLesson(id);
-                  go(href.course(course.id));
-                }}
-              >
-                {t("Delete for good", "Supprimer définitivement", "Endgültig löschen")}
-              </button>
-            ) : (
-              <button type="button" className="icon-button" aria-label={t("Delete the lesson", "Supprimer la séance", "Sitzung löschen")} onClick={() => setConfirmDelete(true)}>
-                <Icon name="trash" size={18} />
-              </button>
-            )}
+            <button type="button" className="icon-button" aria-label={t("Delete the lesson", "Supprimer la séance", "Sitzung löschen")} onClick={() => void moveToTrash("lessons", id, lesson.title, { leaveTo: href.course(course.id), backTo: href.lesson(id) })}>
+              <Icon name="trash" size={18} />
+            </button>
           </div>
         </div>
         <Tabs

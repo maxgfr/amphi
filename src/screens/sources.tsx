@@ -2,7 +2,6 @@
 // note, start a recording, and the list with each source's state.
 
 import { useRef, useState } from "react";
-import { remove } from "../data/db.ts";
 import { ACCEPT, addNote, importFile } from "../data/importers.ts";
 import type { Id, Source } from "../data/schema.ts";
 import { bytes, clock, count, useLang } from "../i18n.ts";
@@ -10,6 +9,7 @@ import { href } from "../router.ts";
 import { RecoveryNotice } from "../speech/recovery.tsx";
 import { Icon, type IconName } from "../ui/icons.tsx";
 import { Empty, Field, Notice, Sheet } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 
 export const SOURCE_ICON: Record<Source["kind"], IconName> = { pdf: "file", text: "note", audio: "headphones", video: "video", recording: "mic", web: "globe" };
 
@@ -91,7 +91,7 @@ export function SourceList({ sources, courseId, lessonId }: { sources: Source[];
                   {s.status === "error" ? <span className="error-text">{s.error}</span> : null}
                 </span>
               </a>
-              <button type="button" className="icon-button" aria-label={t(`Delete ${s.title}`, `Supprimer ${s.title}`, `${s.title} löschen`)} onClick={() => void remove("sources", s.id)}>
+              <button type="button" className="icon-button" aria-label={t(`Delete ${s.title}`, `Supprimer ${s.title}`, `${s.title} löschen`)} onClick={() => void moveToTrash("sources", s.id, s.title)}>
                 <Icon name="trash" size={18} />
               </button>
             </li>

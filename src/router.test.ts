@@ -9,5 +9,6 @@ test("routes round-trip through their links", () => {
   expect(parse(href.source("s1", { t: 65.4 }))).toEqual({ page: "source", id: "s1", at: { page: undefined, t: 65 } });
   expect(parse(href.record("c1", "l1"))).toEqual({ page: "record", courseId: "c1", lessonId: "l1" });
   expect(parse(href.settings("sync"))).toEqual({ page: "settings", section: "sync" });
+  expect(parse(href.trash())).toEqual({ page: "trash" });
   expect(parse("#/nowhere")).toEqual({ page: "today" });
 });

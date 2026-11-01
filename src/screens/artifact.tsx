@@ -2,17 +2,18 @@
 // regenerated as a new version, or deleted.
 
 import { useState } from "react";
-import { get, list, remove, update } from "../data/db.ts";
+import { get, list, update } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Artifact } from "../data/schema.ts";
 import { relative, useLang } from "../i18n.ts";
-import { go, href } from "../router.ts";
+import { href } from "../router.ts";
 import { hasText, MakeSheet } from "../studio/panel.tsx";
 import { studioKind } from "../studio/registry.ts";
 import { cancelJob, useJobs } from "../studio/run.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Back, Empty, Notice, ProgressBar, saveFile } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 
 export function ArtifactScreen({ id }: { id: string }) {
   const { t } = useLang();
@@ -80,9 +81,9 @@ export function ArtifactScreen({ id }: { id: string }) {
               type="button"
               className="icon-button"
               aria-label={t("Delete", "Supprimer", "Löschen")}
-              onClick={async () => {
-                await remove("artifacts", id);
-                go(artifact.lessonId ? href.lesson(artifact.lessonId, "studio") : href.course(course.id, "studio"));
+              onClick={() => {
+                cancelJob(id);
+                void moveToTrash("artifacts", id, artifact.title, { leaveTo: artifact.lessonId ? href.lesson(artifact.lessonId, "studio") : href.course(course.id, "studio"), backTo: href.artifact(id) });
               }}
             >
               <Icon name="trash" size={18} />

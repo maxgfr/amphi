@@ -16,11 +16,13 @@ import { SyncBadge } from "./sync/badge.tsx";
 import { CitationSheet } from "./ui/citation-sheet.tsx";
 import { courseHue, useOpenCourseId } from "./ui/hue.ts";
 import { Icon, type IconName } from "./ui/icons.tsx";
+import { dismiss, hold, resume, useToasts } from "./ui/toast.ts";
 
 // Screens that pull in the AI SDK, recorders or exporters load when opened.
 const ArtifactScreen = lazy(() => import("./screens/artifact.tsx").then((m) => ({ default: m.ArtifactScreen })));
 const Settings = lazy(() => import("./screens/settings.tsx").then((m) => ({ default: m.Settings })));
 const Discover = lazy(() => import("./screens/discover.tsx").then((m) => ({ default: m.Discover })));
+const TrashScreen = lazy(() => import("./screens/trash.tsx").then((m) => ({ default: m.TrashScreen })));
 const Record = lazy(() => import("./screens/record.tsx").then((m) => ({ default: m.RecordScreen })));
 
 type Theme = "system" | "light" | "dark";
@@ -45,7 +47,7 @@ function useTheme(): [boolean, () => void] {
 }
 
 const section = (r: Route): string => {
-  if (r.page === "course" || r.page === "lesson" || r.page === "source" || r.page === "artifact" || r.page === "record") return "courses";
+  if (r.page === "course" || r.page === "lesson" || r.page === "source" || r.page === "artifact" || r.page === "record" || r.page === "trash") return "courses";
   return r.page;
 };
 
@@ -69,6 +71,8 @@ function Screen({ route }: { route: Route }): ReactNode {
       return <Record courseId={route.courseId} lessonId={route.lessonId} />;
     case "settings":
       return <Settings section={route.section} />;
+    case "trash":
+      return <TrashScreen />;
   }
 }
 
@@ -137,7 +141,7 @@ export function App() {
         )}
       </main>
       <CitationSheet />
-      <UpdateToast />
+      <ToastRegion />
     </div>
   );
 }
@@ -161,12 +165,38 @@ function RailCourses() {
   );
 }
 
-/** A new version is installed and waiting: it takes over when the student reloads, never under them. */
-function UpdateToast() {
+/**
+ * Messages at the bottom: a deletion to undo, and a new version installed and
+ * waiting, which takes over when the student reloads, never under them.
+ */
+function ToastRegion() {
   const { t } = useLang();
   const waiting = useWaitingUpdate();
+  const toasts = useToasts();
   return (
     <div className="toast-region" aria-live="polite">
+      {toasts.map((x) => (
+        <div key={x.id} className="toast" onPointerEnter={() => hold(x.id)} onPointerLeave={() => resume(x.id)} onFocus={() => hold(x.id)} onBlur={() => resume(x.id)}>
+          <span>{x.text}</span>
+          <span className="toast-actions">
+            {x.action ? (
+              <button
+                type="button"
+                className="primary small"
+                onClick={() => {
+                  dismiss(x.id);
+                  void x.action?.run();
+                }}
+              >
+                {x.action.label}
+              </button>
+            ) : null}
+            <button type="button" className="icon-button" aria-label={t("Close", "Fermer", "Schließen")} onClick={() => dismiss(x.id)}>
+              <Icon name="x" size={16} />
+            </button>
+          </span>
+        </div>
+      ))}
       {waiting ? (
         <div className="toast">
           <span>{t("A new version of amphi is ready.", "Une nouvelle version d'amphi est prête.", "Eine neue Version von amphi ist bereit.")}</span>

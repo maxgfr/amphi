@@ -1,11 +1,12 @@
 import { lazy, Suspense, useState } from "react";
-import { fresh, get, list, put, removeCourse } from "../data/db.ts";
+import { fresh, get, list, put } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import { count, dateOnly, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Empty, Notice, saveFile, Tabs } from "../ui/kit.tsx";
+import { moveToTrash } from "../ui/trash.ts";
 import { CourseForm } from "./course-form.tsx";
 import { examLabel } from "./courses.tsx";
 import { SourceList } from "./sources.tsx";
@@ -19,7 +20,6 @@ type Tab = "lessons" | "sources" | "studio" | "chat" | "progress";
 export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
   const { t } = useLang();
   const [editing, setEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
   useOpenCourse(id);
@@ -92,22 +92,9 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
             <button type="button" className="secondary" onClick={() => setEditing(true)}>
               <Icon name="edit" size={18} /> <span className="btn-label">{t("Edit", "Modifier", "Bearbeiten")}</span>
             </button>
-            {confirmDelete ? (
-              <button
-                type="button"
-                className="danger"
-                onClick={async () => {
-                  await removeCourse(id);
-                  go(href.courses());
-                }}
-              >
-                {t("Delete for good", "Supprimer définitivement", "Endgültig löschen")}
-              </button>
-            ) : (
-              <button type="button" className="icon-button" aria-label={t("Delete the course", "Supprimer le cours", "Kurs löschen")} onClick={() => setConfirmDelete(true)}>
-                <Icon name="trash" size={18} />
-              </button>
-            )}
+            <button type="button" className="icon-button" aria-label={t("Delete the course", "Supprimer le cours", "Kurs löschen")} onClick={() => void moveToTrash("courses", id, course.title, { leaveTo: href.courses(), backTo: href.course(id) })}>
+              <Icon name="trash" size={18} />
+            </button>
           </div>
         </div>
         {sendError ? <Notice kind="error">{sendError}</Notice> : null}

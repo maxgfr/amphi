@@ -32,7 +32,19 @@ const QUIZ = {
   ],
 };
 
+const DIG = {
+  title: "Entropy",
+  overview: "Disorder, counted.",
+  explanation: "Entropy counts the **microstates** that look the same from outside.",
+  concepts: [
+    { title: "Microstates", summary: "The detailed arrangements of a system.", prerequisites: [] },
+    { title: "Energy", summary: "Already there.", prerequisites: [] },
+  ],
+  readings: [{ title: "Ben-Naim, Entropy Demystified", why: "Builds it from microstates.", level: "beginner" }],
+};
+
 function reply(c: { system: string; last: string }): string {
+  if (c.system.includes("You map a topic") && c.system.includes("sub-concepts")) return JSON.stringify(DIG);
   if (c.system.includes("You map a topic")) return JSON.stringify(PLAN);
   if (c.system.includes("concepts a student must master")) return JSON.stringify(CONCEPTS);
   if (c.system.includes("grade a student's short answer")) return JSON.stringify({ verdict: "incorrect", feedback: "No: it never decreases." });
@@ -126,6 +138,48 @@ async function takeQuiz(page: Page) {
   await page.getByRole("button", { name: "See the score" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Score" })).toContainText("Score: 1 / 3");
 }
+
+test("Discover sits in Today, and a concept of the topic is dug into: an explanation and sub-concepts after it", async ({ page }) => {
+  const w = await watch(page);
+  const calls = await mockAi(page, reply);
+  await setUpAi(page);
+  await page.goto(siteURL);
+  // Three places in the navigation: Discover is part of Today.
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link")).toHaveCount(3);
+  const today = page.getByRole("region", { name: "Discover" });
+  await today.getByRole("button", { name: "A question" }).click();
+  await today.getByLabel("Your question").fill("Why does heat flow from hot to cold?");
+  await expect(today.getByText(/Your question, level and goal are sent to 127\.0\.0\.1:9/)).toBeVisible();
+  await today.getByRole("button", { name: "Map the topic" }).click();
+  await expect(today.getByRole("heading", { name: "Thermodynamics", level: 3 })).toBeVisible();
+  expect(calls.at(-1)!.last).toContain("Their question: Why does heat flow from hot to cold?");
+  await today.getByRole("button", { name: "Create the topic" }).click();
+  await expect(page.getByRole("heading", { name: "Thermodynamics", level: 1 })).toBeVisible();
+
+  await page.getByRole("tab", { name: "Progress" }).click();
+  await conceptItem(page, "Entropy").getByRole("link", { name: "Dig into “Entropy”" }).click();
+  await expect(page.getByRole("heading", { name: "Dig into “Entropy”", level: 1 })).toBeVisible();
+  await expect(page.getByText(/The concept “Entropy”, its summary, the title of “Thermodynamics” and its concepts' names/)).toBeVisible();
+  await page.getByRole("button", { name: "Dig deeper" }).click();
+  await expect(page.getByText("microstates", { exact: false }).first()).toBeVisible();
+  const subs = page.getByRole("group", { name: "Sub-concepts" });
+  await expect(subs.getByRole("checkbox", { name: /Microstates/ })).toBeChecked();
+  await expect(subs.getByRole("checkbox", { name: /Energy/ })).not.toBeChecked();
+  await expect(subs.getByText("Already in the course")).toBeVisible();
+  await page.getByRole("button", { name: "Add to “Thermodynamics”" }).click();
+
+  await expect(page.getByRole("tab", { name: "Progress" })).toHaveAttribute("aria-selected", "true");
+  const titles = page.locator(".concept .concept-title");
+  await expect(titles).toHaveText(["Energy", "Entropy", "Microstates", "The second law"]);
+  await expect(conceptItem(page, "Microstates")).toContainText("Builds on: Entropy");
+  await page.getByRole("tab", { name: "Sources" }).click();
+  await expect(page.getByRole("link", { name: /Deeper · Entropy/ })).toBeVisible();
+  // Without web search, new sources cannot be looked for: said, and the button waits.
+  await page.getByRole("link", { name: "Find new sources on the web" }).click();
+  await expect(page.getByText(/new sources need a web search/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Find new sources" })).toBeDisabled();
+  await w.assertClean();
+});
 
 test("progress: concepts from the sources, mastery from a quiz, self-assessment, a tutor session, a review on Today", async ({ page }) => {
   const w = await watch(page);

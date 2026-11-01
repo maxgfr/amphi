@@ -10,5 +10,9 @@ test("routes round-trip through their links", () => {
   expect(parse(href.record("c1", "l1"))).toEqual({ page: "record", courseId: "c1", lessonId: "l1" });
   expect(parse(href.settings("sync"))).toEqual({ page: "settings", section: "sync" });
   expect(parse(href.trash())).toEqual({ page: "trash" });
+  expect(parse(href.discover())).toEqual({ page: "discover" });
+  expect(parse(href.discover({ courseId: "c1" }))).toEqual({ page: "discover", courseId: "c1" });
+  expect(parse(href.discover({ courseId: "c1", conceptId: "k1" }))).toEqual({ page: "discover", courseId: "c1", conceptId: "k1" });
+  expect(parse(href.discover({ courseId: "c1", refresh: true }))).toEqual({ page: "discover", courseId: "c1", refresh: true });
   expect(parse("#/nowhere")).toEqual({ page: "today" });
 });

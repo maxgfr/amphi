@@ -48,6 +48,8 @@ function useTheme(): [boolean, () => void] {
 
 const section = (r: Route): string => {
   if (r.page === "course" || r.page === "lesson" || r.page === "source" || r.page === "artifact" || r.page === "record" || r.page === "trash") return "courses";
+  // Discover lives in Today, unless a course sent the student there.
+  if (r.page === "discover") return r.courseId ? "courses" : "today";
   return r.page;
 };
 
@@ -58,7 +60,7 @@ function Screen({ route }: { route: Route }): ReactNode {
     case "courses":
       return <Courses />;
     case "discover":
-      return <Discover />;
+      return <Discover key={`${route.courseId}/${route.conceptId}/${route.refresh}`} target={{ courseId: route.courseId, conceptId: route.conceptId, refresh: route.refresh }} />;
     case "course":
       return <CourseScreen key={route.id} id={route.id} tab={route.tab} />;
     case "lesson":
@@ -92,7 +94,6 @@ export function App() {
   const nav: { id: string; href: string; icon: IconName; label: string }[] = [
     { id: "today", href: href.today(), icon: "home", label: t("Today", "Aujourd'hui", "Heute") },
     { id: "courses", href: href.courses(), icon: "book", label: t("Courses", "Cours", "Kurse") },
-    { id: "discover", href: href.discover(), icon: "compass", label: t("Discover", "Découvrir", "Entdecken") },
     { id: "settings", href: href.settings(), icon: "settings", label: t("Settings", "Réglages", "Einstellungen") },
   ];
   const current = section(route);

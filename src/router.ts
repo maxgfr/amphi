@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
 export type Route =
   | { page: "today" }
   | { page: "courses" }
-  | { page: "discover" }
+  | { page: "discover"; courseId?: string; conceptId?: string; refresh?: boolean }
   | { page: "course"; id: string; tab?: string }
   | { page: "lesson"; id: string; tab?: string }
   | { page: "source"; id: string; at?: { page?: number; t?: number } }
@@ -21,9 +21,10 @@ export function parse(hash: string): Route {
   const q = new URLSearchParams(query);
   switch (a) {
     case "courses":
-    case "discover":
     case "trash":
       return { page: a };
+    case "discover":
+      return b ? { page: "discover", courseId: b, conceptId: c || undefined, refresh: q.has("refresh") || undefined } : { page: "discover" };
     case "c":
       return b ? { page: "course", id: b, tab: c } : { page: "courses" };
     case "l":
@@ -45,7 +46,8 @@ export function parse(hash: string): Route {
 export const href = {
   today: () => "#/",
   courses: () => "#/courses",
-  discover: () => "#/discover",
+  discover: (t: { courseId?: string; conceptId?: string; refresh?: boolean } = {}) =>
+    `#/discover${t.courseId ? `/${encodeURIComponent(t.courseId)}${t.conceptId ? `/${encodeURIComponent(t.conceptId)}` : ""}` : ""}${t.courseId && t.refresh ? "?refresh" : ""}`,
   course: (id: string, tab?: string) => `#/c/${encodeURIComponent(id)}${tab ? `/${tab}` : ""}`,
   lesson: (id: string, tab?: string) => `#/l/${encodeURIComponent(id)}${tab ? `/${tab}` : ""}`,
   source: (id: string, at?: { page?: number; t?: number }) => `#/s/${encodeURIComponent(id)}${at?.page ? `?p=${at.page}` : at?.t !== undefined ? `?t=${Math.floor(at.t)}` : ""}`,

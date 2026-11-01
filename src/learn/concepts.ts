@@ -7,7 +7,7 @@ import { z } from "zod";
 import { budgetFor, buildContext } from "../ai/context.ts";
 import { capabilities, writeIn } from "../ai/llm.ts";
 import { askJson } from "../ai/structured.ts";
-import { fresh, put } from "../data/db.ts";
+import { fresh, list, put } from "../data/db.ts";
 import type { Concept, Course, Id, Source } from "../data/schema.ts";
 import { currentLang } from "../i18n.ts";
 import { citeLabel, MAX_DEPTH, type MindNode, newNodeId } from "../studio/render/mindmap-tree.ts";
@@ -33,26 +33,46 @@ export const CONCEPTS_SHAPE = `{ "concepts": [ {
   "refs": string[]            // the labels of the passages it comes from, e.g. "S1 p.3"
 } ] }`;
 
-/** Concept records in the given order, the same concept once, prerequisites linked by title to the concepts before. */
-export function conceptRecords(raw: readonly RawConcept[], courseId: Id, now = Date.now()): Concept[] {
+/**
+ * Concept records in the given order, the same concept once, prerequisites
+ * linked by title to the concepts before; `existing` ones (a course adding
+ * concepts) are neither repeated nor forgotten as prerequisites.
+ */
+export function conceptRecords(raw: readonly RawConcept[], courseId: Id, now = Date.now(), existing: readonly Concept[] = []): Concept[] {
   const out: Concept[] = [];
+  const known = [...existing];
   for (const r of raw) {
     const title = r.title.replace(/\s+/g, " ");
-    if (out.some((c) => nameTokens(c.title).join(" ") === nameTokens(title).join(" "))) continue;
+    if (known.some((c) => nameTokens(c.title).join(" ") === nameTokens(title).join(" "))) continue;
     const prerequisites: Id[] = [];
     for (const p of r.prerequisites ?? []) {
       let best: Concept | undefined;
       let score = 0;
-      for (const c of out) {
+      for (const c of known) {
         const s = nameSimilarity(p, c.title);
         if (s > score) [best, score] = [c, s];
       }
       if (best && !prerequisites.includes(best.id)) prerequisites.push(best.id);
     }
     const refs = [...new Set((r.refs ?? []).map((x) => citeLabel(x)).filter((x) => x !== undefined))];
-    out.push({ ...fresh(now), courseId, title, summary: r.summary?.trim() ?? "", order: out.length + 1, prerequisites, refs });
+    const record: Concept = { ...fresh(now), courseId, title, summary: r.summary?.trim() ?? "", order: out.length + 1, prerequisites, refs };
+    out.push(record);
+    known.push(record);
   }
   return out;
+}
+
+/** Add concepts to a course: after `after` (else at the end), as sub-concepts of `parentId` when given; the order is renumbered. */
+export async function insertConcepts(courseId: Id, raw: readonly RawConcept[], o: { after?: Concept; parentId?: Id } = {}): Promise<Concept[]> {
+  const existing = (await list("concepts", "courseId", courseId)).sort((a, b) => a.order - b.order);
+  const added = conceptRecords(raw, courseId, Date.now(), existing);
+  if (o.parentId) for (const c of added) c.parentId = o.parentId;
+  for (const c of added) if (o.parentId && !c.prerequisites.includes(o.parentId)) c.prerequisites.unshift(o.parentId);
+  const after = o.after ? existing.findIndex((c) => c.id === o.after!.id) : -1;
+  const at = after < 0 ? existing.length : after + 1;
+  const all = [...existing.slice(0, at), ...added, ...existing.slice(at)];
+  for (const [i, c] of all.entries()) if (added.includes(c) || c.order !== i + 1) await put("concepts", { ...c, order: i + 1 });
+  return added;
 }
 
 const firstSentence = (s: string) => {

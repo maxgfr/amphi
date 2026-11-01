@@ -72,6 +72,16 @@ export function SourceList({ sources, courseId, lessonId }: { sources: Source[];
         </button>
         <input ref={input} type="file" multiple accept={ACCEPT} hidden onChange={(e) => e.currentTarget.files && void add(e.currentTarget.files)} />
       </div>
+      {lessonId ? null : (
+        <div className="row">
+          <a className="button secondary small" href={href.discover({ courseId, refresh: true })}>
+            <Icon name="globe" size={16} /> {t("Find new sources on the web", "Trouver de nouvelles sources sur le web", "Neue Quellen im Web finden")}
+          </a>
+          <a className="button secondary small" href={href.discover({ courseId })}>
+            <Icon name="compass" size={16} /> {t("Add a topic, a question, a book", "Ajouter un sujet, une question, un livre", "Thema, Frage, Buch hinzufügen")}
+          </a>
+        </div>
+      )}
       <RecoveryNotice courseId={courseId} />
       {busy > 0 ? <p className="meta" role="status">{t("Importing…", "Import…", "Import…")}</p> : null}
       {errors.map((e) => (

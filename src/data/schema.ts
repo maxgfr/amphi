@@ -36,6 +36,10 @@ export interface Course extends Base {
   /** Topics: what the student wants (exam, general knowledge, project) and their level. */
   goal?: string;
   level?: string;
+  /** Topics: what the student started from in Discover (a topic, a question, a work, a skill). */
+  seed?: "topic" | "question" | "work" | "skill";
+  /** When Discover last searched the web for this course's sources. */
+  searchedAt?: number;
 }
 
 export interface Lesson extends Base {
@@ -151,6 +155,8 @@ export interface Concept extends Base {
   summary: string;
   order: number;
   prerequisites: Id[];
+  /** A sub-concept's concept (Discover's "dig deeper"); it is also among its prerequisites. */
+  parentId?: Id;
   /** Citation labels into the sources ("S1 p.3"). */
   refs: string[];
 }

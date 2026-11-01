@@ -286,6 +286,9 @@ function ConceptItem({ concept: c, index, concepts, mastery, sources, configured
         <button type="button" className="secondary small" disabled={!configured} onClick={onTutor}>
           <Icon name="chat" size={16} /> {t("Work on it with the tutor", "Travailler avec le tuteur", "Mit dem Tutor üben")}
         </button>
+        <a className="button secondary small" href={href.discover({ courseId: c.courseId, conceptId: c.id })} aria-label={t(`Dig into “${c.title}”`, `Creuser « ${c.title} »`, `„${c.title}“ vertiefen`)}>
+          <Icon name="compass" size={16} /> {t("Dig deeper", "Creuser", "Vertiefen")}
+        </a>
         <span className="concept-edit">
           <button type="button" className="icon-button" aria-label={t(`Rename “${c.title}”`, `Renommer « ${c.title} »`, `„${c.title}“ umbenennen`)} onClick={() => setRenaming(true)}>
             <Icon name="edit" size={16} />

@@ -1,10 +1,10 @@
 import { beforeEach, expect, test } from "bun:test";
 import { IDBFactory } from "fake-indexeddb";
-import { list, resetDbForTests } from "../data/db.ts";
+import { fresh, get, list, put, resetDbForTests } from "../data/db.ts";
 import type { MindmapData } from "../studio/render/mindmap-tree.ts";
-import { createTopic, type DiscoverDeps, type DiscoverInput, discoverTopic, proposalNote, TopicAnswer, toTopicMap, urlKey } from "./discover.ts";
+import { applyDiscovery, brief, createTopic, type DiscoverDeps, type DiscoverInput, discover, discoverTopic, loadDiscoverContext, proposalNote, TopicAnswer, toTopicMap, urlKey } from "./discover.ts";
 
-const INPUT: DiscoverInput = { topic: "Thermodynamics", level: "beginner", goal: "Pass the June exam", language: "en" };
+const INPUT: DiscoverInput = { kind: "topic", topic: "Thermodynamics", level: "beginner", goal: "Pass the June exam", language: "en" };
 
 const ANSWER = TopicAnswer.parse({
   title: "Thermodynamics",
@@ -118,4 +118,50 @@ test("creating the topic makes the course, the notes, the concepts and a mind ma
   const root = (artifacts[0]!.data as MindmapData).root;
   expect(root.children[0]!.title).toBe("Energy");
   expect(root.children[0]!.children[0]!.title).toBe("Entropy");
+});
+
+test("each seed and intent tells the model what the student brings and what the course has", () => {
+  expect(brief({ ...INPUT, kind: "question", topic: "Why does ice float?" })).toStartWith("Their question: Why does ice float?");
+  const ctx = { course: { id: "c", createdAt: 0, updatedAt: 0, kind: "course" as const, title: "Physics" }, concept: { id: "k", createdAt: 0, updatedAt: 0, courseId: "c", title: "Entropy", summary: "Disorder.", order: 1, prerequisites: [], refs: [] }, concepts: [], urls: new Set(["example.org/a"]) };
+  ctx.concepts = [ctx.concept] as never;
+  expect(brief(INPUT, ctx, "dig")).toContain("Concept to dig into: Entropy\nWhat the student has about it so far: Disorder.");
+  expect(brief(INPUT, ctx, "refresh")).toContain("Pages it already has (never propose them again): example.org/a");
+  expect(brief({ ...INPUT, kind: "skill", topic: "SQL" }, ctx, "extend")).toContain('It goes into their course "Physics", which already covers: Entropy');
+});
+
+test("pages the course has are left out and counted; a given link is kept; known concepts are matched", () => {
+  const known = { urls: new Set(["en.wikipedia.org/wiki/Thermodynamics"]), concepts: [{ id: "k1", createdAt: 0, updatedAt: 0, courseId: "c", title: "Energy", summary: "", order: 1, prerequisites: [], refs: [] }] };
+  const map = toTopicMap(ANSWER, { ...INPUT, kind: "work", topic: "https://example.org/fermi" }, [], true, known);
+  expect(map.skipped).toBe(2);
+  expect(map.proposals.map((p) => [p.url, p.status, p.suggested])).toEqual([
+    ["https://example.org/fermi", "given", true],
+    ["https://example.edu/thermo-101", "unlisted", true],
+  ]);
+  expect(map.concepts.map((c) => c.match)).toEqual(["k1", undefined]);
+});
+
+test("new sources need a search tool; digging asks for an explanation and sub-concepts", async () => {
+  const calls: { system: string; prompt?: string; tools?: unknown }[] = [];
+  await expect(discover(INPUT, { courseId: "c", refresh: true }, { deps: fakeDeps(false, calls), context: { urls: new Set(), concepts: [] } })).rejects.toThrow("web");
+  await discover(INPUT, { courseId: "c", conceptId: "k" }, { deps: fakeDeps(true, calls), context: { urls: new Set(), concepts: [] } });
+  expect(calls.at(-1)!.system).toContain("2 to 6 sub-concepts");
+});
+
+test("a dig adds its explanation, its sub-concepts after the concept and the chosen pages into the course", async () => {
+  const c = await put("courses", { ...fresh(), kind: "course", title: "Physics" });
+  const [energy, work] = await Promise.all([put("concepts", { ...fresh(), courseId: c.id, title: "Energy", summary: "", order: 1, prerequisites: [], refs: [] }), put("concepts", { ...fresh(), courseId: c.id, title: "Work", summary: "", order: 2, prerequisites: [], refs: [] })]);
+  await put("sources", { ...fresh(), courseId: c.id, kind: "web", title: "Old", url: "https://en.wikipedia.org/wiki/Thermodynamics", status: "ready", trashedAt: Date.now() });
+  const target = { courseId: c.id, conceptId: energy.id };
+  const ctx = await loadDiscoverContext(target);
+  const raw = TopicAnswer.parse({ ...ANSWER, explanation: "Energy, *further*.", concepts: [{ title: "Kinetic energy", summary: "Of motion." }, { title: "Energy" }] });
+  const map = toTopicMap(raw, INPUT, [], true, ctx);
+  expect(map.skipped).toBe(2);
+  await applyDiscovery(INPUT, target, map, { proposals: [0], concepts: [0, 1] });
+  const concepts = (await list("concepts", "courseId", c.id)).sort((a, b) => a.order - b.order);
+  expect(concepts.map((x) => x.title)).toEqual(["Energy", "Kinetic energy", "Work"]);
+  expect(concepts[1]).toMatchObject({ parentId: energy.id, prerequisites: [energy.id] });
+  expect(concepts[2]!.id).toBe(work.id);
+  const notes = (await list("sources", "courseId", c.id)).map((s) => s.title).sort();
+  expect(notes).toEqual(["Deeper · Energy", "Made-up course"]);
+  expect((await get("courses", c.id))?.searchedAt).toBeNumber();
 });

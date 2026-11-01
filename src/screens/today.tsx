@@ -1,5 +1,7 @@
-// Today: the one thing to do now, a few more, and the courses.
+// Today: the one thing to do now, a few more, something new to discover, and
+// the courses.
 
+import { lazy, Suspense } from "react";
 import { useLive } from "../data/hooks.ts";
 import { type T, useLang } from "../i18n.ts";
 import { nextSteps, type Step } from "../learn/next.ts";
@@ -9,6 +11,9 @@ import { href } from "../router.ts";
 import { Icon, type IconName } from "../ui/icons.tsx";
 import { courseHue } from "../ui/hue.ts";
 import { Binder, courseSummaries } from "./courses.tsx";
+
+// Discover pulls in the AI SDK: it loads after the rest of Today, out of the shell.
+const DiscoverSection = lazy(() => import("./discover.tsx").then((m) => ({ default: m.DiscoverSection })));
 
 async function configured(): Promise<boolean> {
   const { loadLlm, savedSettings } = await import("../ai/llm.ts");
@@ -96,6 +101,9 @@ export function Today() {
           })}
         </ul>
       ) : null}
+      <Suspense fallback={<div aria-busy="true" />}>
+        <DiscoverSection />
+      </Suspense>
       {data.courses.length ? (
         <>
           <h2 className="section-title">{t("Your courses", "Vos cours", "Ihre Kurse")}</h2>

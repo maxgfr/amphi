@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { fresh, get, list, put } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
-import { count, dateOnly, useLang } from "../i18n.ts";
+import { count, dateOnly, relative, useLang } from "../i18n.ts";
 import { go, href } from "../router.ts";
 import { courseHue, useOpenCourse } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
@@ -99,6 +99,7 @@ export function CourseScreen({ id, tab }: { id: string; tab?: string }) {
         </div>
         {sendError ? <Notice kind="error">{sendError}</Notice> : null}
         {course.examDate ? <p className="divider-facts">{examLabel(course.examDate, t)} · {dateOnly(new Date(course.examDate).getTime())}</p> : null}
+        {course.searchedAt ? <p className="divider-facts">{t(`Sources searched on the web ${relative(course.searchedAt)}`, `Sources cherchées sur le web ${relative(course.searchedAt)}`, `Quellen im Web gesucht ${relative(course.searchedAt)}`)}</p> : null}
         <Tabs tabs={tabs} value={current} onChange={(k) => go(href.course(id, k))} label={t("Course sections", "Sections du cours", "Kursbereiche")} />
       </header>
       <div className="tab-panel" role="tabpanel">

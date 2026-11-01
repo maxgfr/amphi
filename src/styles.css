@@ -3326,8 +3326,32 @@ fieldset:disabled .quiz-choice {
 .discover-options input[list]::-webkit-calendar-picker-indicator {
   opacity: 0.45;
 }
-.discover-result h2 {
+.discover-result h2,
+.discover-result h3 {
   margin-block-end: 0;
+}
+.discover-today {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.discover-today > .section-title,
+.discover-today > p {
+  margin-block-end: 0;
+}
+.discover-flow {
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.discover-flow .disclosure {
+  background: var(--surface-2);
+}
+.discover-explanation {
+  max-width: var(--measure);
+  padding-inline-start: var(--space-4);
+  border-inline-start: 3px solid var(--course, var(--line-strong));
 }
 .discover-concepts {
   margin: 0;

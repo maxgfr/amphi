@@ -17,7 +17,7 @@
         "dompurify": "3.4.17",
         "fflate": "0.8.3",
         "idb": "8.0.4",
-        "llm-connect": "2.6.0",
+        "llm-connect": "2.7.0",
         "llm-models": "1.14.0",
         "marked": "18.1.2",
         "mediabunny": "1.64.0",
@@ -428,7 +428,7 @@
 
     "lie": ["lie@3.3.0", "", { "dependencies": { "immediate": "~3.0.5" } }, "sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ=="],
 
-    "llm-connect": ["llm-connect@2.6.0", "", { "dependencies": { "llm-models": "^1.14.0" }, "peerDependencies": { "@ai-sdk/anthropic": "^4.0.0", "@ai-sdk/google": "^4.0.0", "@ai-sdk/mistral": "^4.0.0", "@ai-sdk/openai": "^4.0.0", "@ai-sdk/openai-compatible": "^3.0.0", "@huggingface/transformers": "^4.0.0", "ai": "^7.0.0", "onnxruntime-web": ">=1.22.0", "react": ">=18" }, "optionalPeers": ["@ai-sdk/anthropic", "@ai-sdk/google", "@ai-sdk/mistral", "@ai-sdk/openai", "@ai-sdk/openai-compatible", "@huggingface/transformers", "ai", "onnxruntime-web", "react"] }, "sha512-vXDowqxOPae/WCdVn27A7/6+vYVGV/CiHqGoMf7eWgXUZoT0UbBfYGoDeew/aJJSlQkgtvl9A77YeEfU9AY8WA=="],
+    "llm-connect": ["llm-connect@2.7.0", "", { "dependencies": { "llm-models": "^1.14.0" }, "peerDependencies": { "@ai-sdk/anthropic": "^4.0.0", "@ai-sdk/google": "^4.0.0", "@ai-sdk/mistral": "^4.0.0", "@ai-sdk/openai": "^4.0.0", "@ai-sdk/openai-compatible": "^3.0.0", "@huggingface/transformers": "^4.0.0", "ai": "^7.0.0", "onnxruntime-web": ">=1.22.0", "react": ">=18" }, "optionalPeers": ["@ai-sdk/anthropic", "@ai-sdk/google", "@ai-sdk/mistral", "@ai-sdk/openai", "@ai-sdk/openai-compatible", "@huggingface/transformers", "ai", "onnxruntime-web", "react"] }, "sha512-sr2/aH2iWBVDdQ83UX/5tZ2OPi2O6I28OqKAWLMcgTaZEhAp6KKAAEL+7Zu7HCt1znX0G+1zByT4zAP6sHl0pA=="],
 
     "llm-models": ["llm-models@1.14.0", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.30.0", "commander": "^15.0.0", "zod": "^4.4.3" }, "bin": { "llm-models": "build/index.js" } }, "sha512-RHK41ceuWrNhmj8oOzvf4DJBJCaUHgy8jwAk2PX0eBv9N37O4W2Fy42WQteBF9CluA5ilm666YvCypVO2S4Yyg=="],
 

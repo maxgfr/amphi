@@ -149,3 +149,18 @@ test("after a first visit, every screen, the Studio's views and its exports work
   await context.setOffline(false);
   await w.assertClean();
 });
+
+test("the service worker never serves what another site of the origin cached", async ({ page }) => {
+  // maxgfr.github.io is shared by every project page: any of them can write a cache named as it likes.
+  await page.goto(siteURL);
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.reload();
+  const answer = await page.evaluate(async () => {
+    const url = new URL("planted.js", location.href).href;
+    await (await caches.open("another-site")).put(url, new Response("planted"));
+    const res = await fetch(url);
+    return { status: res.status, text: await res.text() };
+  });
+  expect(answer.text).not.toBe("planted");
+  expect(answer.status).toBe(404);
+});

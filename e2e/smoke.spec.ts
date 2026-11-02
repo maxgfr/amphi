@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { courseWithNote, mockAi, setUpAi, siteURL, watch } from "./helpers.ts";
+import { courseWithNote, MOCK_AI, mockAi, setUpAi, siteURL, watch } from "./helpers.ts";
 
 test.use({ locale: "en-US" });
 
@@ -71,4 +71,19 @@ test("a report cites its sources, and a chat answer is summarised into a note", 
   await page.getByRole("tab", { name: "Sources" }).click();
   await expect(page.getByRole("link", { name: /Exchange summary/ })).toBeVisible();
   await w.assertClean();
+});
+
+test("when another site of the origin has filled the storage, saving says the settings will not last", async ({ page }) => {
+  // maxgfr.github.io is shared by every project page: their writes count against one quota.
+  await page.addInitScript(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+    };
+  });
+  await page.goto(`${siteURL}#/settings/ai`);
+  await page.getByRole("button", { name: "On my machine" }).click();
+  await page.getByLabel("Server address").fill(MOCK_AI);
+  await page.getByLabel("Model", { exact: true }).fill("mock");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByRole("status")).toHaveText("Storage for this site is full: your change will be lost on reload.");
 });

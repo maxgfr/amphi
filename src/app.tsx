@@ -10,6 +10,7 @@ import { SourceScreen } from "./screens/source.tsx";
 import { Today } from "./screens/today.tsx";
 import { Unlock } from "./screens/unlock.tsx";
 import { loadVault, vault } from "./secrets.ts";
+import { readLocal, writeLocal } from "./storage.ts";
 import { list } from "./data/db.ts";
 import { useLive } from "./data/hooks.ts";
 import { SyncBadge } from "./sync/badge.tsx";
@@ -29,7 +30,7 @@ type Theme = "system" | "light" | "dark";
 const THEME_KEY = "amphi-theme";
 
 function useTheme(): [boolean, () => void] {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(THEME_KEY) as Theme | null) ?? "system");
+  const [theme, setTheme] = useState<Theme>(() => (readLocal(THEME_KEY) as Theme | null) ?? "system");
   const [systemDark, setSystemDark] = useState(() => matchMedia("(prefers-color-scheme: dark)").matches);
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
@@ -40,7 +41,7 @@ function useTheme(): [boolean, () => void] {
   useEffect(() => {
     if (theme === "system") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_KEY, theme);
+    writeLocal(THEME_KEY, theme);
   }, [theme]);
   const dark = theme === "dark" || (theme === "system" && systemDark);
   return [dark, () => setTheme(dark ? "light" : "dark")];

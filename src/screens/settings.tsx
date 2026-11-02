@@ -8,12 +8,21 @@ import { llm, loadLlm, reloadLlm } from "../ai/llm.ts";
 import { getMeta, persist } from "../data/db.ts";
 import { hasDemo, loadDemo, removeDemo } from "../data/demo.ts";
 import { useLive } from "../data/hooks.ts";
-import { bytes, useLang } from "../i18n.ts";
+import { bytes, type T, useLang } from "../i18n.ts";
 import { useOfflineReady } from "../pwa.ts";
 import { go, href } from "../router.ts";
 import { protectWithPassphrase, removePassphrase, vaultMode } from "../secrets.ts";
+import { StorageFullError } from "../storage.ts";
 import { Icon } from "../ui/icons.tsx";
 import { Field, Notice, Tabs } from "../ui/kit.tsx";
+
+// The origin is shared by every project page of maxgfr.github.io: another site can fill its storage.
+const storageFull = (t: T) =>
+  t(
+    "Storage for this site is full: your change will be lost on reload.",
+    "Le stockage de ce site est plein : votre modification sera perdue au rechargement.",
+    "Der Speicher dieser Website ist voll: Ihre Änderung geht beim Neuladen verloren.",
+  );
 
 const SyncSettings = lazy(() => import("../sync/settings.tsx").then((m) => ({ default: m.SyncSettings })));
 const VoiceSettings = lazy(() => import("../voice/settings.tsx").then((m) => ({ default: m.VoiceSettings })));
@@ -206,7 +215,9 @@ function AiSettings() {
             const r = await llm.save();
             setStatus(
               r.ok
-                ? t("Saved.", "Enregistré.", "Gespeichert.")
+                ? r.persisted
+                  ? t("Saved.", "Enregistré.", "Gespeichert.")
+                  : storageFull(t)
                 : r.reason === "insecure-endpoint"
                   ? t("Use https, or http only on this machine (localhost).", "Utilisez https, ou http seulement sur cette machine (localhost).", "Verwenden Sie https oder http nur auf diesem Rechner (localhost).")
                   : t("Some settings are missing or invalid.", "Des réglages manquent ou sont invalides.", "Einige Einstellungen fehlen oder sind ungültig."),
@@ -252,7 +263,12 @@ function KeySettings() {
           onSubmit={async (e) => {
             e.preventDefault();
             if (pass !== again) return setStatus(t("The two passphrases differ.", "Les deux phrases de passe diffèrent.", "Die beiden Passphrasen unterscheiden sich."));
-            await protectWithPassphrase(pass);
+            try {
+              await protectWithPassphrase(pass);
+            } catch (err) {
+              if (err instanceof StorageFullError) return setStatus(storageFull(t));
+              throw err;
+            }
             location.reload();
           }}
         >
@@ -274,7 +290,12 @@ function KeySettings() {
             type="button"
             className="secondary"
             onClick={async () => {
-              await removePassphrase();
+              try {
+                await removePassphrase();
+              } catch (err) {
+                if (err instanceof StorageFullError) return setStatus(storageFull(t));
+                throw err;
+              }
               location.reload();
             }}
           >

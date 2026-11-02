@@ -53,6 +53,9 @@ sw.addEventListener("message", (event: ExtendableMessageEvent) => {
 // reloads. Older versions are deleted.
 const META = "amphi-meta";
 const KEEP_VERSIONS = 2;
+// The voice models (src/workers/voice.ts) are not a version of the site: they
+// survive every deploy and are removed from Settings.
+const VOICES = "amphi-voices";
 
 sw.addEventListener("activate", (event: ExtendableEvent) => {
   event.waitUntil(
@@ -61,7 +64,7 @@ sw.addEventListener("activate", (event: ExtendableEvent) => {
       const res = await meta.match(abs("./__versions"));
       const versions = ((res ? await res.json() : []) as string[]).filter((v) => v !== CACHE);
       versions.push(CACHE);
-      const keep = new Set([...versions.slice(-KEEP_VERSIONS), META]);
+      const keep = new Set([...versions.slice(-KEEP_VERSIONS), META, VOICES]);
       await meta.put(abs("./__versions"), new Response(JSON.stringify(versions.slice(-KEEP_VERSIONS))));
       const keys = await caches.keys();
       await Promise.all(keys.filter((k) => k.startsWith("amphi-") && !keep.has(k)).map((k) => caches.delete(k)));

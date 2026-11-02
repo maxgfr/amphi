@@ -29,7 +29,7 @@
     "dompurify": "3.4.17",
     "fflate": "0.8.3",
     "idb": "8.0.4",
-    "llm-connect": "2.5.0",
+    "llm-connect": "2.6.0",
     "llm-models": "1.14.0",
     "marked": "18.1.2",
     "mediabunny": "1.64.0",

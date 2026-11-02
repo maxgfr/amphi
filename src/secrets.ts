@@ -12,6 +12,7 @@
 // created again under the new protection, then the secrets are written back.
 
 import { createKeyVault, type KeyVault } from "llm-connect";
+import { readLocal, StorageFullError, writeLocal } from "./storage.ts";
 
 export type VaultMode = "device" | "passphrase";
 const MODE_KEY = "amphi-vault-mode";
@@ -19,11 +20,7 @@ const DB = "amphi-vault";
 const AUTO_LOCK_MS = 15 * 60_000;
 
 export function vaultMode(): VaultMode {
-  try {
-    return localStorage.getItem(MODE_KEY) === "passphrase" ? "passphrase" : "device";
-  } catch {
-    return "device";
-  }
+  return readLocal(MODE_KEY) === "passphrase" ? "passphrase" : "device";
 }
 
 export const vault: KeyVault = createKeyVault({ dbName: DB, autoLockMs: vaultMode() === "passphrase" ? AUTO_LOCK_MS : undefined });
@@ -53,11 +50,19 @@ async function readAll(): Promise<[string, string][]> {
   return out;
 }
 
+// The mode is written first: if the storage is full, nothing is touched rather
+// than leaving a vault the next visit would open the wrong way.
 async function rewrite(secrets: [string, string][], create: () => Promise<void>, mode: VaultMode) {
-  await vault.reset();
-  await create();
-  for (const [name, v] of secrets) await vault.set(name, v);
-  localStorage.setItem(MODE_KEY, mode);
+  const before = vaultMode();
+  if (!writeLocal(MODE_KEY, mode)) throw new StorageFullError();
+  try {
+    await vault.reset();
+    await create();
+    for (const [name, v] of secrets) await vault.set(name, v);
+  } catch (e) {
+    writeLocal(MODE_KEY, before);
+    throw e;
+  }
 }
 
 /** Protect every secret with a passphrase from now on. The page reloads to apply the auto-lock. */
@@ -76,7 +81,7 @@ export async function removePassphrase(): Promise<void> {
 /** Forgotten passphrase: every secret is deleted and the vault starts again in device mode. */
 export async function resetVault(): Promise<void> {
   await vault.reset();
-  localStorage.setItem(MODE_KEY, "device");
+  writeLocal(MODE_KEY, "device");
   await vault.create(randomPassphrase(), { rememberOnDevice: true });
 }
 

@@ -45,7 +45,7 @@ const DIG = {
 
 function reply(c: { system: string; last: string }): string {
   if (c.system.includes("You plan a path of lessons")) return JSON.stringify({ lessons: [{ title: "What energy is", goal: "Say what energy is.", concepts: ["Energy"], sources: [1] }, { title: "Disorder and the second law", concepts: ["Entropy", "The second law"] }] });
-  if (c.system.includes("You suggest what a student could learn next")) return JSON.stringify({ suggestions: [{ title: "Statistical mechanics", kind: "further", why: "Where entropy comes from.", level: "intermediate", from: 1 }] });
+  if (c.system.includes("You suggest what a student could learn next")) return JSON.stringify({ suggestions: [{ title: "Statistical mechanics", kind: "further", why: "Where entropy comes from.", level: "intermediate", from: 1 }, { title: "Heat engines", kind: "related", why: "Where the second law is put to work.", level: "beginner", from: 1 }] });
   if (c.system.includes("You map a topic") && c.system.includes("sub-concepts")) return JSON.stringify(DIG);
   if (c.system.includes("You map a topic")) return JSON.stringify(PLAN);
   if (c.system.includes("concepts a student must master")) return JSON.stringify(CONCEPTS);
@@ -183,7 +183,7 @@ test("Discover sits in Today, and a concept of the topic is dug into: an explana
   await w.assertClean();
 });
 
-test("Today suggests topics from the courses, only when asked, keeps them, and maps one in a click", async ({ page }) => {
+test("Today suggests topics from the courses, only when asked, keeps them, and maps several at once, even while the student is elsewhere", async ({ page }) => {
   const w = await watch(page);
   const calls = await mockAi(page, reply);
   await setUpAi(page);
@@ -199,10 +199,43 @@ test("Today suggests topics from the courses, only when asked, keeps them, and m
   await page.reload();
   await expect(today.getByText("Go further · Thermodynamics")).toBeVisible();
   expect(calls.length).toBe(asked);
+  // Two at once, and off to another page while they run: they keep going.
   await today.getByRole("button", { name: "Map “Statistical mechanics”" }).click();
+  await today.getByRole("button", { name: "Map “Heat engines”" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Courses" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Courses" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
+  const maps = today.getByRole("list").filter({ has: page.getByRole("button", { name: /Open “/ }) });
+  await expect(maps.getByRole("button", { name: /^Open “/ })).toHaveCount(2);
+  await expect(maps.getByText(/^Ready · 3 concepts, 2 sources/)).toHaveCount(2);
+  const mapped = calls.filter((c) => c.system.includes("You map a topic")).map((c) => c.last);
+  expect(mapped.some((l) => l.includes("Topic: Statistical mechanics") && l.includes("Their goal, in their own words: Go further after “Thermodynamics”"))).toBe(true);
+  expect(mapped.some((l) => l.includes("Topic: Heat engines"))).toBe(true);
+  // Each opens in the form above, ready to become a topic.
+  await today.getByRole("button", { name: "See the map of “Heat engines”" }).click();
   await expect(today.getByRole("heading", { name: "Thermodynamics", level: 3 })).toBeVisible();
-  expect(calls.at(-1)!.last).toContain("Topic: Statistical mechanics");
-  expect(calls.at(-1)!.last).toContain("Their goal, in their own words: Go further after “Thermodynamics”");
+  await expect(today.getByRole("button", { name: "Shown above" })).toBeDisabled();
+  await today.getByRole("button", { name: "Create the topic" }).click();
+  await expect(page.getByRole("heading", { name: "Thermodynamics", level: 1 })).toBeVisible();
+  await page.goto(siteURL);
+  await expect(today.getByRole("button", { name: /^Open “/ })).toHaveCount(1);
+  await w.assertClean();
+});
+
+test("a map on its way keeps going while the student is on another page, and says where it is", async ({ page }) => {
+  const w = await watch(page);
+  await mockAi(page, reply, (c) => (c.system.includes("You map a topic") ? 2500 : 0));
+  await setUpAi(page);
+  await page.goto(siteURL);
+  const today = page.getByRole("region", { name: "Discover" });
+  await today.getByLabel("Topic").fill("Thermodynamics");
+  await today.getByRole("button", { name: "Map the topic" }).click();
+  await expect(today.getByRole("status").filter({ hasText: "Making the map…" }).first()).toBeVisible();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Courses" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Courses" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
+  await expect(today.getByText("Thermodynamics · Making the map…")).toBeVisible();
+  await expect(today.getByRole("heading", { name: "Thermodynamics", level: 3 })).toBeVisible({ timeout: 10_000 });
   await w.assertClean();
 });
 

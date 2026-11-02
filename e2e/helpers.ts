@@ -36,8 +36,8 @@ export interface AiCall {
   stream: boolean;
 }
 
-/** Answers the app's chat completions with `reply(call)`, streamed when asked. Returns the calls seen. */
-export async function mockAi(page: Page, reply: (call: AiCall) => string) {
+/** Answers the app's chat completions with `reply(call)`, streamed when asked, after `delay(call)` ms if given. Returns the calls seen. */
+export async function mockAi(page: Page, reply: (call: AiCall) => string, delay?: (call: AiCall) => number) {
   const calls: AiCall[] = [];
   await page.route(`${MOCK_AI}/**`, async (route: Route) => {
     const url = route.request().url();
@@ -50,6 +50,8 @@ export async function mockAi(page: Page, reply: (call: AiCall) => string) {
       stream: Boolean(body.stream),
     };
     calls.push(call);
+    const wait = delay?.(call) ?? 0;
+    if (wait) await new Promise((r) => setTimeout(r, wait));
     const content = reply(call);
     if (!call.stream) {
       return route.fulfill({

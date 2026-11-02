@@ -12,9 +12,10 @@ import { loadLlm, recipient, savedSettings } from "../ai/llm.ts";
 import { list } from "../data/db.ts";
 import { useLive } from "../data/hooks.ts";
 import type { Course } from "../data/schema.ts";
-import { count, languageLabel, type T, useLang } from "../i18n.ts";
+import { clock, count, languageLabel, type T, useLang } from "../i18n.ts";
 import { dismissSuggestion, loadSuggestions, type Suggestion, type SuggestionKind, suggestTopics } from "../learn/suggest.ts";
-import { applyDiscovery, canSearch, clearDraft, type DiscoverContext, type DiscoverInput, type DiscoverTarget, discover, type Intent, intentOf, type Level, loadDiscoverContext, loadDraft, type Proposal, SEED_KINDS, type SeedKind, saveDraft, type TopicMap } from "../learn/discover.ts";
+import { applyDiscovery, canSearch, clearDraft, type DiscoverContext, type DiscoverInput, type DiscoverTarget, type Intent, intentOf, type Level, loadDiscoverContext, loadDraft, type Proposal, SEED_KINDS, type SeedKind, saveDraft, type TopicMap } from "../learn/discover.ts";
+import { adoptJob, chooseInJob, type DiscoverJob, getJob, isActive, removeJob, retryJob, sameTarget, startJob, useDiscoverJobs, allJobs } from "../learn/discover-jobs.ts";
 import { go, href } from "../router.ts";
 import { courseHue } from "../ui/hue.ts";
 import { Icon } from "../ui/icons.tsx";
@@ -84,16 +85,33 @@ export function Discover({ target = {} }: { target?: DiscoverTarget }) {
         <h1>{head[intent].h1}</h1>
         <p className="divider-lead">{head[intent].lead}</p>
       </header>
-      <DiscoverFlow target={target} ctx={ctx} />
+      <RouteFlow target={target} ctx={ctx} />
     </div>
   );
 }
 
-/** Discover, on Today: one line to start, the rest under Options, and topics suggested from the courses. */
+/** The job a place shows first: the one its draft had open, an older draft's map, or (from a course) its latest. */
+function initialOpen(target: DiscoverTarget, latest: boolean): string | undefined {
+  const d = loadDraft(target);
+  if (d?.open && getJob(d.open)) return d.open;
+  if (d?.map) return adoptJob(d.input, target, d.map, d.chosen, d.concepts);
+  return latest ? allJobs().findLast((j) => sameTarget(j.target, target))?.id : undefined;
+}
+
+function RouteFlow({ target, ctx }: { target: DiscoverTarget; ctx: DiscoverContext }) {
+  const [open, setOpen] = useState(() => initialOpen(target, intentOf(target) !== "map"));
+  return <DiscoverFlow target={target} ctx={ctx} open={open} onOpen={setOpen} />;
+}
+
+/** Discover, on Today: one line to start, the rest under Options, the maps on their way, and topics suggested from the courses. */
 export function DiscoverSection() {
   const { t } = useLang();
-  const [start, setStart] = useState<Start>();
+  const [open, setOpen] = useState(() => initialOpen({}, false));
   const flow = useRef<HTMLDivElement>(null);
+  const show = (id: string) => {
+    setOpen(id);
+    flow.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   return (
     <section className="discover-today" aria-labelledby="discover-today">
       <h2 className="section-title" id="discover-today">
@@ -101,22 +119,108 @@ export function DiscoverSection() {
       </h2>
       <p className="meta">{t("Something to learn, a question, a book, a skill: amphi maps it, finds sources and makes it a topic, or adds it to a course.", "Un sujet, une question, un livre, une compétence : amphi le cartographie, trouve des sources et en fait un sujet, ou l'ajoute à un cours.", "Ein Thema, eine Frage, ein Buch, eine Fähigkeit: amphi kartiert es, findet Quellen und macht ein Thema daraus oder fügt es einem Kurs hinzu.")}</p>
       <div ref={flow}>
-        <DiscoverFlow target={{}} compact start={start} />
+        <DiscoverFlow target={{}} compact open={open} onOpen={setOpen} />
       </div>
-      <Suggestions
-        onPick={(s) => {
-          setStart((x) => ({ n: (x?.n ?? 0) + 1, suggestion: s }));
-          flow.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }}
-      />
+      <JobList open={open} onShow={show} />
+      <Suggestions onShow={show} />
     </section>
   );
 }
 
-/** A suggestion picked on Today: the flow fills itself with it and runs. */
-interface Start {
-  n: number;
-  suggestion: Suggestion;
+/** Seconds since `from`, ticking while `on`. */
+function useElapsed(on: boolean): number {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    if (!on) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [on]);
+  return now;
+}
+
+function jobStatus(j: DiscoverJob, now: number, t: T): string {
+  const took = clock(Math.max(0, Math.round(((j.finishedAt ?? now) - j.startedAt) / 1000)));
+  switch (j.status) {
+    case "queued":
+      return t("Waiting for a free slot (three maps at a time)", "En attente d'une place (trois cartes à la fois)", "Wartet auf einen freien Platz (drei Karten gleichzeitig)");
+    case "searching":
+      return `${t("Searching the web…", "Recherche sur le web…", "Websuche…")} ${took}`;
+    case "mapping":
+      return `${t("Making the map…", "Mise en forme de la carte…", "Karte wird erstellt…")} ${took}`;
+    case "ready":
+      return t(
+        `Ready · ${count(j.map?.concepts.length ?? 0, ["concept", "concepts"], ["notion", "notions"], ["Begriff", "Begriffe"])}, ${count(j.map?.proposals.length ?? 0, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} · ${took}`,
+        `Prête · ${count(j.map?.concepts.length ?? 0, ["concept", "concepts"], ["notion", "notions"], ["Begriff", "Begriffe"])}, ${count(j.map?.proposals.length ?? 0, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} · ${took}`,
+        `Fertig · ${count(j.map?.concepts.length ?? 0, ["concept", "concepts"], ["notion", "notions"], ["Begriff", "Begriffe"])}, ${count(j.map?.proposals.length ?? 0, ["source", "sources"], ["source", "sources"], ["Quelle", "Quellen"])} · ${took}`,
+      );
+    case "error":
+      return j.error ?? t("Failed", "Échec", "Fehlgeschlagen");
+    case "interrupted":
+      return t("Cut short by a reload", "Interrompue par un rechargement", "Durch Neuladen abgebrochen");
+  }
+}
+
+/** Every map made or on its way, here or from a course, each with where it is. */
+function JobList({ open, onShow }: { open?: string; onShow: (id: string) => void }) {
+  const { t } = useLang();
+  const jobs = useDiscoverJobs();
+  const now = useElapsed(jobs.some(isActive));
+  if (!jobs.length) return null;
+  return (
+    <div className="discover-jobs" aria-labelledby="discover-jobs">
+      <h3 className="section-title" id="discover-jobs">
+        {t("Your maps", "Vos cartes", "Ihre Karten")}
+      </h3>
+      <ul className="list">
+        {[...jobs].reverse().map((j) => {
+          const here = intentOf(j.target) === "map" || intentOf(j.target) === "extend";
+          // What the student asked for; the map's own title when it says something else.
+          const title = j.label || j.map?.title || "";
+          const mapped = j.map && j.map.title !== title ? j.map.title : "";
+          return (
+            <li key={j.id} className="list-item job" aria-current={j.id === open ? "true" : undefined}>
+              <span className="job-main">
+                <span className="job-icon">{isActive(j) ? <span className="spinner" aria-hidden="true" /> : <Icon name={j.status === "ready" ? "compass" : "flag"} />}</span>
+                <span className="list-main">
+                  <span className="list-title">{title}</span>
+                  {mapped ? <span className="meta">{t(`Mapped as “${mapped}”`, `Cartographié comme « ${mapped} »`, `Kartiert als „${mapped}“`)}</span> : null}
+                  <span className={j.status === "error" ? "error-text" : "meta"} role={isActive(j) ? "status" : undefined}>
+                    {jobStatus(j, now, t)}
+                  </span>
+                </span>
+              </span>
+              <span className="row">
+                {j.status === "ready" ? (
+                  here ? (
+                    <button type="button" className="secondary small" disabled={j.id === open} onClick={() => onShow(j.id)}>
+                      {j.id === open ? t("Shown above", "Affichée", "Oben") : t(`Open “${title}”`, `Ouvrir « ${title} »`, `„${title}“ öffnen`)}
+                    </button>
+                  ) : (
+                    <a className="button secondary small" href={href.discover(j.target)}>
+                      {t(`Open “${title}”`, `Ouvrir « ${title} »`, `„${title}“ öffnen`)}
+                    </a>
+                  )
+                ) : null}
+                {j.status === "error" || j.status === "interrupted" ? (
+                  <button type="button" className="secondary small" onClick={() => retryJob(j.id)}>
+                    <Icon name="refresh" size={16} /> {t("Run again", "Relancer", "Erneut starten")}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="icon-button"
+                  aria-label={isActive(j) ? t(`Stop “${title}”`, `Arrêter « ${title} »`, `„${title}“ stoppen`) : t(`Set “${title}” aside`, `Écarter « ${title} »`, `„${title}“ beiseitelegen`)}
+                  onClick={() => removeJob(j.id)}
+                >
+                  <Icon name={isActive(j) ? "stop" : "x"} size={16} />
+                </button>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 function kindLabel(kind: SuggestionKind, t: T): string {
@@ -131,8 +235,9 @@ function kindLabel(kind: SuggestionKind, t: T): string {
 }
 
 /** Topics suggested from the courses: made only when asked, kept on this device until the courses change. */
-function Suggestions({ onPick }: { onPick: (s: Suggestion) => void }) {
+function Suggestions({ onShow }: { onShow: (id: string) => void }) {
   const { t, lang } = useLang();
+  const jobs = useDiscoverJobs();
   const [n, setN] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -146,6 +251,13 @@ function Suggestions({ onPick }: { onPick: (s: Suggestion) => void }) {
   );
   if (!data || !data.courses.length) return null;
   const titleOf = (id?: string) => data.courses.find((c) => c.id === id)?.title;
+  // A suggestion becomes a map of its own (into its course when it is something the course lacks), running beside the others.
+  const pick = (s: Suggestion) => {
+    const from = data.courses.find((c) => c.id === s.courseId);
+    const goal = !from ? "" : s.kind === "prerequisite" ? t(`What “${from.title}” needs first`, `Ce dont « ${from.title} » a besoin d'abord`, `Was „${from.title}“ zuerst braucht`) : t(`Go further after “${from.title}”`, `Aller plus loin après « ${from.title} »`, `Weiter nach „${from.title}“`);
+    startJob({ kind: "topic", topic: s.title, level: s.level, goal, language: from?.language ?? lang }, s.kind === "prerequisite" && from ? { courseId: from.id } : {});
+  };
+  const jobOf = (s: Suggestion) => jobs.findLast((j) => j.input.topic === s.title);
   const ask = async () => {
     setBusy(true);
     setError("");
@@ -183,9 +295,26 @@ function Suggestions({ onPick }: { onPick: (s: Suggestion) => void }) {
                   {s.why ? <span className="meta">{s.why}</span> : null}
                 </div>
                 <span className="row">
-                  <button type="button" className="secondary small" disabled={!data.configured} onClick={() => onPick(s)} aria-label={t(`Map “${s.title}”`, `Cartographier « ${s.title} »`, `„${s.title}“ kartieren`)}>
-                    <Icon name="compass" size={16} /> {t("Map it", "Cartographier", "Kartieren")}
-                  </button>
+                  {(() => {
+                    const job = jobOf(s);
+                    if (job && isActive(job))
+                      return (
+                        <span className="meta" role="status">
+                          <span className="spinner" aria-hidden="true" /> {t("Mapping…", "Carte en cours…", "Wird kartiert…")}
+                        </span>
+                      );
+                    if (job?.status === "ready")
+                      return (
+                        <button type="button" className="secondary small" onClick={() => onShow(job.id)} aria-label={t(`See the map of “${s.title}”`, `Voir la carte de « ${s.title} »`, `Karte von „${s.title}“ ansehen`)}>
+                          <Icon name="compass" size={16} /> {t("See the map", "Voir la carte", "Karte ansehen")}
+                        </button>
+                      );
+                    return (
+                      <button type="button" className="secondary small" disabled={!data.configured} onClick={() => pick(s)} aria-label={t(`Map “${s.title}”`, `Cartographier « ${s.title} »`, `„${s.title}“ kartieren`)}>
+                        <Icon name="compass" size={16} /> {t("Map it", "Cartographier", "Kartieren")}
+                      </button>
+                    );
+                  })()}
                   <button
                     type="button"
                     className="icon-button"
@@ -218,33 +347,24 @@ function Suggestions({ onPick }: { onPick: (s: Suggestion) => void }) {
   );
 }
 
-function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget; ctx?: DiscoverContext; compact?: boolean; start?: Start }) {
+function DiscoverFlow({ target, ctx, compact, open, onOpen }: { target: DiscoverTarget; ctx?: DiscoverContext; compact?: boolean; open?: string; onOpen: (id: string | undefined) => void }) {
   const { t, lang } = useLang();
   const fixed = intentOf(target);
   const [draft] = useState(() => loadDraft(target));
+  const [mountedAt] = useState(Date.now);
   const course = ctx?.course;
   const blank: DiscoverInput = { kind: "topic", topic: "", level: (course?.level as Level | undefined) ?? "beginner", goal: course?.goal ?? "", language: course?.language ?? lang };
   const [input, setInput] = useState<DiscoverInput>(draft?.input ?? blank);
   // Where a new map goes, when the screen was not opened from a course: "" for a new topic.
   const [into, setInto] = useState(draft?.into ?? "");
-  const [map, setMap] = useState<TopicMap | null>(draft?.map ?? null);
-  const [chosen, setChosen] = useState<Set<number>>(new Set(draft?.chosen));
-  const [concepts, setConcepts] = useState<Set<number>>(new Set(draft?.concepts));
-  const [busy, setBusy] = useState<"" | "mapping" | "creating">("");
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
-  const [interrupted, setInterrupted] = useState(Boolean(draft?.mapping && !draft.map));
-  const abort = useRef<AbortController | null>(null);
-  useEffect(() => () => abort.current?.abort(), []);
+  const jobs = useDiscoverJobs();
+  const job = jobs.find((j) => j.id === open);
+  const now = useElapsed(Boolean(job && isActive(job)));
   useEffect(() => {
-    if (busy !== "creating") saveDraft({ input, into: into || undefined, map, chosen: [...chosen], concepts: [...concepts], mapping: busy === "mapping" }, target);
-  }, [input, into, map, chosen, concepts, busy]);
-  // A reload while the model works would lose the answer: ask first.
-  useEffect(() => {
-    if (!busy) return;
-    const hold = (e: BeforeUnloadEvent) => e.preventDefault();
-    addEventListener("beforeunload", hold);
-    return () => removeEventListener("beforeunload", hold);
-  }, [busy]);
+    if (!creating) saveDraft({ input, into: into || undefined, open }, target);
+  }, [input, into, open, creating]);
   const ai = useLive(
     async () => {
       await loadLlm();
@@ -255,73 +375,46 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
     [],
   );
   const courses = useLive(async () => (await list("courses")).sort((a, b) => b.updatedAt - a.updatedAt), ["courses"], []);
-  const targetOf = (where: string): DiscoverTarget => (fixed === "map" && where ? { courseId: where } : target);
-  // A suggestion picked: a topic of its own, or, for what a course lacks, into that course.
-  useEffect(() => {
-    if (!start || busy) return;
-    const s = start.suggestion;
-    const from = courses?.find((c) => c.id === s.courseId);
-    const goal = !from ? input.goal : s.kind === "prerequisite" ? t(`What “${from.title}” needs first`, `Ce dont « ${from.title} » a besoin d'abord`, `Was „${from.title}“ zuerst braucht`) : t(`Go further after “${from.title}”`, `Aller plus loin après « ${from.title} »`, `Weiter nach „${from.title}“`);
-    const next: DiscoverInput = { ...input, kind: "topic", topic: s.title, level: s.level, goal, language: from?.language ?? input.language };
-    const where = s.kind === "prerequisite" && from ? from.id : "";
-    setInput(next);
-    setInto(where);
-    void run(next, where);
-  }, [start?.n]);
   if (!ai || !courses) return <div aria-busy="true" />;
 
-  const effective = targetOf(into);
+  const effective: DiscoverTarget = fixed === "map" && into ? { courseId: into } : target;
   const intent = intentOf(effective);
   const destination: Course | undefined = course ?? courses.find((c) => c.id === into);
   const seed = seedText(input.kind, t);
   const needsText = intent === "map" || intent === "extend";
-  const blocked = !ai.configured || (needsText && !input.topic.trim()) || (intent === "refresh" && !ai.web) || busy !== "";
+  const blocked = !ai.configured || (needsText && !input.topic.trim()) || (intent === "refresh" && !ai.web) || creating;
+  // The map shown is the job's, with the place it was made for.
+  const shownIntent = job ? intentOf(job.target) : intent;
+  const shownInto = job?.target.courseId ? (course?.id === job.target.courseId ? course : courses.find((c) => c.id === job.target.courseId)) : undefined;
 
-  async function run(what = input, where = into) {
+  const run = () => {
     setError("");
-    setInterrupted(false);
-    setMap(null);
-    setBusy("mapping");
-    abort.current = new AbortController();
-    try {
-      const m = await discover(what, targetOf(where), { signal: abort.current.signal });
-      setMap(m);
-      setChosen(new Set(m.proposals.flatMap((p, i) => (p.suggested ? [i] : []))));
-      setConcepts(new Set(m.concepts.flatMap((c, i) => (c.match ? [] : [i]))));
-    } catch (e) {
-      if ((e as Error).name !== "AbortError") setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy("");
-    }
-  }
+    const label = intent === "dig" ? (ctx?.concept?.title ?? "") : intent === "refresh" ? (destination?.title ?? "") : input.topic.trim();
+    onOpen(startJob(input, effective, label));
+  };
 
   const create = async () => {
-    if (!map) return;
-    setBusy("creating");
+    if (!job?.map) return;
+    setCreating(true);
     try {
-      const made = await applyDiscovery(input, effective, map, { proposals: [...chosen], concepts: [...concepts] });
+      const made = await applyDiscovery(job.input, job.target, job.map, { proposals: job.chosen ?? [], concepts: job.concepts ?? [] });
+      removeJob(job.id);
       clearDraft(target);
-      go(intent === "map" ? href.course(made.id) : href.course(made.id, intent === "dig" ? "progress" : "sources"));
+      go(shownIntent === "map" ? href.course(made.id) : href.course(made.id, shownIntent === "dig" ? "progress" : "sources"));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
-      setBusy("");
+      setCreating(false);
     }
   };
 
-  const set = <K extends keyof DiscoverInput>(k: K, v: DiscoverInput[K]) => {
-    setInput((x) => ({ ...x, [k]: v }));
-    setMap(null);
-  };
+  const set = <K extends keyof DiscoverInput>(k: K, v: DiscoverInput[K]) => setInput((x) => ({ ...x, [k]: v }));
 
+  // A fresh form; the map shown stays among Your maps.
   const restart = () => {
-    abort.current?.abort();
     setInput(blank);
     setInto("");
-    setMap(null);
-    setChosen(new Set());
-    setConcepts(new Set());
     setError("");
-    setInterrupted(false);
+    onOpen(undefined);
   };
 
   const sentence = (() => {
@@ -346,11 +439,7 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
     }
   })();
 
-  const action = map
-    ? intent === "map"
-      ? t("Map it again", "Refaire la carte", "Neu kartieren")
-      : t("Run again", "Relancer", "Erneut starten")
-    : { map: t("Map the topic", "Cartographier le sujet", "Thema kartieren"), extend: t("Find what to add", "Trouver quoi ajouter", "Finden, was dazukommt"), dig: t("Dig deeper", "Creuser", "Vertiefen"), refresh: t("Find new sources", "Trouver de nouvelles sources", "Neue Quellen finden") }[intent];
+  const action = { map: t("Map the topic", "Cartographier le sujet", "Thema kartieren"), extend: t("Find what to add", "Trouver quoi ajouter", "Finden, was dazukommt"), dig: t("Dig deeper", "Creuser", "Vertiefen"), refresh: t("Find new sources", "Trouver de nouvelles sources", "Neue Quellen finden") }[intent];
 
   const options = (
     <div className="grid discover-options">
@@ -382,10 +471,7 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
         <Field label={t("Where it goes", "Où le mettre", "Wohin damit")}>
           <select
             value={into}
-            onChange={(e) => {
-              setInto(e.currentTarget.value);
-              setMap(null);
-            }}
+            onChange={(e) => setInto(e.currentTarget.value)}
           >
             <option value="">{t("A new topic", "Un nouveau sujet", "Ein neues Thema")}</option>
             {courses.map((c) => (
@@ -407,16 +493,21 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
             {t("Discover uses your own AI provider.", "Découvrir utilise votre propre fournisseur d'IA.", "Entdecken nutzt Ihren eigenen KI-Anbieter.")} <a href={href.settings("ai")}>{t("Set one up", "En configurer un", "Einen einrichten")}</a>
           </Notice>
         ) : null}
-        {interrupted ? (
-          <Notice>{t("The page was reloaded while the map was being made, so it was lost. Your topic is still here: map it again.", "La page a été rechargée pendant la carte du sujet, qui a été perdue. Votre sujet est conservé : relancez la carte.", "Die Seite wurde während der Kartierung neu geladen, die Karte ging verloren. Ihr Thema ist noch da: Kartieren Sie es erneut.")}</Notice>
-        ) : draft?.map && map === draft.map ? (
+        {job?.status === "interrupted" ? (
+          <Notice>
+            {t("The page was reloaded while the map was being made, so it was lost. Your topic is still here: map it again.", "La page a été rechargée pendant la carte du sujet, qui a été perdue. Votre sujet est conservé : relancez la carte.", "Die Seite wurde während der Kartierung neu geladen, die Karte ging verloren. Ihr Thema ist noch da: Kartieren Sie es erneut.")}{" "}
+            <button type="button" className="link" onClick={() => retryJob(job.id)}>
+              {t("Run again", "Relancer", "Erneut starten")}
+            </button>
+          </Notice>
+        ) : job?.status === "ready" && (job.finishedAt ?? 0) < mountedAt ? (
           <Notice>{t("Picked up where you left off: this map is not a topic yet.", "Repris là où vous en étiez : cette carte n'est pas encore un sujet.", "Dort fortgesetzt, wo Sie aufgehört haben: Diese Karte ist noch kein Thema.")}</Notice>
         ) : null}
         <form
           className="stack"
           onSubmit={(e) => {
             e.preventDefault();
-            void run();
+            run();
           }}
         >
           {needsText ? (
@@ -452,30 +543,59 @@ function DiscoverFlow({ target, ctx, compact, start }: { target: DiscoverTarget;
             </Notice>
           ) : null}
           <div className="row">
-            {busy === "mapping" ? (
-              <button type="button" className="secondary" onClick={() => abort.current?.abort()}>
-                <Icon name="stop" size={18} /> {t("Stop", "Arrêter", "Stopp")}
-              </button>
-            ) : (
-              <button type="submit" className="primary" disabled={blocked}>
-                <Icon name="compass" size={18} /> {action}
-              </button>
-            )}
-            {busy !== "mapping" && (input.topic || (needsText && input.goal) || map) ? (
-              <button type="button" className="link" disabled={busy !== ""} onClick={restart}>
+            <button type="submit" className="primary" disabled={blocked}>
+              <Icon name="compass" size={18} /> {action}
+            </button>
+            {input.topic || (needsText && input.goal) || job ? (
+              <button type="button" className="link" disabled={creating} onClick={restart}>
                 {t("Start over", "Recommencer", "Neu beginnen")}
               </button>
             ) : null}
-            {busy === "mapping" ? (
-              <span className="meta" role="status">
-                {ai.web ? t("Searching the web and mapping it…", "Recherche sur le web et carte en cours…", "Websuche und Kartierung…") : t("Mapping it…", "Carte en cours…", "Wird kartiert…")}
-              </span>
-            ) : null}
           </div>
+          {job && isActive(job) ? (
+            <div className="row discover-progress">
+              <span className="spinner" aria-hidden="true" />
+              <span className="meta" role="status">
+                {job.label || job.map?.title} · {jobStatus(job, now, t)}
+              </span>
+              <button
+                type="button"
+                className="secondary small"
+                onClick={() => {
+                  removeJob(job.id);
+                  onOpen(undefined);
+                }}
+              >
+                <Icon name="stop" size={16} /> {t("Stop", "Arrêter", "Stopp")}
+              </button>
+            </div>
+          ) : null}
+          {compact && job && isActive(job) ? <p className="meta">{t("You can map something else meanwhile, or leave this page: it keeps going.", "Vous pouvez en cartographier un autre en attendant, ou quitter la page : la carte continue.", "Sie können inzwischen etwas anderes kartieren oder die Seite verlassen: Es läuft weiter.")}</p> : null}
         </form>
       </div>
       {error ? <Notice kind="error">{error}</Notice> : null}
-      {map ? <Result map={map} intent={intent} into={destination} chosen={chosen} setChosen={setChosen} concepts={concepts} setConcepts={setConcepts} creating={busy === "creating"} onCreate={() => void create()} compact={compact} /> : null}
+      {job?.status === "error" ? (
+        <Notice kind="error">
+          {job.error}{" "}
+          <button type="button" className="link" onClick={() => retryJob(job.id)}>
+            {t("Run again", "Relancer", "Erneut starten")}
+          </button>
+        </Notice>
+      ) : null}
+      {job?.status === "ready" && job.map ? (
+        <Result
+          map={job.map}
+          intent={shownIntent}
+          into={shownInto}
+          chosen={new Set(job.chosen)}
+          setChosen={(c) => chooseInJob(job.id, { chosen: [...c] })}
+          concepts={new Set(job.concepts)}
+          setConcepts={(c) => chooseInJob(job.id, { concepts: [...c] })}
+          creating={creating}
+          onCreate={() => void create()}
+          compact={compact}
+        />
+      ) : null}
     </>
   );
 }

@@ -3402,6 +3402,48 @@ fieldset:disabled .quiz-choice {
 .suggestion-kind {
   font-weight: 600;
 }
+/* A map on its way: a dot that breathes (still under reduced motion). */
+.spinner {
+  display: inline-block;
+  flex: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 50%;
+  background: var(--accent);
+  animation: rec-pulse 1.6s ease-in-out infinite;
+}
+.discover-progress {
+  flex-wrap: nowrap;
+}
+.discover-jobs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.discover-jobs > .section-title {
+  margin-block: var(--space-3) 0;
+}
+.job-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+.job-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: var(--space-5);
+  color: var(--muted);
+}
+.job[aria-current="true"] {
+  background: var(--surface-2);
+}
+.suggestion .spinner {
+  margin-inline-end: var(--space-1);
+}
 .discover-explanation {
   max-width: var(--measure);
   padding-inline-start: var(--space-4);

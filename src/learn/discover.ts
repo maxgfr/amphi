@@ -258,7 +258,10 @@ function task(input: DiscoverInput, intent: Intent): { rule: string; explained: 
 }
 
 /** Map what the student brings, for where it goes. A refresh needs a model that searches the web. */
-export async function discover(input: DiscoverInput, target: DiscoverTarget = {}, o: { signal?: AbortSignal; deps?: Partial<DiscoverDeps>; context?: DiscoverContext } = {}): Promise<TopicMap> {
+/** Where a discovery is: searching the web, then turning the notes into a map (or mapping straight away without search). */
+export type DiscoverStage = "searching" | "mapping";
+
+export async function discover(input: DiscoverInput, target: DiscoverTarget = {}, o: { signal?: AbortSignal; deps?: Partial<DiscoverDeps>; context?: DiscoverContext; stage?: (s: DiscoverStage) => void } = {}): Promise<TopicMap> {
   const deps = { ...defaults, ...o.deps };
   const intent = intentOf(target);
   const ctx = o.context ?? (target.courseId ? await loadDiscoverContext(target) : undefined);
@@ -268,6 +271,7 @@ export async function discover(input: DiscoverInput, target: DiscoverTarget = {}
   const tools = await deps.searchTools();
   const prompt = brief(input, ctx, intent);
   if (Object.keys(tools).length) {
+    o.stage?.("searching");
     const research = await deps.ask({
       system: `You research on the web for a student who wants to learn. Search the web, then write research notes: the key concepts in the order to learn them with their prerequisites${explained ? ", what is needed to explain it well" : ""}, and 5 to 10 good pages for this student's level and goal (${pages}; prefer reputable and free ones). For each page give its title, its exact URL as the search returned it, what it covers, its level, and a short excerpt or summary of what the page says. List only pages the search returned. Write in ${language}.`,
       prompt,
@@ -275,6 +279,7 @@ export async function discover(input: DiscoverInput, target: DiscoverTarget = {}
       signal: o.signal,
     });
     const listed = research.sources.map((s) => `- ${s.title ?? ""} <${s.url}>`).join("\n");
+    o.stage?.("mapping");
     const raw = await deps.askJson(schema, {
       system: `You map a topic for a student from web research notes. ${rule} Then 5 to 10 sources from the notes: title, the exact URL from the notes (never make one up), why it helps this student, its level, and "excerpt": what the page says, in a few sentences of Markdown taken from the notes. Write in ${language}.`,
       prompt: `${prompt}\n\nResearch notes:\n${research.text}${listed ? `\n\nPages the search returned:\n${listed}` : ""}`,
@@ -284,6 +289,7 @@ export async function discover(input: DiscoverInput, target: DiscoverTarget = {}
     return toTopicMap(raw, input, research.sources, true, ctx);
   }
   if (intent === "refresh") throw new Error("Finding new sources needs a model that can search the web.");
+  o.stage?.("mapping");
   const raw = await deps.askJson(schema, {
     system: `You map a topic for a student, from your own knowledge: you cannot search the web. ${rule} Then 3 to 8 reading suggestions (well-known textbooks, courses or kinds of resources) with why each helps and its level. Never give a URL or a link: the student will look them up. Write in ${language}.`,
     prompt,
@@ -376,9 +382,12 @@ export async function applyDiscovery(input: DiscoverInput, target: DiscoverTarge
 /** What Discover was doing, kept on this device so a reload loses neither the form nor a map already paid for. */
 export interface DiscoverDraft {
   input: DiscoverInput;
-  map: TopicMap | null;
+  /** The map job shown (src/learn/discover-jobs.ts). */
+  open?: string;
+  /** Before maps were jobs: the map itself. */
+  map?: TopicMap | null;
   /** Indexes of the ticked proposals. */
-  chosen: number[];
+  chosen?: number[];
   /** Indexes of the ticked concepts, when adding into a course. */
   concepts?: number[];
   /** The course a new map goes into, when chosen. */
@@ -403,7 +412,7 @@ export function loadDraft(target: DiscoverTarget = {}): DiscoverDraft | null {
 
 export function saveDraft(d: DiscoverDraft, target: DiscoverTarget = {}): void {
   try {
-    if (!d.input.topic.trim() && !d.input.goal.trim() && !d.map) localStorage.removeItem(draftKey(target));
+    if (!d.input.topic.trim() && !d.input.goal.trim() && !d.map && !d.open) localStorage.removeItem(draftKey(target));
     else localStorage.setItem(draftKey(target), JSON.stringify(d));
   } catch {
     // Storage full or blocked: the draft is a convenience.
